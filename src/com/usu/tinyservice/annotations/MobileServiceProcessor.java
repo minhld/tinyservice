@@ -3,7 +3,6 @@ package com.usu.tinyservice.annotations;
 import com.google.auto.service.AutoService;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -62,7 +61,7 @@ public class MobileServiceProcessor extends AbstractProcessor {
         for (TypeElement type : types) {
             //interfaces are types too, but we only need classes
             //we need to check if the TypeElement is a valid class
-            if (isValidClass(type)) {
+            if (isValidClass(type, MobileService.class.getName())) {
                 writeSourceFile(type);
             } else {
                 return true;
@@ -83,19 +82,22 @@ public class MobileServiceProcessor extends AbstractProcessor {
         return SourceVersion.latestSupported();
     }
 
-    private boolean isValidClass(TypeElement type){
+    private boolean isValidClass(TypeElement type, String className){
         if(type.getKind() != ElementKind.CLASS){
-            messager.printMessage(Diagnostic.Kind.ERROR, type.getSimpleName() + " only classes can be annotated with StatusInfo");
+            messager.printMessage(Diagnostic.Kind.ERROR, type.getSimpleName() + 
+            					" only classes can be annotated with " + className);
             return false;
         }
 
         if(type.getModifiers().contains(Modifier.PRIVATE)){
-            messager.printMessage(Diagnostic.Kind.ERROR, type.getSimpleName() + " only public classes can be annotated with StatusInfo");
+            messager.printMessage(Diagnostic.Kind.ERROR, type.getSimpleName() + 
+            					" only public classes can be annotated with " + className);
             return false;
         }
 
         if(type.getModifiers().contains(Modifier.ABSTRACT)){
-            messager.printMessage(Diagnostic.Kind.ERROR, type.getSimpleName() + " only non abstract classes can be annotated with StatusInfo");
+            messager.printMessage(Diagnostic.Kind.ERROR, type.getSimpleName() + 
+            					" only non abstract classes can be annotated with " + className);
             return false;
         }
 
@@ -139,9 +141,8 @@ public class MobileServiceProcessor extends AbstractProcessor {
     }
 
     private String generateFormater(TypeElement originatingType) {
-
-
-        List<VariableElement> fields = new ImmutableList.Builder<VariableElement>().addAll(ElementFilter.fieldsIn(originatingType.getEnclosedElements())).build();
+        List<VariableElement> fields = new ImmutableList.Builder<VariableElement>().
+        					addAll(ElementFilter.fieldsIn(originatingType.getEnclosedElements())).build();
         String sformat = "String.format(\"";
 
         for (VariableElement e : fields) {
