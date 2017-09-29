@@ -1,4 +1,4 @@
-package com.usu.tinyservice.annotations;
+package com.usu.tinyservice.tests;
 
 import java.util.Date;
 
