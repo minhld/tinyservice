@@ -11,31 +11,31 @@ import org.zeromq.ZMQ;
 public abstract class Publisher extends Thread {
     private ZMQ.Socket publisher;
 
-    private String groupIp = "*";
-    private int port = Utils.BROKER_PUBLISH_PORT;
+    private int port = Utils.PUBLISH_PORT;
     private int sendInterval = Utils.PUBLISH_INTERVAL;
+    private String groupIp = "*";
     private boolean neededBroker = false;
 
-    public void setSendInterval(int _interval) {
-        this.sendInterval = _interval;
+    public void setSendInterval(int interval) {
+        this.sendInterval = interval;
     }
 
-    public void setNeededBroker(boolean _neededBroker) {
-        this.neededBroker = _neededBroker;
+    public void setNeededBroker(boolean neededBroker) {
+        this.neededBroker = neededBroker;
     }
 
     public Publisher() {
         this.start();
     }
 
-    public Publisher(String _groupIp) {
-        this.groupIp = _groupIp;
+    public Publisher(String groupIp) {
+        this.groupIp = groupIp;
         this.start();
     }
 
-    public Publisher(String _groupIp, int _port) {
-        this.groupIp = _groupIp;
-        this.port = _port;
+    public Publisher(String groupIp, int port) {
+        this.groupIp = groupIp;
+        this.port = port;
         this.start();
     }
 

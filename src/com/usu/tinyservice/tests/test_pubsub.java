@@ -12,7 +12,7 @@ public class test_pubsub extends Thread {
 		new ExPublisher();
 		
 		// create subscriber
-		Subscriber subscriber = new Subscriber("*", Utils.BROKER_PUBLISH_PORT, new String[] { "video_frame" });
+		Subscriber subscriber = new Subscriber("*", Utils.PUBLISH_PORT, new String[] { "video_frame" });
         subscriber.setMessageListener(new Subscriber.MessageListener() {
             @Override
             public void msgReceived(String topic, final byte[] msg) {
