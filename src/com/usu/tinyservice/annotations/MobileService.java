@@ -8,7 +8,14 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface MobileService {
+	// service version
 	String version() default "1.0";
-	ServiceNetworkType networkType() default ServiceNetworkType.ClientServer;
-	ServiceDataType dataType() default ServiceDataType.JSON;
+	
+	// network model: could be either Pair-Pair, Client-Server, 
+	// Publish-Subscribe or Push-Pull, default value is Client-Server
+	ServiceNetworkModel networkModel() default ServiceNetworkModel.ClientServer;
+	
+	// data transmission type: could be either JSON or binary array
+	// default value is JSON
+	ServiceTransmitType transmitType() default ServiceTransmitType.JSON;
 }

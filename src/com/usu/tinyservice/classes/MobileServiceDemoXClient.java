@@ -18,7 +18,7 @@ public class MobileServiceDemoXClient {
 	}
 	
 	public String getRoot() {
-		
+		return "";
 	}
 	
 	class RequesterX extends Requester {

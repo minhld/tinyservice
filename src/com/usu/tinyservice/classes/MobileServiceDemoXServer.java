@@ -1,5 +1,7 @@
 package com.usu.tinyservice.classes;
 
+import com.usu.tinyservice.messages.RequestMessage;
+import com.usu.tinyservice.network.JSONHelper;
 import com.usu.tinyservice.network.Responder;
 
 /**
@@ -20,12 +22,17 @@ public class MobileServiceDemoXServer {
 	class ResponderX extends Responder {
 		@Override
 		public void respond(byte[] req) {
-			String reqStr = new String(req);
-			switch (reqStr) {
+			String reqJSON = new String(req);
+			RequestMessage reqMsg = JSONHelper.getRequest(reqJSON);
+			
+			switch (reqMsg.funcName) {
 				case "getRoot": {
-					Object retObj = mobileServiceDemo.getRoot();
-					send(retObj);
+					String ret = mobileServiceDemo.getRoot();
+					send(ret);
 					break;
+				}
+				case "getFileList": {
+					
 				}
 			}
 		}
