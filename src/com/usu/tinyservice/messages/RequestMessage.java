@@ -1,7 +1,18 @@
 package com.usu.tinyservice.messages;
 
-public class RequestMessage {
-	public String funcName = "";
+public class RequestMessage extends Message {
 	public InParam[] inParams = new InParam[0];
-	public OutParam outParam;
+	
+	public RequestMessage() { 
+		super();
+	}
+	
+	public RequestMessage(String functionName) {
+		super(functionName);
+	}
+	
+	public RequestMessage(String functionName, String outType, String[] values) {
+		super(functionName, outType, values);
+	}
+
 }

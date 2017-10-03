@@ -21,9 +21,14 @@ public class MobileServiceDemoXClient {
 		return "";
 	}
 	
+	public String[] getFileList(String path, boolean fileOnly) {
+		return null;
+	}
+	
 	class RequesterX extends Requester {
 		@Override
-		public void receive(byte[] data) {
+		public void receive(byte[] resp) {
+			String respJSON = new String(resp);
 			
 		}
 	}

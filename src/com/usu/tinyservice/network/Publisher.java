@@ -11,8 +11,8 @@ import org.zeromq.ZMQ;
 public abstract class Publisher extends Thread {
     private ZMQ.Socket publisher;
 
-    private int port = Utils.PUBLISH_PORT;
-    private int sendInterval = Utils.PUBLISH_INTERVAL;
+    private int port = Constants.PUBLISH_PORT;
+    private int sendInterval = Constants.PUBLISH_INTERVAL;
     private String groupIp = "*";
     private boolean neededBroker = false;
 

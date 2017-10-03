@@ -13,8 +13,8 @@ public abstract class Requester extends Thread {
 	private int port;
 	
 	public Requester() {
-		this.serverIp = Utils.SERVER_GENERAL_IP;
-		this.port = Utils.REQUEST_PORT;
+		this.serverIp = Constants.SERVER_GENERAL_IP;
+		this.port = Constants.REQUEST_PORT;
 	}
 	
 	public Requester(String serverIp, int port) {

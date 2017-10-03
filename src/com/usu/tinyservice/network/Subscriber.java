@@ -8,7 +8,7 @@ import org.zeromq.ZMQ;
 
 public class Subscriber extends Thread {
     private String groupIp = "*";
-    private int port = Utils.SUBSCRIBE_PORT;
+    private int port = Constants.SUBSCRIBE_PORT;
     private String[] topics = new String[] { "" };
     private MessageListener mListener;
 

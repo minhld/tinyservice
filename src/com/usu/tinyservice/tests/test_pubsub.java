@@ -4,7 +4,8 @@ import java.util.Date;
 
 import com.usu.tinyservice.network.Publisher;
 import com.usu.tinyservice.network.Subscriber;
-import com.usu.tinyservice.network.Utils;
+import com.usu.tinyservice.network.BinaryHelper;
+import com.usu.tinyservice.network.Constants;
 
 public class test_pubsub extends Thread {
 	public void run() {
@@ -12,7 +13,7 @@ public class test_pubsub extends Thread {
 		new ExPublisher();
 		
 		// create subscriber
-		Subscriber subscriber = new Subscriber("*", Utils.PUBLISH_PORT, new String[] { "video_frame" });
+		Subscriber subscriber = new Subscriber("*", Constants.PUBLISH_PORT, new String[] { "video_frame" });
         subscriber.setMessageListener(new Subscriber.MessageListener() {
             @Override
             public void msgReceived(String topic, final byte[] msg) {

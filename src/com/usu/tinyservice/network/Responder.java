@@ -12,8 +12,8 @@ public abstract class Responder extends Thread {
 	private int port;
 
 	public Responder() {
-		this.serverIp = Utils.SERVER_GENERAL_IP;
-		this.port = Utils.REQUEST_PORT;
+		this.serverIp = Constants.SERVER_GENERAL_IP;
+		this.port = Constants.REQUEST_PORT;
 	}
 	
 	public Responder(String serverIp, int port) {
@@ -41,7 +41,7 @@ public abstract class Responder extends Thread {
 	}
 	
 	public void send(Object data) {
-		byte[] byteData = Utils.object2ByteArray(data);
+		byte[] byteData = BinaryHelper.object2ByteArray(data);
 		responder.send(byteData);
 	}
 	

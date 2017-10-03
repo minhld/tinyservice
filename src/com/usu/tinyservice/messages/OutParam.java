@@ -7,8 +7,9 @@ package com.usu.tinyservice.messages;
  *
  */
 public class OutParam {
-	public String[] values = new String[0];
 	public String type;
+	public String[] values = new String[0];
+	
 	
 	public OutParam() {
 		this("void");
@@ -18,8 +19,8 @@ public class OutParam {
 		this.type = type;
 	} 
 	
-	public OutParam(String[] values, String type) {
-		this.values = values;
+	public OutParam(String type, String[] values) {
 		this.type = type;
+		this.values = values;
 	}
 }
