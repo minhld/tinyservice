@@ -9,20 +9,25 @@ import com.usu.tinyservice.network.Responder;
  *
  */
 public class MobileServiceDemoXServer {
-	ResponderX responder;
+	MobileServiceDemo mobileServiceDemo;
+	ResponderX resp;
 	
 	public MobileServiceDemoXServer() {
-		responder = new ResponderX();
-	}
-	
-	public String getRoot() {
-		
+		mobileServiceDemo = new MobileServiceDemo();
+		resp = new ResponderX();
 	}
 	
 	class ResponderX extends Responder {
 		@Override
-		public void respond(byte[] data) {
-			
+		public void respond(byte[] req) {
+			String reqStr = new String(req);
+			switch (reqStr) {
+				case "getRoot": {
+					Object retObj = mobileServiceDemo.getRoot();
+					send(retObj);
+					break;
+				}
+			}
 		}
 	}
 }

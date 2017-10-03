@@ -29,8 +29,8 @@ public abstract class Responder extends Thread {
 	        responder.connect("tcp://" + this.serverIp + ":" + this.port);
 
 	        while (!isInterrupted()) {
-	        	byte[] resp = responder.recv(0);
-	        	respond(resp);
+	        	byte[] req = responder.recv(0);
+	        	respond(req);
 	        }
 	        
 	        responder.close();
@@ -40,12 +40,15 @@ public abstract class Responder extends Thread {
 		}
 	}
 	
-	public void send(byte[] data) {
-		if (responder != null) {
-			responder.send(data);
-		}
+	public void send(Object data) {
+		byte[] byteData = Utils.object2ByteArray(data);
+		responder.send(byteData);
 	}
 	
-	public abstract void respond(byte[] data);
+	public void send(byte[] data) {
+		responder.send(data);
+	}
+	
+	public abstract void respond(byte[] req);
 	
 }

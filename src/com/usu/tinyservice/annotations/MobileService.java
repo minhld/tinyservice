@@ -9,5 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface MobileService {
 	String version() default "1.0";
-	String type() default "PS";	//
+	ServiceNetworkType networkType() default ServiceNetworkType.ClientServer;
+	ServiceDataType dataType() default ServiceDataType.JSON;
 }
