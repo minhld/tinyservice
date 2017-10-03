@@ -13,9 +13,13 @@ public @interface MobileService {
 	
 	// network model: could be either Pair-Pair, Client-Server, 
 	// Publish-Subscribe or Push-Pull, default value is Client-Server
-	ServiceNetworkModel networkModel() default ServiceNetworkModel.ClientServer;
+	NetworkModel networkModel() default NetworkModel.ClientServer;
 	
 	// data transmission type: could be either JSON or binary array
 	// default value is JSON
-	ServiceTransmitType transmitType() default ServiceTransmitType.JSON;
+	TransmitType transmitType() default TransmitType.JSON;
+	
+	// synchronization mode
+	// default is Asynchronous
+	SyncMode syncMode() default SyncMode.Async;
 }

@@ -3,9 +3,10 @@ package com.usu.tinyservice.classes;
 import java.io.File;
 
 import com.usu.tinyservice.annotations.MobileService;
-import com.usu.tinyservice.annotations.ServiceTransmitType;
+import com.usu.tinyservice.annotations.TransmitType;
 import com.usu.tinyservice.annotations.ServiceMethod;
-import com.usu.tinyservice.annotations.ServiceNetworkModel;
+import com.usu.tinyservice.annotations.SyncMode;
+import com.usu.tinyservice.annotations.NetworkModel;
 
 /**
  * this is pretty much a demo of how a Mobile Service looks like
@@ -15,8 +16,9 @@ import com.usu.tinyservice.annotations.ServiceNetworkModel;
  */
 @MobileService(
 		version = "1.1", 
-		networkModel = ServiceNetworkModel.ClientServer,
-		transmitType = ServiceTransmitType.JSON)
+		networkModel = NetworkModel.ClientServer,
+		transmitType = TransmitType.JSON,
+		syncMode = SyncMode.Async)
 public class MobileServiceDemo {
 	@ServiceMethod
 	public String getRoot() {

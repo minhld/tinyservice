@@ -2,6 +2,7 @@ package com.usu.tinyservice.messages;
 
 import java.util.UUID;
 
+
 public class Message {
 	public String messageId;
 	public String functionName;
@@ -20,4 +21,5 @@ public class Message {
 		this(functionName);
 		this.outParam = new OutParam(outType, values);
 	}
+	
 }

@@ -40,9 +40,13 @@ public abstract class Responder extends Thread {
 		}
 	}
 	
-	public void send(Object data) {
-		byte[] byteData = BinaryHelper.object2ByteArray(data);
-		responder.send(byteData);
+//	public void send(Object data) {
+//		byte[] byteData = BinaryHelper.object2ByteArray(data);
+//		responder.send(byteData);
+//	}
+	
+	public void send(String data) {
+		send(data.getBytes());
 	}
 	
 	public void send(byte[] data) {

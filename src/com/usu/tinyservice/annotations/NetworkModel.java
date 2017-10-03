@@ -1,6 +1,6 @@
 package com.usu.tinyservice.annotations;
 
-public enum ServiceNetworkModel {
+public enum NetworkModel {
 	ClientServer,
 	PublishSubscribe,
 }

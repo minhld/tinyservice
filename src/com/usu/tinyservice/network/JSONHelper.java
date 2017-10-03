@@ -26,4 +26,5 @@ public class JSONHelper {
 		return gson.fromJson(json, ResponseMessage.class);
 	}
 	
+	
 }

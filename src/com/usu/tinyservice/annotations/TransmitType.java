@@ -1,6 +1,6 @@
 package com.usu.tinyservice.annotations;
 
-public enum ServiceTransmitType {
+public enum TransmitType {
 	Binary,
 	JSON
 }

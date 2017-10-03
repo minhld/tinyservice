@@ -3,11 +3,12 @@ package com.usu.tinyservice.classes;
 import com.usu.tinyservice.messages.RequestMessage;
 import com.usu.tinyservice.messages.ResponseMessage;
 import com.usu.tinyservice.network.JSONHelper;
+import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.Responder;
 
 /**
- * this is how a generated Mobile Service class looks like 
- * creates _Server class
+ * this is a demo server instance of the MobileServiceDemo
+ * 
  * @author minhld
  *
  */
@@ -18,6 +19,7 @@ public class MobileServiceDemoXServer {
 	public MobileServiceDemoXServer() {
 		mobileServiceDemo = new MobileServiceDemo();
 		resp = new ResponderX();
+		resp.start();
 	}
 	
 	class ResponderX extends Responder {
@@ -28,14 +30,36 @@ public class MobileServiceDemoXServer {
 			
 			switch (reqMsg.functionName) {
 				case "getRoot": {
+					// create input parameters
+					
+					// execute the function
 					String ret = mobileServiceDemo.getRoot();
-					ResponseMessage respMsg = new ResponseMessage(reqMsg.functionName, "String", new String[] { ret });
+					
+					// prepare the output parameters
+					String retType = "String";
+					String[] retValues = NetUtils.getString(ret);
+					ResponseMessage respMsg = new ResponseMessage(reqMsg.functionName, retType, retValues);
 					String respJSON = JSONHelper.createResponse(respMsg);
 					send(respJSON);
+					
 					break;
 				}
 				case "getFileList": {
+					// create input parameters
+					String path = (String) reqMsg.inParams[0].values[0];
+					boolean fileOnly = Boolean.getBoolean(reqMsg.inParams[1].values[0]);
 					
+					// execute the function
+					String[] rets = mobileServiceDemo.getFileList(path, fileOnly);
+					
+					// prepare the output parameters
+					String retType = "String";
+					String[] retValues = NetUtils.getStringArray(rets);
+					ResponseMessage respMsg = new ResponseMessage(reqMsg.functionName, retType, retValues);
+					String respJSON = JSONHelper.createResponse(respMsg);
+					send(respJSON);
+					
+					break;
 				}
 			}
 		}

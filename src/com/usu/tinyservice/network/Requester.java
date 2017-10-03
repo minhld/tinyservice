@@ -34,6 +34,10 @@ public abstract class Requester extends Thread {
         context.term();
 	}
 	
+	public void send(String data) {
+		send(data.getBytes());
+	}
+		
 	public void send(byte[] data) {
 		if (requester != null) {
 			requester.send(data);
@@ -43,4 +47,5 @@ public abstract class Requester extends Thread {
 	}
 	
 	public abstract void receive(byte[] data);
+	
 }

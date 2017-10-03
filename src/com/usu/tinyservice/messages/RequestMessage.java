@@ -11,8 +11,8 @@ public class RequestMessage extends Message {
 		super(functionName);
 	}
 	
-	public RequestMessage(String functionName, String outType, String[] values) {
-		super(functionName, outType, values);
+	public RequestMessage(String functionName, String outType) {
+		super(functionName, outType, new String[0]);
 	}
 
 }
