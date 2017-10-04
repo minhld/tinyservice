@@ -39,11 +39,14 @@ public class MobileServiceDemoXClient {
 	public void getFileList(String path, boolean fileOnly) {
 		// compose input parameters
 		String functionName = "getFileList";
-		InParam[] inParams = new InParam[2];
-		inParams[0] = new InParam("path", "String", new String[] { "D:\\" });
-		inParams[1] = new InParam("fileOnly", "boolean", new String[] { "true" });
 		String outType = "String[]";
 		RequestMessage reqMsg = new RequestMessage(functionName, outType);
+		reqMsg.inParams = new InParam[2];
+		reqMsg.inParams[0] = new InParam("path", "String", new String[] { "D:\\" });
+		reqMsg.inParams[1] = new InParam("fileOnly", "boolean", new String[] { "true" });
+		
+		
+		
 
 		// create request message and send
 		String msgJSON = JSONHelper.createRequest(reqMsg);

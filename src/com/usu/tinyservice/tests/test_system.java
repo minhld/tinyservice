@@ -20,7 +20,7 @@ public class test_system extends Thread {
 		
 		Utils.sleep(500);
 		
-		client.getRoot();
+		client.getFileList("D:\\", true);
 	}
 	
 	public static void main(String args[]) {
