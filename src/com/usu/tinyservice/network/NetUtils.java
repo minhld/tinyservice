@@ -8,6 +8,12 @@ public class NetUtils {
     	return rets;
     }
 	
+	public static <T> String[] getStringArray(T inputParam) {
+		String[] rets = new String[1];
+    	rets[0] = inputParam.toString();
+    	return rets;
+	}
+	
     public static <T> String[] getStringArray(T[] inputArray) {
     	String[] rets = new String[inputArray.length];
     	for (int i = 0; i < rets.length; i++) {

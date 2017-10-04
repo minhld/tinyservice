@@ -19,7 +19,7 @@ import com.usu.tinyservice.annotations.CommModel;
 		commModel = CommModel.ClientServer,
 		transmitType = TransmitType.JSON)
 public class MobileServiceDemo {
-	@ServiceMethod(syncMode = SyncMode.Async)
+	@ServiceMethod(syncMode = SyncMode.Sync)
 	public String getRoot() {
 		return "D:\\";
 	}

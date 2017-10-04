@@ -3,6 +3,7 @@ package com.usu.tinyservice.classes;
 import com.usu.tinyservice.messages.InParam;
 import com.usu.tinyservice.messages.RequestMessage;
 import com.usu.tinyservice.network.JSONHelper;
+import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 import com.usu.tinyservice.network.Requester;
 
@@ -42,12 +43,11 @@ public class MobileServiceDemoXClient {
 		String outType = "String[]";
 		RequestMessage reqMsg = new RequestMessage(functionName, outType);
 		reqMsg.inParams = new InParam[2];
-		reqMsg.inParams[0] = new InParam("path", "String", new String[] { "D:\\" });
-		reqMsg.inParams[1] = new InParam("fileOnly", "boolean", new String[] { "true" });
+		String[] param1 = NetUtils.getStringArray(path);
+		reqMsg.inParams[0] = new InParam("path", "String", param1);
+		String[] param2 = NetUtils.getStringArray(fileOnly);
+		reqMsg.inParams[1] = new InParam("fileOnly", "boolean", param2);
 		
-		
-		
-
 		// create request message and send
 		String msgJSON = JSONHelper.createRequest(reqMsg);
 		req.send(msgJSON);
