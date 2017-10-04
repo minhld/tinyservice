@@ -12,4 +12,9 @@ public class ResponseMessage extends Message {
 	public ResponseMessage(String functionName, String outType, String[] values) {
 		super(functionName, outType, values);
 	}
+	
+	public ResponseMessage(String messageId, String functionName, String outType, String[] values) {
+		super(functionName, outType, values);
+		this.messageId = messageId;
+	}
 }

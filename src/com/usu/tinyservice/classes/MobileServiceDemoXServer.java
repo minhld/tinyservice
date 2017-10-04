@@ -17,9 +17,12 @@ public class MobileServiceDemoXServer {
 	ResponderX resp;
 	
 	public MobileServiceDemoXServer() {
-		mobileServiceDemo = new MobileServiceDemo();
-		resp = new ResponderX();
-		resp.start();
+		// core function
+		this.mobileServiceDemo = new MobileServiceDemo();
+
+		// start the Responder
+		this.resp = new ResponderX();
+		this.resp.start();
 	}
 	
 	class ResponderX extends Responder {
@@ -38,7 +41,7 @@ public class MobileServiceDemoXServer {
 					// prepare the output parameters
 					String retType = "String";
 					String[] retValues = NetUtils.getString(ret);
-					ResponseMessage respMsg = new ResponseMessage(reqMsg.functionName, retType, retValues);
+					ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);
 					String respJSON = JSONHelper.createResponse(respMsg);
 					send(respJSON);
 					
@@ -55,7 +58,7 @@ public class MobileServiceDemoXServer {
 					// prepare the output parameters
 					String retType = "String";
 					String[] retValues = NetUtils.getStringArray(rets);
-					ResponseMessage respMsg = new ResponseMessage(reqMsg.functionName, retType, retValues);
+					ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);
 					String respJSON = JSONHelper.createResponse(respMsg);
 					send(respJSON);
 					

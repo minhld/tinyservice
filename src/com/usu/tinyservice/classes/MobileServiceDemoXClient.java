@@ -17,8 +17,12 @@ public class MobileServiceDemoXClient {
 	public ReceiveListener listener;
 	
 	public MobileServiceDemoXClient(ReceiveListener listener) {
-		this.req = new RequesterX();
+		// start listener
 		this.listener = listener;
+		
+		// start the Requester
+		this.req = new RequesterX();
+		this.req.start();
 	}
 	
 	public void getRoot() {

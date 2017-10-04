@@ -11,7 +11,7 @@ public class Message {
 	public Message() { 
 		this.messageId = UUID.randomUUID().toString();
 	}
-	
+
 	public Message(String functionName) {
 		this();
 		this.functionName = functionName;
@@ -21,5 +21,5 @@ public class Message {
 		this(functionName);
 		this.outParam = new OutParam(outType, values);
 	}
-	
+
 }
