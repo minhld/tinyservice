@@ -8,5 +8,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
 public @interface ServiceMethod {
-	
+	// synchronization mode
+	// default is Asynchronous
+	SyncMode syncMode() default SyncMode.Async;
+
 }
