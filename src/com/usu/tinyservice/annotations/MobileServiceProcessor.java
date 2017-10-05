@@ -52,8 +52,11 @@ public class MobileServiceProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment env) {
         //get all elements annotated with StatusInfo
-        Collection<? extends Element> annotatedElements = env.getElementsAnnotatedWith(MobileService.class);
+        // Collection<? extends Element> annotatedElements = env.getElementsAnnotatedWith(MobileService.class);
+    	Collection<? extends Element> annotatedElements = env.getElementsAnnotatedWith(MobileService.class);
 
+    	Collection<? extends Element> annotatedMethods = env.getElementsAnnotatedWith(ServiceMethod.class);
+    	
         //filter out elements we don't need
         List<TypeElement> types = new ImmutableList.Builder<TypeElement>().addAll(
                                     ElementFilter.typesIn(annotatedElements)).build();
