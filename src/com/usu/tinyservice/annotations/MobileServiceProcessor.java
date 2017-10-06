@@ -55,8 +55,6 @@ public class MobileServiceProcessor extends AbstractProcessor {
         // Collection<? extends Element> annotatedElements = env.getElementsAnnotatedWith(MobileService.class);
     	Collection<? extends Element> annotatedElements = env.getElementsAnnotatedWith(MobileService.class);
 
-    	Collection<? extends Element> annotatedMethods = env.getElementsAnnotatedWith(ServiceMethod.class);
-    	
         //filter out elements we don't need
         List<TypeElement> types = new ImmutableList.Builder<TypeElement>().addAll(
                                     ElementFilter.typesIn(annotatedElements)).build();
@@ -65,7 +63,8 @@ public class MobileServiceProcessor extends AbstractProcessor {
             //interfaces are types too, but we only need classes
             //we need to check if the TypeElement is a valid class
             if (isValidClass(type, MobileService.class.getName())) {
-                writeSourceFile(type);
+                // writeSourceFile(type);
+            	MobileServiceCreator.generateServer(processingEnv, type);
             } else {
                 return true;
             }
@@ -142,7 +141,7 @@ public class MobileServiceProcessor extends AbstractProcessor {
             e.printStackTrace();
         }
     }
-
+    
     private String generateFormater(TypeElement originatingType) {
         List<VariableElement> fields = new ImmutableList.Builder<VariableElement>().
         					addAll(ElementFilter.fieldsIn(originatingType.getEnclosedElements())).build();
