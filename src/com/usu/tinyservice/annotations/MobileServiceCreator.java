@@ -1,6 +1,5 @@
 package com.usu.tinyservice.annotations;
 
-import java.awt.Window.Type;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -12,6 +11,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.JavaFileObject;
+
+import com.usu.tinyservice.network.JSONHelper;
 
 /**
  * create 
@@ -114,14 +115,14 @@ public class MobileServiceCreator {
 
 		// define all the function wrapper
 		for (int i = 0; i < methods.size(); i++) {
-			printAsyncServerHandler(writer, methods.get(i));
+			printJSONAsyncServerHandler(writer, methods.get(i));
 		}
 		
 		// close the part
 		writer.println("      }");
 	}
 	
-	private static void printAsyncServerHandler(PrintWriter writer, Element e) {
+	private static void printJSONAsyncServerHandler(PrintWriter writer, Element e) {
 		ServiceMethod sm = e.getAnnotation(ServiceMethod.class);
 		// only accept functions having annotation, function and sync_mode is ASYNC
 		if (e.getAnnotation(ServiceMethod.class) != null && e instanceof ExecutableElement && sm.syncMode() == SyncMode.Async) {
@@ -130,16 +131,57 @@ public class MobileServiceCreator {
 			writer.println("      case \"" + ee.getSimpleName() + "\": {");
 			
 			List<? extends VariableElement> ves = ee.getParameters();
+			for (int i = 0; i < ves.size(); i++) {
+				printInputParam(ves.get(i));
+			}
+			
 			TypeMirror retType = ee.getReturnType();
 			if (ves.size() > 0) {
 				
 			}
 			
+			writer.println("        String respJSON = JSONHelper.createResponse(respMsg);");
+			writer.println("        send(respJSON);");
+			writer.println("        break;");
 			writer.println("      }");
 		}
 	}
 	
+	private static String printInputParam(VariableElement e) {
+		String inParamsStr = "";
+		String vName = e.getSimpleName().toString();
+		String vType = e.asType().toString();
+		if (vType.contains("[]")) {
+			
+		} else {
+			if (vType.contains("String")) {
+				inParamsStr += "        " + vType + " " + vName + " = "; 
+			} else {
+				
+			}
+		}
+		
+		return inParamsStr;
+	}
+	
+	
+	
 	public static void generateClient(TypeElement type) {
 		
 	}
+	
+//	private static String wrapType(TypeMirror type, String paramExp) {
+//		String typeStr = type.getKind().name();
+//		switch (typeStr) {
+//			case "String": {
+//				break;
+//			}
+//			default: {
+//				// default is a string
+//				return "(String) " + paramExp;
+//				break;
+//			}
+//		}
+//		
+//	}
 }
