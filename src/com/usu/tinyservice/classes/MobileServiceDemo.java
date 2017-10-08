@@ -29,4 +29,11 @@ public class MobileServiceDemo {
 		File pathFile = new File(path);
 		return pathFile.list();
 	}
+	
+	@ServiceMethod(syncMode = SyncMode.Async)
+	public int[] getFileList2(String path, int[] count, boolean fileOnly) {
+		// File pathFile = new File(path);
+		return new int[] { 1, 5, 3, 7, 9};
+	}
+
 }
