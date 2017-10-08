@@ -131,8 +131,10 @@ public class MobileServiceCreator {
 			writer.println("      case \"" + ee.getSimpleName() + "\": {");
 			
 			List<? extends VariableElement> ves = ee.getParameters();
+			String inputParamStr;
 			for (int i = 0; i < ves.size(); i++) {
-				printInputParam(ves.get(i));
+				inputParamStr = printInputParam(ves.get(i));
+				writer.println(inputParamStr);
 			}
 			
 			TypeMirror retType = ee.getReturnType();
@@ -149,18 +151,31 @@ public class MobileServiceCreator {
 	
 	private static String printInputParam(VariableElement e) {
 		String inParamsStr = "";
-		String vName = e.getSimpleName().toString();
-		String vType = e.asType().toString();
-		if (vType.contains("[]")) {
-			
-		} else {
-			if (vType.contains("String")) {
-				inParamsStr += "        " + vType + " " + vName + " = "; 
-			} else {
-				
-			}
-		}
 		
+		// define variable name
+		String vName = e.getSimpleName().toString();
+		String vNames = vName + "s";
+		
+		// define variable types
+		String vFullType = e.asType().toString();
+		vFullType.replace("[]", "");	// -> remove the [] sign
+		int lastDot = vFullType.lastIndexOf('.');
+		String vTypeName = vFullType.substring(lastDot + 1);
+		inParamsStr += "        // for variable " + "\"" + vName + "\"\n";
+		inParamsStr += "        " + vFullType + "[] " + vNames + " = new " + vFullType + "[reqMsg.inParams[0].values.length];\n";
+		inParamsStr += "        for (int i = 0; i < reqMsg.inParams[0].values.length; i++) {\n";
+		if (vFullType.contains("String")) {
+			inParamsStr += "          " + vFullType + " " + vNames + "[i] = (" + vFullType + ") reqMsg.inParams[0].values[i];\n";  
+		} else {
+			inParamsStr += "          " + vFullType + " " + vNames + "[i] = " + vFullType + ".parse" + vTypeName + "(vTypereqMsg.inParams[0].values[i]);\n";
+		}
+		inParamsStr += "        }\n";
+		inParamsStr += "        \n";
+		inParamsStr += "        if (reqMsg.inParams[0].values.length == 1) {\n";
+		inParamsStr += "          " + vFullType + " " + vName + " = " + vNames + "[0];\n";
+		inParamsStr += "        } else {\n";
+		inParamsStr += "          " + vFullType + " " + vName + " = " + vNames + ";\n";
+		inParamsStr += "        }\n";
 		return inParamsStr;
 	}
 	
