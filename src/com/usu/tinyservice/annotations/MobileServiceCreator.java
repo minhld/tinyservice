@@ -11,6 +11,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.JavaFileObject;
 
+import com.usu.tinyservice.network.Requester;
 
 /**
  * class to create server and client objects.  
@@ -161,7 +162,7 @@ public class MobileServiceCreator {
 			funcCall += printInputParam(ves.get(i)) + "\n";
 		}
 		
-		String retType = getType(ee.getReturnType().toString());
+		String retType = getOnlyName(ee.getReturnType().toString());
 		
 		funcCall += "        // start calling function \"" + funcName + "\"\n";
 		funcCall += "        " + ee.getReturnType().toString() + " rets = " + classInstance + "." + funcName + "(";
@@ -194,7 +195,7 @@ public class MobileServiceCreator {
 		
 		// define variable types
 		String vFullType = e.asType().toString();
-		String vType = getType(vFullType).replace("[]", "");
+		String vType = getOnlyName(vFullType).replace("[]", "");
 		
 		// assign value from a parameter to an array
 		inParamsStr += "        // for variable " + "\"" + vName + "\"\n";
@@ -221,7 +222,71 @@ public class MobileServiceCreator {
 	 * @param type
 	 */
 	public static void generateClient(ProcessingEnvironment env, TypeElement type) {
+		// get service attributes
+		MobileService classService = type.getAnnotation(MobileService.class);
+		// CommModel commModel = classService.commModel();
+		TransmitType transType = classService.transmitType();
 		
+		String fullClassName = type.getQualifiedName().toString();
+		int lastDotIndex = fullClassName.lastIndexOf('.');
+		String packageName = fullClassName.substring(0, lastDotIndex);
+		String className = fullClassName.substring(lastDotIndex + 1);
+		
+		String clientClassName = className + "Client";
+		
+		// get list of inner methods
+		List<? extends Element> methods = type.getEnclosedElements();
+		
+		try {
+			JavaFileObject builderFile = env.getFiler().createSourceFile(clientClassName);
+			PrintWriter writer = new PrintWriter(builderFile.openWriter());
+
+			// print package and default imports
+			writer.println("package " + packageName + ";");
+			writer.println();
+			writer.println("import com.usu.tinyservice.messages.InParam;");
+			writer.println("import com.usu.tinyservice.messages.RequestMessage;");
+			writer.println("import com.usu.tinyservice.network.JSONHelper;");
+			writer.println("import com.usu.tinyservice.network.NetUtils;");
+			writer.println("import com.usu.tinyservice.network.ReceiveListener;");
+			writer.println("import com.usu.tinyservice.network.Requester;");
+			writer.println();
+			
+			// declare class prototype 
+			writer.println("public class " + clientClassName + " {");
+			
+			// declare the original service & network class 
+			classInstance = className.toLowerCase();
+			writer.println("  public ReceiveListener listener;"); 
+			writer.println("  private RequesterX req;");
+			writer.println();
+			
+			// define the server constructor
+			writer.println("  public " + clientClassName + "() {");
+			writer.println("    // start listener");
+			writer.println("    this.listener = listener;\n");
+			writer.println("    // create request message and send");
+			writer.println("    req = new RequesterX();");
+			writer.println("    req.start();");
+			writer.println("  }");
+			writer.println();
+			
+			// define the extended Responder
+
+			
+			// the last part
+			writer.println("  class RequesterX extends Requester {\n" + 
+						   "	@Override\n" + 
+						   "	public void receive(byte[] resp) {\n" + 
+						   "	  listener.dataReceived(resp);\n" + 
+						   "	}\n" + 
+						   "  }");
+			writer.println("}");
+			
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -267,13 +332,13 @@ public class MobileServiceCreator {
 	}
 	
 	/**
-	 * remove the package name from the full-name type 
+	 * remove the package name from the full-name 
 	 * 
-	 * @param fullType
+	 * @param fullName
 	 * @return
 	 */
-	private static String getType(String fullType) {
-		int lastDot = fullType.lastIndexOf('.');
-		return fullType.substring(lastDot + 1);
+	private static String getOnlyName(String fullName) {
+		int lastDot = fullName.lastIndexOf('.');
+		return fullName.substring(lastDot + 1);
 	}
 }
