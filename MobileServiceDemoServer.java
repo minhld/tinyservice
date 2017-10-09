@@ -24,6 +24,18 @@ public class MobileServiceDemoServer {
       RequestMessage reqMsg = JSONHelper.getRequest(reqJSON);
 
       switch (reqMsg.functionName) {
+      case "getRoot": {
+        // start calling function "getRoot"
+        java.lang.String rets = mobileservicedemo.getRoot();
+        String retType = "String";
+        String[] retValues = NetUtils.getStringArray(rets);
+        ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);
+
+        // convert to JSON
+        String respJSON = JSONHelper.createResponse(respMsg);
+        send(respJSON);
+        break;
+      }
       case "getFileList": {
         // for variable "path"
         String[] paths = new String[reqMsg.inParams[0].values.length];

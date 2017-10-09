@@ -129,7 +129,8 @@ public class MobileServiceCreator {
 		ServiceMethod sm = e.getAnnotation(ServiceMethod.class);
 		
 		// only accept functions having annotation, function and sync_mode is ASYNC
-		if (e.getAnnotation(ServiceMethod.class) != null && e instanceof ExecutableElement && sm.syncMode() == SyncMode.Async) {
+		// if (e.getAnnotation(ServiceMethod.class) != null && e instanceof ExecutableElement && sm.syncMode() == SyncMode.Async) {
+		if (sm != null && e instanceof ExecutableElement) {
 			String funcPrepare = printFuncCall(e);
 			
 			String respConvert = "";
@@ -232,10 +233,8 @@ public class MobileServiceCreator {
 		String packageName = fullClassName.substring(0, lastDotIndex);
 		String className = fullClassName.substring(lastDotIndex + 1);
 		
+		// define client class name
 		String clientClassName = className + "Client";
-		
-		// get list of inner methods
-		List<? extends Element> methods = type.getEnclosedElements();
 		
 		try {
 			JavaFileObject builderFile = env.getFiler().createSourceFile(clientClassName);
@@ -271,8 +270,15 @@ public class MobileServiceCreator {
 			writer.println("  }");
 			writer.println();
 			
-			// define the extended Responder
-
+			// define the client function stubs
+			// get list of inner methods
+			List<? extends Element> methods = type.getEnclosedElements();
+			// define all the function wrapper
+			String clientFuncs = "";
+			for (int i = 0; i < methods.size(); i++) {
+				clientFuncs += printFunctionCaller(transType, methods.get(i)) + "\n";
+			}
+			writer.println(clientFuncs);
 			
 			// the last part
 			writer.println("  class RequesterX extends Requester {\n" + 
@@ -287,6 +293,40 @@ public class MobileServiceCreator {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static String printFunctionCaller(TransmitType transType, Element e) {
+		ServiceMethod sm = e.getAnnotation(ServiceMethod.class);
+		ExecutableElement ee = (ExecutableElement) e;
+		String funcName = ee.getSimpleName().toString();
+
+		// define the total string of the function caller
+		String funcCaller = "  public ";
+		String retType = getOnlyName(ee.getReturnType().toString());
+		
+		if (sm == null || !(e instanceof ExecutableElement)) {
+			return "";
+		}
+		
+		// prepare function prototype
+		if (sm.syncMode() == SyncMode.Async) {
+			funcCaller += "void " + funcName + "(";
+		} else {
+			funcCaller += retType + " " + funcName + "(";
+		}
+		
+		List<? extends VariableElement> ves = ee.getParameters();
+		VariableElement ve;
+		for (int i = 0; i < ves.size(); i++) {
+			ve = ves.get(i);
+			funcCaller += getOnlyName(ve.asType().toString()) + " " + ve.getSimpleName() + (i < ves.size() - 1 ? ", " : "");
+		}
+		funcCaller += ") {\n";
+		
+		// enclose part
+		funcCaller += "  }\n";
+		
+		return funcCaller;
 	}
 
 	/**

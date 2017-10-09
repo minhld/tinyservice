@@ -20,6 +20,17 @@ public class MobileServiceDemoClient {
     req.start();
   }
 
+
+  public String getRoot() {
+  }
+
+  public void getFileList(String path, boolean fileOnly) {
+  }
+
+  public void getFileList2(String path, int[] count, boolean fileOnly) {
+  }
+
+
   class RequesterX extends Requester {
 	@Override
 	public void receive(byte[] resp) {
