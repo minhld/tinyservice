@@ -11,8 +11,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.JavaFileObject;
 
-import com.usu.tinyservice.network.NetUtils;
-
 
 /**
  * class to create server and client objects.  
@@ -76,13 +74,8 @@ public class MobileServiceCreator {
 			writer.println("    @Override");
 			writer.println("    public void respond(byte[] req) {");
 			
-			if (transType == TransmitType.JSON) {
-				// if JSON is needed
-				printJSONResponder(writer, type, methods);
-			} else if (transType == TransmitType.Binary) {
-				// ... Binary ...
-				printBinaryResponder(writer, type, methods);
-			}
+			String serverResponder = printAsyncServerResponder(transType, type, methods);
+			writer.println(serverResponder);
 			
 			// the last part
 			writer.println("    }");
@@ -96,52 +89,33 @@ public class MobileServiceCreator {
 	}
 	
 	/**
-	 * print out the Binary part in the Responder class
-	 * 
-	 * @param writer
-	 * @param e
-	 * @param methods
-	 */
-	private static void printBinaryResponder(PrintWriter writer, Element e, List<? extends Element> methods) {
-		// define all the function wrapper
-		for (int i = 0; i < methods.size(); i++) {
-			printSyncServerHandler(writer, methods.get(i));
-		}
-	}
-
-	/**
-	 * 
-	 * @param writer
-	 * @param e
-	 */
-	private static void printSyncServerHandler(PrintWriter writer, Element e) {
-		if (e.getAnnotation(ServiceMethod.class) != null && e instanceof ExecutableElement) {
-			
-		}
-	}
-	
-	/**
 	 * print out the JSON part in the Responder class
 	 * 
 	 * @param writer
 	 * @param e
 	 * @param methods
 	 */
-	private static void printJSONResponder(PrintWriter writer, Element e, List<? extends Element> methods) {
-		writer.println("      String reqJSON = new String(req);");
-		writer.println("      RequestMessage reqMsg = JSONHelper.getRequest(reqJSON);");
-		writer.println();
+	private static String printAsyncServerResponder(TransmitType transType, Element e, List<? extends Element> methods) {
+		String serverResponder = "";
+		String reqConvert = "";
+		if (transType == TransmitType.JSON) {
+			reqConvert = "      // get request message from JSON \n" + 
+						 "      String reqJSON = new String(req);\n" +
+						 "      RequestMessage reqMsg = JSONHelper.getRequest(reqJSON);\n\n";
+		}
 		
 		// define the switch - where all the functions are iterated here
-		writer.println("      switch (reqMsg.functionName) {");
+		serverResponder += reqConvert + 
+						 "      switch (reqMsg.functionName) {\n";
 
 		// define all the function wrapper
 		for (int i = 0; i < methods.size(); i++) {
-			printJSONAsyncServerHandler(writer, methods.get(i));
+			serverResponder += printAsyncFunctionHandler(transType, methods.get(i));
 		}
 		
 		// close the part
-		writer.println("      }");
+		serverResponder += "      }\n";
+		return serverResponder;
 	}
 	
 	/**
@@ -150,21 +124,31 @@ public class MobileServiceCreator {
 	 * @param writer
 	 * @param e
 	 */
-	private static void printJSONAsyncServerHandler(PrintWriter writer, Element e) {
+	private static String printAsyncFunctionHandler(TransmitType transType, Element e) {
 		ServiceMethod sm = e.getAnnotation(ServiceMethod.class);
 		
 		// only accept functions having annotation, function and sync_mode is ASYNC
 		if (e.getAnnotation(ServiceMethod.class) != null && e instanceof ExecutableElement && sm.syncMode() == SyncMode.Async) {
 			String funcPrepare = printFuncCall(e);
 			
-			String jSONConvert = "        // convert to JSON\n" +
-								 "        String respJSON = JSONHelper.createResponse(respMsg);\n" + 
-								 "        send(respJSON);\n";
-			funcPrepare = funcPrepare.replace(REP_STRING, jSONConvert);
-			writer.println(funcPrepare);
+			String respConvert = "";
+			if (transType == TransmitType.JSON) {
+				respConvert = "        // convert to JSON\n" +
+							  "        String respJSON = JSONHelper.createResponse(respMsg);\n" + 
+							  "        send(respJSON);\n";
+			}
+			funcPrepare = funcPrepare.replace(REP_STRING, respConvert);
+			return funcPrepare;
 		}
+		return "";
 	}
 	
+	/**
+	 * print the function call part of the Responder
+	 * 
+	 * @param e
+	 * @return
+	 */
 	private static String printFuncCall(Element e) {
 		ExecutableElement ee = (ExecutableElement) e;
 		String funcName = ee.getSimpleName().toString();

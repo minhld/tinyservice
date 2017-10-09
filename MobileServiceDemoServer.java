@@ -19,6 +19,7 @@ public class MobileServiceDemoServer {
   class ResponderX extends Responder {
     @Override
     public void respond(byte[] req) {
+      // get request message from JSON 
       String reqJSON = new String(req);
       RequestMessage reqMsg = JSONHelper.getRequest(reqJSON);
 
@@ -49,7 +50,6 @@ public class MobileServiceDemoServer {
         send(respJSON);
         break;
       }
-
       case "getFileList2": {
         // for variable "path"
         String[] paths = new String[reqMsg.inParams[0].values.length];
@@ -83,8 +83,8 @@ public class MobileServiceDemoServer {
         send(respJSON);
         break;
       }
-
       }
+
     }
   }
 }
