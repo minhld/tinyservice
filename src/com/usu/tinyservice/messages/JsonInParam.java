@@ -5,14 +5,14 @@ package com.usu.tinyservice.messages;
  * @author minhld
  *
  */
-public class InJsonParam {
+public class JsonInParam {
 	public String param;
 	public String type;
 	public String[] values;
 	
-	public InJsonParam() { } 
+	public JsonInParam() { } 
 	
-	public InJsonParam(String param, String type, String[] values) {
+	public JsonInParam(String param, String type, String[] values) {
 		this.param = param;
 		this.type = type;
 		this.values = values;

@@ -6,20 +6,20 @@ package com.usu.tinyservice.messages;
  * @author minhld
  *
  */
-public class OutJsonParam {
+public class JsonOutParam {
 	public String type;
 	public String[] values = new String[0];
 	
 	
-	public OutJsonParam() {
+	public JsonOutParam() {
 		this("void");
 	}
 	
-	public OutJsonParam(String type) {
+	public JsonOutParam(String type) {
 		this.type = type;
 	} 
 	
-	public OutJsonParam(String type, String[] values) {
+	public JsonOutParam(String type, String[] values) {
 		this.type = type;
 		this.values = values;
 	}

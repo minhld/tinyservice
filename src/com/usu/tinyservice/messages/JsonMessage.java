@@ -4,25 +4,25 @@ import java.io.Serializable;
 import java.util.UUID;
 
 
-public class Message implements Serializable {
+public class JsonMessage implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	public String messageId;
 	public String functionName;
-	public OutJsonParam outParam;
+	public JsonOutParam outParam;
 	
-	public Message() { 
+	public JsonMessage() { 
 		this.messageId = UUID.randomUUID().toString();
 	}
 
-	public Message(String functionName) {
+	public JsonMessage(String functionName) {
 		this();
 		this.functionName = functionName;
 	}
 	
-	public Message(String functionName, String outType, String[] values) {
+	public JsonMessage(String functionName, String outType, String[] values) {
 		this(functionName);
-		this.outParam = new OutJsonParam(outType, values);
+		this.outParam = new JsonOutParam(outType, values);
 	}
 
 }

@@ -21,7 +21,7 @@ public class test_system extends Thread {
 		Utils.sleep(500);
 		
 		int[] count = new int[] { 1, 3, 5, 7, 9 };
-		client.getFileList2("D:\\", count, true);
+		client.getFileList1("D:\\", count, true);
 	}
 	
 	public static void main(String args[]) {

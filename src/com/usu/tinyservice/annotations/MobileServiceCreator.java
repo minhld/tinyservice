@@ -50,8 +50,8 @@ public class MobileServiceCreator {
 			// print package and default imports
 			writer.println("package " + packageName + ";");
 			writer.println();
-			writer.println("import com.usu.tinyservice.messages.RequestMessage;");
-			writer.println("import com.usu.tinyservice.messages.ResponseMessage;");
+			writer.println("import com.usu.tinyservice.messages.JsonRequestMessage;");
+			writer.println("import com.usu.tinyservice.messages.JsonResponseMessage;");
 			writer.println("import com.usu.tinyservice.network.JSONHelper;");
 			writer.println("import com.usu.tinyservice.network.NetUtils;");
 			writer.println("import com.usu.tinyservice.network.Responder;");
@@ -106,7 +106,7 @@ public class MobileServiceCreator {
 		if (transType == TransmitType.JSON) {
 			reqConvert = "      // get request message from JSON \n" + 
 						 "      String reqJSON = new String(req);\n" +
-						 "      RequestMessage reqMsg = JSONHelper.getRequest(reqJSON);\n\n";
+						 "      JsonRequestMessage reqMsg = JSONHelper.getRequest(reqJSON);\n\n";
 		}
 		
 		// define the switch - where all the functions are iterated here
@@ -177,7 +177,7 @@ public class MobileServiceCreator {
 		funcCall += ");\n";
 		funcCall += "        String retType = \"" + retType.replace("[]", "") + "\";\n";
 		funcCall += "        String[] retValues = NetUtils.getStringArray(rets);\n";
-		funcCall += "        ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);\n\n"; 
+		funcCall += "        JsonResponseMessage respMsg = new JsonResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);\n\n"; 
 				
 		funcCall += REP_STRING;
 		funcCall += "        break;\n" +
@@ -250,8 +250,8 @@ public class MobileServiceCreator {
 			// print package and default imports
 			writer.println("package " + packageName + ";");
 			writer.println();
-			writer.println("import com.usu.tinyservice.messages.InParam;");
-			writer.println("import com.usu.tinyservice.messages.RequestMessage;");
+			writer.println("import com.usu.tinyservice.messages.JsonInParam;");
+			writer.println("import com.usu.tinyservice.messages.JsonRequestMessage;");
 			writer.println("import com.usu.tinyservice.network.JSONHelper;");
 			writer.println("import com.usu.tinyservice.network.NetUtils;");
 			writer.println("import com.usu.tinyservice.network.ReceiveListener;");
@@ -332,7 +332,7 @@ public class MobileServiceCreator {
 		// prepare the input parameters
 		List<? extends VariableElement> ves = ee.getParameters();
 		VariableElement ve;
-		String inParamStr = ves.size() > 0 ? "    reqMsg.inParams = new InParam[" + ves.size() + "];\n" : "";
+		String inParamStr = ves.size() > 0 ? "    reqMsg.inParams = new JsonInParam[" + ves.size() + "];\n" : "";
 		
 		String vType, vName;
 		for (int i = 0; i < ves.size(); i++) {
@@ -342,14 +342,14 @@ public class MobileServiceCreator {
 			
 			funcCaller += getOnlyName(vType + " " + vName + (i < ves.size() - 1 ? ", " : ""));
 			inParamStr += "    String[] param" + (i + 1) + " = NetUtils.getStringArray(" + vName + ");\n" +
-						  "    reqMsg.inParams[" + i + "] = new InParam(\"" + vName + "\", \"" + vType + "\", param" + (i + 1) + ");\n";
+						  "    reqMsg.inParams[" + i + "] = new JsonInParam(\"" + vName + "\", \"" + vType + "\", param" + (i + 1) + ");\n";
 		}
 		
 		funcCaller += ") {\n" +
 					  "    // compose input parameters\n" +
 					  "    String functionName = \"" + funcName + "\";\n" + 
 					  "    String outType = \"" + retType + "\";\n" +
-					  "    RequestMessage reqMsg = new RequestMessage(functionName, outType);\n" + 
+					  "    JsonRequestMessage reqMsg = new JsonRequestMessage(functionName, outType);\n" + 
 					  "    \n" +
 					  "    // create request message and send\n";
 		

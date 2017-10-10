@@ -1,7 +1,7 @@
 package com.usu.tinyservice.classes;
 
-import com.usu.tinyservice.messages.RequestMessage;
-import com.usu.tinyservice.messages.ResponseMessage;
+import com.usu.tinyservice.messages.JsonRequestMessage;
+import com.usu.tinyservice.messages.JsonResponseMessage;
 import com.usu.tinyservice.network.JSONHelper;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.Responder;
@@ -21,22 +21,10 @@ public class MobileServiceDemoServer {
     public void respond(byte[] req) {
       // get request message from JSON 
       String reqJSON = new String(req);
-      RequestMessage reqMsg = JSONHelper.getRequest(reqJSON);
+      JsonRequestMessage reqMsg = JSONHelper.getRequest(reqJSON);
 
       switch (reqMsg.functionName) {
-      case "getRoot": {
-        // start calling function "getRoot"
-        java.lang.String rets = mobileservicedemo.getRoot();
-        String retType = "String";
-        String[] retValues = NetUtils.getStringArray(rets);
-        ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);
-
-        // convert to JSON
-        String respJSON = JSONHelper.createResponse(respMsg);
-        send(respJSON);
-        break;
-      }
-      case "getFileList": {
+      case "getFileList1": {
         // for variable "path"
         String[] paths = new String[reqMsg.inParams[0].values.length];
         for (int i = 0; i < reqMsg.inParams[0].values.length; i++) {
@@ -44,38 +32,12 @@ public class MobileServiceDemoServer {
         }
         String path = paths[0];
 
-        // for variable "fileOnly"
-        boolean[] fileOnlys = new boolean[reqMsg.inParams[1].values.length];
+        // for variable "data"
+        int[] datas = new int[reqMsg.inParams[1].values.length];
         for (int i = 0; i < reqMsg.inParams[1].values.length; i++) {
-          fileOnlys[i] = Boolean.parseBoolean(reqMsg.inParams[1].values[i]);
+          datas[i] = Integer.parseInt(reqMsg.inParams[1].values[i]);
         }
-        boolean fileOnly = fileOnlys[0];
-
-        // start calling function "getFileList"
-        java.lang.String[] rets = mobileservicedemo.getFileList(path, fileOnly);
-        String retType = "String";
-        String[] retValues = NetUtils.getStringArray(rets);
-        ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);
-
-        // convert to JSON
-        String respJSON = JSONHelper.createResponse(respMsg);
-        send(respJSON);
-        break;
-      }
-      case "getFileList2": {
-        // for variable "path"
-        String[] paths = new String[reqMsg.inParams[0].values.length];
-        for (int i = 0; i < reqMsg.inParams[0].values.length; i++) {
-          paths[i] = reqMsg.inParams[0].values[i];
-        }
-        String path = paths[0];
-
-        // for variable "count"
-        int[] counts = new int[reqMsg.inParams[1].values.length];
-        for (int i = 0; i < reqMsg.inParams[1].values.length; i++) {
-          counts[i] = Integer.parseInt(reqMsg.inParams[1].values[i]);
-        }
-        int[] count = counts;
+        int[] data = datas;
 
         // for variable "fileOnly"
         boolean[] fileOnlys = new boolean[reqMsg.inParams[2].values.length];
@@ -84,11 +46,11 @@ public class MobileServiceDemoServer {
         }
         boolean fileOnly = fileOnlys[0];
 
-        // start calling function "getFileList2"
-        int[] rets = mobileservicedemo.getFileList2(path, count, fileOnly);
+        // start calling function "getFileList1"
+        int[] rets = mobileservicedemo.getFileList1(path, data, fileOnly);
         String retType = "int";
         String[] retValues = NetUtils.getStringArray(rets);
-        ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);
+        JsonResponseMessage respMsg = new JsonResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);
 
         // convert to JSON
         String respJSON = JSONHelper.createResponse(respMsg);

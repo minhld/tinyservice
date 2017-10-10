@@ -1,7 +1,7 @@
 package com.usu.tinyservice.classes;
 
-import com.usu.tinyservice.messages.InParam;
-import com.usu.tinyservice.messages.RequestMessage;
+import com.usu.tinyservice.messages.JsonInParam;
+import com.usu.tinyservice.messages.JsonRequestMessage;
 import com.usu.tinyservice.network.JSONHelper;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
@@ -21,51 +21,20 @@ public class MobileServiceDemoClient {
   }
 
 
-  public void getRoot() {
+  public void getFileList1(String path, int[] data, boolean fileOnly) {
     // compose input parameters
-    String functionName = "getRoot";
-    String outType = "String";
-    RequestMessage reqMsg = new RequestMessage(functionName, outType);
-    
-    // create request message and send
-
-    // create a json message
-    String msgJSON = JSONHelper.createRequest(reqMsg);
-    req.send(msgJSON);
-  }
-
-  public void getFileList(String path, boolean fileOnly) {
-    // compose input parameters
-    String functionName = "getFileList";
-    String outType = "String[]";
-    RequestMessage reqMsg = new RequestMessage(functionName, outType);
-    
-    // create request message and send
-    reqMsg.inParams = new InParam[2];
-    String[] param1 = NetUtils.getStringArray(path);
-    reqMsg.inParams[0] = new InParam("path", "String", param1);
-    String[] param2 = NetUtils.getStringArray(fileOnly);
-    reqMsg.inParams[1] = new InParam("fileOnly", "boolean", param2);
-
-    // create a json message
-    String msgJSON = JSONHelper.createRequest(reqMsg);
-    req.send(msgJSON);
-  }
-
-  public void getFileList2(String path, int[] count, boolean fileOnly) {
-    // compose input parameters
-    String functionName = "getFileList2";
+    String functionName = "getFileList1";
     String outType = "int[]";
-    RequestMessage reqMsg = new RequestMessage(functionName, outType);
+    JsonRequestMessage reqMsg = new JsonRequestMessage(functionName, outType);
     
     // create request message and send
-    reqMsg.inParams = new InParam[3];
+    reqMsg.inParams = new JsonInParam[3];
     String[] param1 = NetUtils.getStringArray(path);
-    reqMsg.inParams[0] = new InParam("path", "String", param1);
-    String[] param2 = NetUtils.getStringArray(count);
-    reqMsg.inParams[1] = new InParam("count", "int[]", param2);
+    reqMsg.inParams[0] = new JsonInParam("path", "String", param1);
+    String[] param2 = NetUtils.getStringArray(data);
+    reqMsg.inParams[1] = new JsonInParam("data", "int[]", param2);
     String[] param3 = NetUtils.getStringArray(fileOnly);
-    reqMsg.inParams[2] = new InParam("fileOnly", "boolean", param3);
+    reqMsg.inParams[2] = new JsonInParam("fileOnly", "boolean", param3);
 
     // create a json message
     String msgJSON = JSONHelper.createRequest(reqMsg);
