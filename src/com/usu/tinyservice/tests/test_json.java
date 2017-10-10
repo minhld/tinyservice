@@ -3,7 +3,7 @@ package com.usu.tinyservice.tests;
 import com.usu.tinyservice.messages.json.JsonInParam;
 import com.usu.tinyservice.messages.json.JsonOutParam;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
-import com.usu.tinyservice.network.JSONHelper;
+import com.usu.tinyservice.network.NetUtils;
 
 public class test_json extends Thread {
 	public void run() {
@@ -12,10 +12,10 @@ public class test_json extends Thread {
 		request1.functionName = "getRoot";
 		request1.outParam = new JsonOutParam("String");
 		
-		String request1Json = JSONHelper.createRequest(request1);
+		String request1Json = NetUtils.createRequest(request1);
 		System.out.println(request1Json);
 		
-		request1 = JSONHelper.getRequest(request1Json);
+		request1 = NetUtils.getRequest(request1Json);
 		System.out.println("funcName: " + request1.functionName);
 		for (int i = 0; i < request1.inParams.length; i++) {
 			System.out.println("inParams[" + i + "]: " + request1.inParams[i].param + "," + request1.inParams[i].values[0]);
@@ -30,10 +30,10 @@ public class test_json extends Thread {
 		request2.inParams[1] = new JsonInParam("fileOnly", "boolean", new String[] { "true" });
 		request2.outParam = new JsonOutParam("String[]");
 		
-		String request2Json = JSONHelper.createRequest(request2);
+		String request2Json = NetUtils.createRequest(request2);
 		System.out.println(request2Json);
 		
-		request2 = JSONHelper.getRequest(request2Json);
+		request2 = NetUtils.getRequest(request2Json);
 		System.out.println("funcName: " + request2.functionName);
 		for (int i = 0; i < request2.inParams.length; i++) {
 			System.out.println("inParams[" + i + "]: " + request2.inParams[i].param + "," + request2.inParams[i].values[0]);

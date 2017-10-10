@@ -2,7 +2,6 @@ package com.usu.tinyservice.classes;
 
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
-import com.usu.tinyservice.network.JSONHelper;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.Responder;
 
@@ -21,7 +20,7 @@ public class MobileServiceDemoServer {
     public void respond(byte[] req) {
       // get request message from JSON 
       String reqJSON = new String(req);
-      JsonRequestMessage reqMsg = JSONHelper.getRequest(reqJSON);
+      JsonRequestMessage reqMsg = NetUtils.getRequest(reqJSON);
 
       switch (reqMsg.functionName) {
       case "getFileList1": {
@@ -47,13 +46,13 @@ public class MobileServiceDemoServer {
         boolean fileOnly = fileOnlys[0];
 
         // start calling function "getFileList1"
-        int[] rets = mobileservicedemo.getFileList1(path, data, fileOnly);
+        int[] rets = null; // mobileservicedemo.getFileList1(path, data, fileOnly);
         String retType = "int";
         String[] retValues = NetUtils.getStringArray(rets);
         JsonResponseMessage respMsg = new JsonResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, retValues);
 
         // convert to JSON
-        String respJSON = JSONHelper.createResponse(respMsg);
+        String respJSON = NetUtils.createResponse(respMsg);
         send(respJSON);
         break;
       }

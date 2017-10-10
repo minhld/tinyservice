@@ -4,7 +4,6 @@ import java.util.Date;
 
 import com.usu.tinyservice.network.Publisher;
 import com.usu.tinyservice.network.Subscriber;
-import com.usu.tinyservice.network.BinaryHelper;
 import com.usu.tinyservice.network.Constants;
 
 public class test_pubsub extends Thread {

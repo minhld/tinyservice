@@ -1,5 +1,15 @@
 package com.usu.tinyservice.network;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import com.google.gson.Gson;
+import com.usu.tinyservice.messages.json.JsonRequestMessage;
+import com.usu.tinyservice.messages.json.JsonResponseMessage;
+
 public class NetUtils {
 	
 	public static <T> String[] getString(T inputArray) {
@@ -86,6 +96,13 @@ public class NetUtils {
     	return rets;
     }
     
+    /**
+     * convert from a primitive type to Object type and return
+     * result in the string format 
+     * 
+     * @param type
+     * @return
+     */
     public static String convertType(String type) {
 		switch (type) {
 			case "byte": {
@@ -118,4 +135,78 @@ public class NetUtils {
 			
 		}
 	}
+    
+    public static String createRequest(JsonRequestMessage request) {
+		Gson gson = new Gson();
+		return gson.toJson(request);
+	}
+	
+	public static JsonRequestMessage getRequest(String json) {
+		Gson gson = new Gson();
+		return gson.fromJson(json, JsonRequestMessage.class);
+	}
+	
+	public static String createResponse(JsonResponseMessage response) {
+		Gson gson = new Gson();
+		return gson.toJson(response);
+	}
+	
+	public static JsonResponseMessage getResponse(String json) {
+		Gson gson = new Gson();
+		return gson.fromJson(json, JsonResponseMessage.class);
+	}
+	
+	/**
+     * serialize an object to binary array
+     *
+     * @param obj
+     * @return
+     * @throws IOException
+     */
+    public static byte[] serialize(Object obj) {
+    	ByteArrayOutputStream b = null;
+    	try {
+	        b = new ByteArrayOutputStream();
+	        ObjectOutputStream o = new ObjectOutputStream(b);
+	        o.writeObject(obj);
+	        o.flush();
+	        return b.toByteArray();
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    		return new byte[0];
+    	} finally {
+    		try {
+    			if (b!= null) {
+    				b.close();
+    			}
+    		} catch (IOException ex) { }
+    	}
+    }
+
+    /**
+     * deserialize an object from a binary array
+     *
+     * @param bytes
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static Object deserialize(byte[] bytes) throws Exception {
+        ByteArrayInputStream b = null;
+        try {
+        	b = new ByteArrayInputStream(bytes);
+	        ObjectInputStream o = new ObjectInputStream(b);
+	        return o.readObject();
+        } catch (IOException e) {
+    		e.printStackTrace();
+    		return new byte[0];
+    	} finally {
+    		try {
+    			if (b!= null) {
+    				b.close();
+    			}
+    		} catch (IOException ex) { }
+    	}
+    }
+
 }

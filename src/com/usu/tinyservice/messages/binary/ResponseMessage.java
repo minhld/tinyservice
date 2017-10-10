@@ -1,8 +1,6 @@
 package com.usu.tinyservice.messages.binary;
 
-import com.usu.tinyservice.messages.json.JsonMessage;
-
-public class ResponseMessage extends JsonMessage {
+public class ResponseMessage extends Message {
 	private static final long serialVersionUID = 1L;
 
 	public ResponseMessage() { 

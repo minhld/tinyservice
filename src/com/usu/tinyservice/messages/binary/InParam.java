@@ -8,11 +8,20 @@ package com.usu.tinyservice.messages.binary;
 public class InParam {
 	public String param;
 	public String type;
-	public String[] values;
+	public Object[] values;
 	
 	public InParam() { } 
 	
-	public InParam(String param, String type, String[] values) {
+	public InParam(String param, String type, Object value) {
+		this.param = param;
+		this.type = type;
+		try {
+			this.values = new Object[1];
+			this.values[0] = value;
+		} catch (Exception e) { } 
+	}
+	
+	public InParam(String param, String type, Object[] values) {
 		this.param = param;
 		this.type = type;
 		this.values = values;

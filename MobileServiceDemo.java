@@ -20,12 +20,7 @@ import com.usu.tinyservice.annotations.CommModel;
 public class MobileServiceDemo {
 	
 	@ServiceMethod(syncMode = SyncMode.Async)
-	public Data1 getFileList1(String path, Data1 data, boolean fileOnly) {
-		Data1 data1 = new Data1();
-		data1.data11 = new int[] { 1, 3, 5 };
-		data1.data12 = new String[] { "hello", "there" }; 
-		data1.data13 = "my name is Creator!".getBytes();
-		return data1;
+	public int[] getFileList1(String path, int[] data, boolean fileOnly) {
+		return new int[] { 1, 3, 5 };
 	}
-
 }
