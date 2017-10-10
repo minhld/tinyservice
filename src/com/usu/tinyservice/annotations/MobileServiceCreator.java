@@ -11,6 +11,11 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.JavaFileObject;
 
+import com.usu.tinyservice.messages.InParam;
+import com.usu.tinyservice.messages.RequestMessage;
+import com.usu.tinyservice.network.JSONHelper;
+import com.usu.tinyservice.network.NetUtils;
+import com.usu.tinyservice.network.ReceiveListener;
 import com.usu.tinyservice.network.Requester;
 
 /**
@@ -160,7 +165,7 @@ public class MobileServiceCreator {
 		
 		List<? extends VariableElement> ves = ee.getParameters();
 		for (int i = 0; i < ves.size(); i++) {
-			funcCall += printInputParam(ves.get(i)) + "\n";
+			funcCall += printInputParam(ves.get(i), i) + "\n";
 		}
 		
 		String retType = getOnlyName(ee.getReturnType().toString());
@@ -185,9 +190,11 @@ public class MobileServiceCreator {
 	 * help converting parameter into the general format 
 	 * 
 	 * @param e
+	 * @param idx
+	 * 
 	 * @return
 	 */
-	private static String printInputParam(VariableElement e) {
+	private static String printInputParam(VariableElement e, int idx) {
 		String inParamsStr = "";
 		
 		// define variable name
@@ -200,9 +207,9 @@ public class MobileServiceCreator {
 		
 		// assign value from a parameter to an array
 		inParamsStr += "        // for variable " + "\"" + vName + "\"\n";
-		inParamsStr += "        " + vType + "[] " + vNames + " = new " + vType + "[reqMsg.inParams[0].values.length];\n";
-		inParamsStr += "        for (int i = 0; i < reqMsg.inParams[0].values.length; i++) {\n";
-		inParamsStr += "          " + vNames + "[i] = " + convertType(vType, "reqMsg.inParams[0].values[i]") + ";\n";  
+		inParamsStr += "        " + vType + "[] " + vNames + " = new " + vType + "[reqMsg.inParams[" + idx + "].values.length];\n";
+		inParamsStr += "        for (int i = 0; i < reqMsg.inParams[" + idx + "].values.length; i++) {\n";
+		inParamsStr += "          " + vNames + "[i] = " + convertType(vType, "reqMsg.inParams[" + idx + "].values[i]") + ";\n";  
 		inParamsStr += "        }\n";
 
 		// assign values from the array to the original parameter 
@@ -261,7 +268,7 @@ public class MobileServiceCreator {
 			writer.println();
 			
 			// define the server constructor
-			writer.println("  public " + clientClassName + "() {");
+			writer.println("  public " + clientClassName + "(ReceiveListener listener) {");
 			writer.println("    // start listener");
 			writer.println("    this.listener = listener;\n");
 			writer.println("    // create request message and send");
@@ -315,13 +322,40 @@ public class MobileServiceCreator {
 			funcCaller += retType + " " + funcName + "(";
 		}
 		
+		// prepare the input parameters
 		List<? extends VariableElement> ves = ee.getParameters();
 		VariableElement ve;
+		String inParamStr = ves.size() > 0 ? "    reqMsg.inParams = new InParam[" + ves.size() + "];\n" : "";
+		
+		String vType, vName;
 		for (int i = 0; i < ves.size(); i++) {
 			ve = ves.get(i);
-			funcCaller += getOnlyName(ve.asType().toString()) + " " + ve.getSimpleName() + (i < ves.size() - 1 ? ", " : "");
+			vType = getOnlyName(ve.asType().toString());
+			vName = ve.getSimpleName().toString();
+			
+			funcCaller += getOnlyName(vType + " " + vName + (i < ves.size() - 1 ? ", " : ""));
+			inParamStr += "    String[] param" + (i + 1) + " = NetUtils.getStringArray(" + vName + ");\n" +
+						  "    reqMsg.inParams[" + i + "] = new InParam(\"" + vName + "\", \"" + vType + "\", param" + (i + 1) + ");\n";
 		}
-		funcCaller += ") {\n";
+		
+		funcCaller += ") {\n" +
+					  "    // compose input parameters\n" +
+					  "    String functionName = \"" + funcName + "\";\n" + 
+					  "    String outType = \"" + retType + "\";\n" +
+					  "    RequestMessage reqMsg = new RequestMessage(functionName, outType);\n" + 
+					  "    \n" +
+					  "    // create request message and send\n";
+		
+		// concatenate the input parameter analytic part
+		funcCaller += inParamStr;
+		
+		// prepare the message to send to server
+		if (transType == TransmitType.JSON) {
+			funcCaller += "    String msgJSON = JSONHelper.createRequest(reqMsg);\n" +
+					  	  "    req.send(msgJSON);\n";
+		} else {
+			
+		}
 		
 		// enclose part
 		funcCaller += "  }\n";
