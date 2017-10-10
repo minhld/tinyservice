@@ -1,7 +1,7 @@
 package com.usu.tinyservice.classes;
 
 
-import com.usu.tinyservice.messages.IData;
+import com.usu.tinyservice.messages.binary.IData;
 
 public class Data1 extends IData {
 	private static final long serialVersionUID = 1L;

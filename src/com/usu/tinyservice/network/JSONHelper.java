@@ -1,8 +1,8 @@
 package com.usu.tinyservice.network;
 
 import com.google.gson.Gson;
-import com.usu.tinyservice.messages.JsonRequestMessage;
-import com.usu.tinyservice.messages.JsonResponseMessage;
+import com.usu.tinyservice.messages.json.JsonRequestMessage;
+import com.usu.tinyservice.messages.json.JsonResponseMessage;
 
 public class JSONHelper {
 	

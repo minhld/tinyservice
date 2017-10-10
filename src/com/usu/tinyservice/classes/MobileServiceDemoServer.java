@@ -1,7 +1,7 @@
 package com.usu.tinyservice.classes;
 
-import com.usu.tinyservice.messages.JsonRequestMessage;
-import com.usu.tinyservice.messages.JsonResponseMessage;
+import com.usu.tinyservice.messages.json.JsonRequestMessage;
+import com.usu.tinyservice.messages.json.JsonResponseMessage;
 import com.usu.tinyservice.network.JSONHelper;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.Responder;

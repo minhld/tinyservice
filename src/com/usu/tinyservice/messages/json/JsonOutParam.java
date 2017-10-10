@@ -1,4 +1,4 @@
-package com.usu.tinyservice.messages;
+package com.usu.tinyservice.messages.json;
 
 /**
  * define the output parameter containing only value 
@@ -6,20 +6,20 @@ package com.usu.tinyservice.messages;
  * @author minhld
  *
  */
-public class OutParam {
+public class JsonOutParam {
 	public String type;
 	public String[] values = new String[0];
 	
 	
-	public OutParam() {
+	public JsonOutParam() {
 		this("void");
 	}
 	
-	public OutParam(String type) {
+	public JsonOutParam(String type) {
 		this.type = type;
 	} 
 	
-	public OutParam(String type, String[] values) {
+	public JsonOutParam(String type, String[] values) {
 		this.type = type;
 		this.values = values;
 	}

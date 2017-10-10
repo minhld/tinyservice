@@ -1,8 +1,8 @@
 package com.usu.tinyservice.tests;
 
-import com.usu.tinyservice.messages.JsonInParam;
-import com.usu.tinyservice.messages.JsonOutParam;
-import com.usu.tinyservice.messages.JsonRequestMessage;
+import com.usu.tinyservice.messages.json.JsonInParam;
+import com.usu.tinyservice.messages.json.JsonOutParam;
+import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.network.JSONHelper;
 
 public class test_json extends Thread {

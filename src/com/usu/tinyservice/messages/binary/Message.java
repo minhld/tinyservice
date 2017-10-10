@@ -1,26 +1,28 @@
-package com.usu.tinyservice.messages;
+package com.usu.tinyservice.messages.binary;
 
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.usu.tinyservice.messages.json.JsonOutParam;
 
-public class JsonMessage implements Serializable {
+
+public class Message implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	public String messageId;
 	public String functionName;
 	public JsonOutParam outParam;
 	
-	public JsonMessage() { 
+	public Message() { 
 		this.messageId = UUID.randomUUID().toString();
 	}
 
-	public JsonMessage(String functionName) {
+	public Message(String functionName) {
 		this();
 		this.functionName = functionName;
 	}
 	
-	public JsonMessage(String functionName, String outType, String[] values) {
+	public Message(String functionName, String outType, String[] values) {
 		this(functionName);
 		this.outParam = new JsonOutParam(outType, values);
 	}

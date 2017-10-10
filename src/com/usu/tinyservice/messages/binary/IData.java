@@ -1,4 +1,4 @@
-package com.usu.tinyservice.messages;
+package com.usu.tinyservice.messages.binary;
 
 import java.io.Serializable;
 

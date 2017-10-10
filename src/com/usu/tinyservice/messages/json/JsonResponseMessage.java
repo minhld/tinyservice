@@ -1,4 +1,4 @@
-package com.usu.tinyservice.messages;
+package com.usu.tinyservice.messages.json;
 
 public class JsonResponseMessage extends JsonMessage {
 	private static final long serialVersionUID = 1L;

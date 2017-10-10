@@ -50,8 +50,8 @@ public class MobileServiceCreator {
 			// print package and default imports
 			writer.println("package " + packageName + ";");
 			writer.println();
-			writer.println("import com.usu.tinyservice.messages.JsonRequestMessage;");
-			writer.println("import com.usu.tinyservice.messages.JsonResponseMessage;");
+			writer.println("import com.usu.tinyservice.messages.json.JsonRequestMessage;");
+			writer.println("import com.usu.tinyservice.messages.json.JsonResponseMessage;");
 			writer.println("import com.usu.tinyservice.network.JSONHelper;");
 			writer.println("import com.usu.tinyservice.network.NetUtils;");
 			writer.println("import com.usu.tinyservice.network.Responder;");
@@ -250,8 +250,8 @@ public class MobileServiceCreator {
 			// print package and default imports
 			writer.println("package " + packageName + ";");
 			writer.println();
-			writer.println("import com.usu.tinyservice.messages.JsonInParam;");
-			writer.println("import com.usu.tinyservice.messages.JsonRequestMessage;");
+			writer.println("import com.usu.tinyservice.messages.json.JsonInParam;");
+			writer.println("import com.usu.tinyservice.messages.json.JsonRequestMessage;");
 			writer.println("import com.usu.tinyservice.network.JSONHelper;");
 			writer.println("import com.usu.tinyservice.network.NetUtils;");
 			writer.println("import com.usu.tinyservice.network.ReceiveListener;");
