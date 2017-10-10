@@ -1,6 +1,8 @@
 package com.usu.tinyservice.messages;
 
 public class ResponseMessage extends Message {
+	private static final long serialVersionUID = 1L;
+
 	public ResponseMessage() { 
 		super();
 	}

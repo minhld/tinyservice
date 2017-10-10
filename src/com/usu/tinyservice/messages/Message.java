@@ -1,9 +1,12 @@
 package com.usu.tinyservice.messages;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 
-public class Message {
+public class Message implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	public String messageId;
 	public String functionName;
 	public OutParam outParam;

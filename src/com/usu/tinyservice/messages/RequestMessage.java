@@ -1,6 +1,8 @@
 package com.usu.tinyservice.messages;
 
 public class RequestMessage extends Message {
+	private static final long serialVersionUID = 1L;
+	
 	public InParam[] inParams = new InParam[0];
 	
 	public RequestMessage() { 
