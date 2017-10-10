@@ -9,7 +9,7 @@ public class Message implements Serializable {
 	
 	public String messageId;
 	public String functionName;
-	public OutParam outParam;
+	public OutJsonParam outParam;
 	
 	public Message() { 
 		this.messageId = UUID.randomUUID().toString();
@@ -22,7 +22,7 @@ public class Message implements Serializable {
 	
 	public Message(String functionName, String outType, String[] values) {
 		this(functionName);
-		this.outParam = new OutParam(outType, values);
+		this.outParam = new OutJsonParam(outType, values);
 	}
 
 }

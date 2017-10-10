@@ -1,7 +1,7 @@
 package com.usu.tinyservice.tests;
 
-import com.usu.tinyservice.messages.InParam;
-import com.usu.tinyservice.messages.OutParam;
+import com.usu.tinyservice.messages.InJsonParam;
+import com.usu.tinyservice.messages.OutJsonParam;
 import com.usu.tinyservice.messages.RequestMessage;
 import com.usu.tinyservice.network.JSONHelper;
 
@@ -10,7 +10,7 @@ public class test_json extends Thread {
 		// REQUEST 1
 		RequestMessage request1 = new RequestMessage();
 		request1.functionName = "getRoot";
-		request1.outParam = new OutParam("String");
+		request1.outParam = new OutJsonParam("String");
 		
 		String request1Json = JSONHelper.createRequest(request1);
 		System.out.println(request1Json);
@@ -24,11 +24,11 @@ public class test_json extends Thread {
 		// REQUEST 2
 		RequestMessage request2 = new RequestMessage();
 		request2.functionName = "getFileList";
-		request2.outParam = new OutParam("String");
-		request2.inParams = new InParam[2];
-		request2.inParams[0] = new InParam("path", "String", new String[] { "D:\\" });
-		request2.inParams[1] = new InParam("fileOnly", "boolean", new String[] { "true" });
-		request2.outParam = new OutParam("String[]");
+		request2.outParam = new OutJsonParam("String");
+		request2.inParams = new InJsonParam[2];
+		request2.inParams[0] = new InJsonParam("path", "String", new String[] { "D:\\" });
+		request2.inParams[1] = new InJsonParam("fileOnly", "boolean", new String[] { "true" });
+		request2.outParam = new OutJsonParam("String[]");
 		
 		String request2Json = JSONHelper.createRequest(request2);
 		System.out.println(request2Json);
