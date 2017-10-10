@@ -17,7 +17,7 @@ import javax.tools.JavaFileObject;
  * @author minhld
  *
  */
-public class MobileServiceCreator {
+public class MobileServiceBinCreator {
 	static final String REP_STRING = "!@#$%^";
 	static String classInstance;
 	
