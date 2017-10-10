@@ -61,7 +61,6 @@ public class MobileServiceDemoClient {
     reqMsg.inParams = new InParam[3];
     String[] param1 = NetUtils.getStringArray(path);
     reqMsg.inParams[0] = new InParam("path", "String", param1);
-    List list = Arrays.asList(count);
     String[] param2 = NetUtils.getStringArray(count);
     reqMsg.inParams[1] = new InParam("count", "int[]", param2);
     String[] param3 = NetUtils.getStringArray(fileOnly);
