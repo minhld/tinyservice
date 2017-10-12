@@ -46,8 +46,8 @@ public class MobileServiceDemoServer {
 
         // start calling function "getFileList1"
         Data1[] rets = mobileservicedemo.getFileList1(path, data, fileOnly);
-        String respType = "Data1[]";
-        ResponseMessage respMsg = new ResponseMessage(reqMsg.functionName, respType, rets);
+        String retType = "Data1[]";
+        ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, rets);
 
         // convert to binary 
         byte[] resp = NetUtils.serialize(respMsg);

@@ -11,6 +11,9 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.JavaFileObject;
 
+import com.usu.tinyservice.messages.binary.RequestMessage;
+import com.usu.tinyservice.network.NetUtils;
+
 /**
  * class to create server and client objects.  
  * 
@@ -52,7 +55,6 @@ public class MobileServiceBinCreator {
 			writer.println();
 			writer.println("import com.usu.tinyservice.messages.binary.RequestMessage;");
 			writer.println("import com.usu.tinyservice.messages.binary.ResponseMessage;");
-			writer.println("import com.usu.tinyservice.network.JSONHelper;");
 			writer.println("import com.usu.tinyservice.network.NetUtils;");
 			writer.println("import com.usu.tinyservice.network.Responder;");
 			writer.println();
@@ -107,6 +109,9 @@ public class MobileServiceBinCreator {
 			reqConvert = "      // get request message from JSON \n" + 
 						 "      String reqJSON = new String(req);\n" +
 						 "      RequestMessage reqMsg = JSONHelper.getRequest(reqJSON);\n\n";
+		} else {
+			reqConvert = "      // get request message\n" + 
+					 	 "      RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(req);\n\n";
 		}
 		
 		// define the switch - where all the functions are iterated here
@@ -142,7 +147,12 @@ public class MobileServiceBinCreator {
 				respConvert = "        // convert to JSON\n" +
 							  "        String respJSON = JSONHelper.createResponse(respMsg);\n" + 
 							  "        send(respJSON);\n";
+			} else {
+				respConvert = "        // convert to JSON\n" +
+						  	  "        byte[] resp = NetUtils.serialize(respMsg);\n" + 
+						  	  "        send(resp);\n";
 			}
+			
 			funcPrepare = funcPrepare.replace(REP_STRING, respConvert);
 			return funcPrepare;
 		}

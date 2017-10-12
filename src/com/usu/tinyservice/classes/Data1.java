@@ -1,9 +1,6 @@
 package com.usu.tinyservice.classes;
 
-
 import java.io.Serializable;
-
-import com.usu.tinyservice.messages.binary.IData;
 
 public class Data1 implements Serializable {
 	private static final long serialVersionUID = 1L;
