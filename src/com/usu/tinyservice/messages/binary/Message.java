@@ -3,9 +3,6 @@ package com.usu.tinyservice.messages.binary;
 import java.io.Serializable;
 import java.util.UUID;
 
-import com.usu.tinyservice.messages.json.JsonOutParam;
-
-
 public class Message implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -22,7 +19,7 @@ public class Message implements Serializable {
 		this.functionName = functionName;
 	}
 	
-	public Message(String functionName, String outType, String[] values) {
+	public Message(String functionName, String outType, Object[] values) {
 		this(functionName);
 		this.outParam = new OutParam(outType, values);
 	}

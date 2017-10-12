@@ -12,7 +12,7 @@ public class OutParam implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	public String type;
-	public String[] values = new String[0];
+	public Object[] values = new Object[0];
 	
 	
 	public OutParam() {
@@ -23,7 +23,7 @@ public class OutParam implements Serializable {
 		this.type = type;
 	} 
 	
-	public OutParam(String type, String[] values) {
+	public OutParam(String type, Object[] values) {
 		this.type = type;
 		this.values = values;
 	}

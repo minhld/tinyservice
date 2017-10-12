@@ -3,6 +3,8 @@ package com.usu.tinyservice.tests;
 import com.usu.tinyservice.classes.Data1;
 import com.usu.tinyservice.classes.MobileServiceDemoClient;
 import com.usu.tinyservice.classes.MobileServiceDemoServer;
+import com.usu.tinyservice.messages.binary.ResponseMessage;
+import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 import com.usu.tinyservice.utils.Utils;
 
@@ -15,7 +17,9 @@ public class test_system extends Thread {
 		MobileServiceDemoClient client = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override
 			public void dataReceived(byte[] data) {
-				System.out.println(new String(data));
+				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
+				Data1[] data1 = (Data1[]) resp.outParam.values;
+				System.out.println(new String(data1[0].data13));
 			}
 		});
 		
@@ -24,7 +28,7 @@ public class test_system extends Thread {
 		Data1 data1 = new Data1(); 
 		data1.data11 = new int[] { 1, 2, 3 };
 		data1.data12 = new String[] { "abc", "def" };
-		data1.data13 = new byte[] { 1, 1, 0 };
+		data1.data13 = "hello from client".getBytes();
 		
 		client.getFileList1("D:\\", new Data1[] { data1 }, true);
 	}
