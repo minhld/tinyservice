@@ -33,10 +33,9 @@ public void getFileList1(String path, Data1 data[], boolean fileOnly) {
     reqMsg.inParams[1] = new InParam("data", "Data1", data);
     reqMsg.inParams[2] = new InParam("fileOnly", "Boolean", fileOnly);
 
-    
-    // create a json message
-//    String msgJSON = JSONHelper.createRequest(reqMsg);
-//    req.send(msgJSON);
+    // create a binary message
+    byte[] msg = NetUtils.serialize(reqMsg);
+    req.send(msg);
   }
 
 

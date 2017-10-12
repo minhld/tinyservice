@@ -21,7 +21,6 @@ public class test_system extends Thread {
 		
 		Utils.sleep(500);
 		
-		int[] count = new int[] { 1, 3, 5, 7, 9 };
 		Data1 data1 = new Data1(); 
 		data1.data11 = new int[] { 1, 2, 3 };
 		data1.data12 = new String[] { "abc", "def" };

@@ -1,11 +1,15 @@
 package com.usu.tinyservice.messages.binary;
 
+import java.io.Serializable;
+
 /**
  * define the input parameter class to hold a pair of key-value
  * @author minhld
  *
  */
-public class InParam {
+public class InParam implements Serializable {
+	public static final long serialVersionUID = 1l;
+	
 	public String param;
 	public String type;
 	public Object[] values;
