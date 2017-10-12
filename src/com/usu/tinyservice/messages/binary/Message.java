@@ -11,7 +11,7 @@ public class Message implements Serializable {
 	
 	public String messageId;
 	public String functionName;
-	public JsonOutParam outParam;
+	public OutParam outParam;
 	
 	public Message() { 
 		this.messageId = UUID.randomUUID().toString();
@@ -24,7 +24,7 @@ public class Message implements Serializable {
 	
 	public Message(String functionName, String outType, String[] values) {
 		this(functionName);
-		this.outParam = new JsonOutParam(outType, values);
+		this.outParam = new OutParam(outType, values);
 	}
 
 }

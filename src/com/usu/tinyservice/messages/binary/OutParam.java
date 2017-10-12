@@ -1,12 +1,16 @@
 package com.usu.tinyservice.messages.binary;
 
+import java.io.Serializable;
+
 /**
  * define the output parameter containing only value 
  * 
  * @author minhld
  *
  */
-public class OutParam {
+public class OutParam implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	public String type;
 	public String[] values = new String[0];
 	

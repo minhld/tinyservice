@@ -191,13 +191,13 @@ public class NetUtils {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static Object deserialize(byte[] bytes) throws Exception {
+    public static Object deserialize(byte[] bytes) {
         ByteArrayInputStream b = null;
         try {
         	b = new ByteArrayInputStream(bytes);
 	        ObjectInputStream o = new ObjectInputStream(b);
 	        return o.readObject();
-        } catch (IOException e) {
+        } catch (Exception e) {
     		e.printStackTrace();
     		return new byte[0];
     	} finally {
