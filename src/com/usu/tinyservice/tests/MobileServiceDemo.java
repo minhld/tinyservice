@@ -1,9 +1,8 @@
-package com.usu.tinyservice.classes;
+package com.usu.tinyservice.tests;
 
 
 import com.usu.tinyservice.annotations.MobileService;
 import com.usu.tinyservice.annotations.TransmitType;
-import com.usu.tinyservice.tests.Data1;
 import com.usu.tinyservice.annotations.ServiceMethod;
 import com.usu.tinyservice.annotations.SyncMode;
 import com.usu.tinyservice.annotations.CommModel;

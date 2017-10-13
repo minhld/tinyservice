@@ -15,8 +15,8 @@ public @interface MobileService {
 	// Publish-Subscribe or Push-Pull, default value is Client-Server
 	CommModel commModel() default CommModel.ClientServer;
 	
-	// data transmission type: could be either JSON or binary array
-	// default value is JSON
-	TransmitType transmitType() default TransmitType.JSON;
+	// data transmission type: could be either Binary or JSON
+	// default value is Binary
+	TransmitType transmitType() default TransmitType.Binary;
 	
 }

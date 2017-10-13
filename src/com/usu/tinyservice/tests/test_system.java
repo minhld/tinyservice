@@ -1,11 +1,8 @@
 package com.usu.tinyservice.tests;
 
-import com.usu.tinyservice.classes.MobileServiceDemoClient;
-import com.usu.tinyservice.classes.MobileServiceDemoServer;
 import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
-import com.usu.tinyservice.utils.Utils;
 
 public class test_system extends Thread {
 	public void run() {
@@ -22,7 +19,7 @@ public class test_system extends Thread {
 			}
 		});
 		
-		Utils.sleep(500);
+		NetUtils.sleep(500);
 		
 		Data1 data1 = new Data1(); 
 		data1.data11 = new int[] { 1, 2, 3 };

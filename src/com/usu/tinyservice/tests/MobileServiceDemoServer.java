@@ -1,4 +1,4 @@
-package com.usu.tinyservice.classes;
+package com.usu.tinyservice.tests;
 
 import com.usu.tinyservice.messages.binary.RequestMessage;
 import com.usu.tinyservice.messages.binary.ResponseMessage;
