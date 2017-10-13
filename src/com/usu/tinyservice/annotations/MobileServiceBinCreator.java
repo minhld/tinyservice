@@ -11,8 +11,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.JavaFileObject;
 
-import com.usu.tinyservice.messages.binary.RequestMessage;
-import com.usu.tinyservice.network.NetUtils;
 
 /**
  * class to create server and client objects.  
@@ -34,7 +32,7 @@ public class MobileServiceBinCreator {
 		// get service attributes
 		MobileService classService = type.getAnnotation(MobileService.class);
 		// CommModel commModel = classService.commModel();
-		TransmitType transType = classService.transmitType();
+		// TransmitType transType = classService.transmitType();
 		
 		String fullClassName = type.getQualifiedName().toString();
 		int lastDotIndex = fullClassName.lastIndexOf('.');
@@ -81,7 +79,8 @@ public class MobileServiceBinCreator {
 			writer.println("    @Override");
 			writer.println("    public void respond(byte[] req) {");
 			
-			String serverResponder = printAsyncServerResponder(transType, type, methods);
+			// String serverResponder = printAsyncServerResponder(transType, type, methods);
+			String serverResponder = printAsyncServerResponder(type, methods);
 			writer.println(serverResponder);
 			
 			// the last part
@@ -98,21 +97,15 @@ public class MobileServiceBinCreator {
 	/**
 	 * print out the JSON part in the Responder class
 	 * 
-	 * @param writer
 	 * @param e
 	 * @param methods
 	 */
-	private static String printAsyncServerResponder(TransmitType transType, Element e, List<? extends Element> methods) {
+	// private static String printAsyncServerResponder(TransmitType transType, Element e, List<? extends Element> methods) {
+	private static String printAsyncServerResponder(Element e, List<? extends Element> methods) {
 		String serverResponder = "";
 		String reqConvert = "";
-		if (transType == TransmitType.JSON) {
-			reqConvert = "      // get request message from JSON \n" + 
-						 "      String reqJSON = new String(req);\n" +
-						 "      RequestMessage reqMsg = JSONHelper.getRequest(reqJSON);\n\n";
-		} else {
-			reqConvert = "      // get request message\n" + 
-					 	 "      RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(req);\n\n";
-		}
+		reqConvert = "      // get request message\n" + 
+				 	 "      RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(req);\n\n";
 		
 		// define the switch - where all the functions are iterated here
 		serverResponder += reqConvert + 
@@ -120,7 +113,8 @@ public class MobileServiceBinCreator {
 
 		// define all the function wrapper
 		for (int i = 0; i < methods.size(); i++) {
-			serverResponder += printAsyncFunctionHandler(transType, methods.get(i));
+			// serverResponder += printAsyncFunctionHandler(transType, methods.get(i));
+			serverResponder += printAsyncFunctionHandler(methods.get(i));
 		}
 		
 		// close the part
@@ -131,10 +125,10 @@ public class MobileServiceBinCreator {
 	/**
 	 * print out one function block in JSON support 
 	 * 
-	 * @param writer
 	 * @param e
 	 */
-	private static String printAsyncFunctionHandler(TransmitType transType, Element e) {
+	// private static String printAsyncFunctionHandler(TransmitType transType, Element e) {
+	private static String printAsyncFunctionHandler(Element e) {		
 		ServiceMethod sm = e.getAnnotation(ServiceMethod.class);
 		
 		// only accept functions having annotation, function and sync_mode is ASYNC
@@ -142,16 +136,9 @@ public class MobileServiceBinCreator {
 		if (sm != null && e instanceof ExecutableElement) {
 			String funcPrepare = printFuncCall(e);
 			
-			String respConvert = "";
-			if (transType == TransmitType.JSON) {
-				respConvert = "        // convert to JSON\n" +
-							  "        String respJSON = JSONHelper.createResponse(respMsg);\n" + 
-							  "        send(respJSON);\n";
-			} else {
-				respConvert = "        // convert to JSON\n" +
-						  	  "        byte[] resp = NetUtils.serialize(respMsg);\n" + 
-						  	  "        send(resp);\n";
-			}
+			String respConvert = "        // convert to JSON\n" +
+						  	  	 "        byte[] resp = NetUtils.serialize(respMsg);\n" + 
+						  	  	 "        send(resp);\n";
 			
 			funcPrepare = funcPrepare.replace(REP_STRING, respConvert);
 			return funcPrepare;
