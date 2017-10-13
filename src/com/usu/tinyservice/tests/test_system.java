@@ -1,6 +1,5 @@
 package com.usu.tinyservice.tests;
 
-import com.usu.tinyservice.classes.Data1;
 import com.usu.tinyservice.classes.MobileServiceDemoClient;
 import com.usu.tinyservice.classes.MobileServiceDemoServer;
 import com.usu.tinyservice.messages.binary.ResponseMessage;

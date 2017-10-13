@@ -53,11 +53,11 @@ public class MobileServiceProcessor extends AbstractProcessor {
             //we need to check if the TypeElement is a valid class
             if (isValidClass(type, MobileService.class.getName())) {
                 // writeSourceFile(type);
-            	 MobileServiceCreator.generateServer(processingEnv, type);
-            	 MobileServiceCreator.generateClient(processingEnv, type);
+            	// MobileServiceCreator.generateServer(processingEnv, type);
+            	// MobileServiceCreator.generateClient(processingEnv, type);
             	
-//            	MobileServiceBinCreator.generateServer(processingEnv, type);
-//            	MobileServiceBinCreator.generateClient(processingEnv, type);
+            	MobileServiceBinCreator.generateServer(processingEnv, type);
+            	MobileServiceBinCreator.generateClient(processingEnv, type);
             } else {
                 return true;
             }
