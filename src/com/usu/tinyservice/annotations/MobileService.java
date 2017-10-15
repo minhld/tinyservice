@@ -19,4 +19,6 @@ public @interface MobileService {
 	// default value is Binary
 	TransmitType transmitType() default TransmitType.Binary;
 	
+	// host & port OR an unique name (TBD) 
+	
 }
