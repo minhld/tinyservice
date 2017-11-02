@@ -21,6 +21,7 @@ public class test_system extends Thread {
 		
 		NetUtils.sleep(500);
 		
+		// prepare data
 		Data1 data1 = new Data1(); 
 		data1.data11 = new int[] { 1, 2, 3 };
 		data1.data12 = new String[] { "abc", "def" };
