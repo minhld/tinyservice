@@ -158,8 +158,8 @@ public abstract class Worker extends Thread {
 //    private void initWithoutBroker() { }
 
     class ExAckClient extends AckClient {
-        public ExAckClient(ZMQ.Context _context, String _ip, byte[] _id) {
-            super(_context, _ip, _id);
+        public ExAckClient(ZMQ.Context context, String ip, byte[] id) {
+            super(context, ip, id);
         }
 
         @Override
