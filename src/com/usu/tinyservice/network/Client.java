@@ -18,14 +18,14 @@ public abstract class Client extends Thread {
         this.start();
     }
 
-    public Client(String _groupIp) {
-        this.groupIp = _groupIp;
+    public Client(String groupIp) {
+        this.groupIp = groupIp;
         this.start();
     }
 
-    public Client(String _groupIp, int _port) {
-        this.groupIp = _groupIp;
-        this.port = _port;
+    public Client(String groupIp, int port) {
+        this.groupIp = groupIp;
+        this.port = port;
         this.start();
     }
 

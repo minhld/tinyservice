@@ -14,7 +14,7 @@ import java.util.HashMap;
  *
  */
 public class Broker extends Thread {
-    private String brokerIp = "*";
+    private String brokerIp = NetUtils.DEFAULT_IP;
 
     private HashMap<String, WorkerInfo> workerList;
     private static HashMap<String, JobMergeInfo> jobMergeList;
@@ -25,7 +25,10 @@ public class Broker extends Thread {
     long startTime = 0;
     static long startRLRequestTime = 0;
 
-
+    public Broker() {
+        this.start();
+    }
+    
     public Broker(String brokerIp) {
         this.brokerIp = brokerIp;
         this.start();
@@ -36,30 +39,30 @@ public class Broker extends Thread {
         initRouterMode();
     }
 
-    /**
-     * this function is only called when developer invoke pub-sub mode (default)
-     * which is for data transmission only
-     */
-    private void initPubSubMode() {
-        ZMQ.Context context = ZMQ.context(1);
-
-        // initiate publish socket
-        String xpubUri = "tcp://" + this.brokerIp + ":" + NetUtils.CLIENT_PORT;
-        ZMQ.Socket xpubSk = context.socket(ZMQ.XPUB);
-        xpubSk.bind(xpubUri);
-
-        // initiate subscribe socket
-        String xsubUri = "tcp://" + this.brokerIp + ":" + NetUtils.SERVER_PORT;
-        ZMQ.Socket xsubSk = context.socket(ZMQ.XSUB);
-        xsubSk.bind(xsubUri);
-
-        // bind the two sockets together - this will suspend here to listen
-        ZMQ.proxy(xsubSk, xpubSk, null);
-
-        xsubSk.close();
-        xpubSk.close();
-        context.term();
-    }
+//    /**
+//     * this function is only called when developer invoke pub-sub mode (default)
+//     * which is for data transmission only
+//     */
+//    private void initPubSubMode() {
+//        ZMQ.Context context = ZMQ.context(1);
+//
+//        // initiate publish socket
+//        String xpubUri = "tcp://" + this.brokerIp + ":" + NetUtils.CLIENT_PORT;
+//        ZMQ.Socket xpubSk = context.socket(ZMQ.XPUB);
+//        xpubSk.bind(xpubUri);
+//
+//        // initiate subscribe socket
+//        String xsubUri = "tcp://" + this.brokerIp + ":" + NetUtils.SERVER_PORT;
+//        ZMQ.Socket xsubSk = context.socket(ZMQ.XSUB);
+//        xsubSk.bind(xsubUri);
+//
+//        // bind the two sockets together - this will suspend here to listen
+//        ZMQ.proxy(xsubSk, xpubSk, null);
+//
+//        xsubSk.close();
+//        xpubSk.close();
+//        context.term();
+//    }
 
     /**
      * this function is called when developer invoke router mode
@@ -117,6 +120,7 @@ public class Broker extends Thread {
                     // WORKER has finished loading, returned DRL value
                     // update worker list
                     workerList.put(workerId, new WorkerInfo(workerId));
+                    System.err.println("[Broker - From Worker] [" + workerId + "] Worker Stored!");
                     // ackServer.updateWorkerNumbers(workerList.size());
 
                 } else {
@@ -169,7 +173,7 @@ public class Broker extends Thread {
                 // // all DRL values, it will consider DRLs and divide job into tasks with
                 // // proportional data amounts to the DRL values.
                 // ackServer.queryDRL(clientId, request);
-
+                System.err.println("[Broker - From Client] " + new String(request));
             }
 
         }
