@@ -110,50 +110,52 @@ public abstract class Worker extends Thread {
      */
     protected byte[] defaultResolveRequest(byte[] packageBytes) {
         try {
-            // get back the job package sent by broker
-            JobPackage request = (JobPackage) Utils.deserialize(packageBytes);
-
-            // report out that worker receives a request
-            receivedTask(request.clientId, request.dataBytes.length);
-
-            // ====== ====== ====== EXAMPLE SECTION ====== ====== ======
-
-            // // ====== image-processing example ======
-            // // initiate data parser and job objects from the request package
-            JobDataParser dataParser = new JobDataParserImpl(); // JobHelper.getDataParser(this.context, this.workerId, request.jobBytes);
-            // Job job = new JobImpl(); // JobHelper.getJob(this.context, this.workerId, request.jobBytes);
-            Job job = new BitmapJobImpl();
-
-            // // ====== word-count example ======
-            // JobDataParser dataParser = new WordDataParserImpl();
-            // Job job = new WordJobImpl();
-
-            // // ====== internet-share example ======
-            // JobDataParser dataParser = new NetDataParserImpl();
-            // Job job = new NetJobImpl();
-
-            // // ====== internet-share example ======
-            // JobDataParser dataParser = new EmptyDataParserImpl();
-            // Job job = new EmptyJobImpl();
-
-            // ====== ====== ====== END EXAMPLE ====== ====== ======
-
-            // execute the job
-            Object dataObject = dataParser.parseBytesToObject(request.dataBytes);
-            Object result = job.exec(dataObject);
-
-            return dataParser.parseObjectToBytes(result);
+//            // get back the job package sent by broker
+//            JobPackage request = (JobPackage) Utils.deserialize(packageBytes);
+//
+//            // report out that worker receives a request
+//            receivedTask(request.clientId, request.dataBytes.length);
+//
+//            // ====== ====== ====== EXAMPLE SECTION ====== ====== ======
+//
+//            // // ====== image-processing example ======
+//            // // initiate data parser and job objects from the request package
+//            JobDataParser dataParser = new JobDataParserImpl(); // JobHelper.getDataParser(this.context, this.workerId, request.jobBytes);
+//            // Job job = new JobImpl(); // JobHelper.getJob(this.context, this.workerId, request.jobBytes);
+//            Job job = new BitmapJobImpl();
+//
+//            // // ====== word-count example ======
+//            // JobDataParser dataParser = new WordDataParserImpl();
+//            // Job job = new WordJobImpl();
+//
+//            // // ====== internet-share example ======
+//            // JobDataParser dataParser = new NetDataParserImpl();
+//            // Job job = new NetJobImpl();
+//
+//            // // ====== internet-share example ======
+//            // JobDataParser dataParser = new EmptyDataParserImpl();
+//            // Job job = new EmptyJobImpl();
+//
+//            // ====== ====== ====== END EXAMPLE ====== ====== ======
+//
+//            // execute the job
+//            Object dataObject = dataParser.parseBytesToObject(request.dataBytes);
+//            Object result = job.exec(dataObject);
+//
+//            return dataParser.parseObjectToBytes(result);
+        	
+        	return workerId.getBytes();
         } catch (Exception e) {
             e.printStackTrace();
             return new byte[0];
         }
     }
 
-    /**
-     * initiate worker without broker at the middle.
-     * worker also takes the role of broker
-     */
-    private void initWithoutBroker() { }
+//    /**
+//     * initiate worker without broker at the middle.
+//     * worker also takes the role of broker
+//     */
+//    private void initWithoutBroker() { }
 
     class ExAckClient extends AckClient {
         public ExAckClient(ZMQ.Context _context, String _ip, byte[] _id) {
@@ -191,6 +193,12 @@ public abstract class Worker extends Thread {
      */
     public abstract void receivedTask(String clientId, int dataSize);
 
+    /**
+     * this event occurs when worker finishes the current work
+     * 
+     * @param workerId
+     * @param taskDone
+     */
     public abstract void workerFinished(String workerId, TaskDone taskDone);
 
     /**
