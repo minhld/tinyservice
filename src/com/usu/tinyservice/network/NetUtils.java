@@ -5,13 +5,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Random;
+
+import org.zeromq.ZMQ;
+import org.zeromq.ZMQ.Socket;
 
 import com.google.gson.Gson;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
 
 public class NetUtils {
-	
+    public static final int SERVER_PORT = 6666;
+    public static final int CLIENT_PORT = 6668;
+    
+    public static final String WORKER_READY = "READY";
+	public static final String BROKER_DELIMITER = "";
+    public static final String ID_DELIMITER = "@@@";
+
+    private static Random rand = new Random(System.currentTimeMillis());
+
+    
 	public static <T> String[] getString(T inputArray) {
     	String[] rets = new String[1];
     	rets[0] = inputArray.toString();
@@ -209,6 +222,18 @@ public class NetUtils {
     	}
     }
 
+    /**
+     * set random ID for the specific socket
+     * 
+     * @param sock
+     */
+    public static void setId (Socket sock)
+    {
+        String identity = String.format ("%04X-%04X", rand.nextInt (), rand.nextInt ());
+        sock.setIdentity (identity.getBytes (ZMQ.CHARSET));
+    }
+
+    
     public static void sleep(long time) {
 		try {
 			Thread.sleep(time);
