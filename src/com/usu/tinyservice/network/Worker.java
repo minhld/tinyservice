@@ -2,7 +2,7 @@ package com.usu.tinyservice.network;
 
 import org.zeromq.ZMQ;
 
-import com.usu.tinyservice.network.utils.AckClient;
+//import com.usu.tinyservice.network.utils.AckClient;
 
 /**
  * The worker serves as a servant for the broker. It receives tasks
@@ -15,7 +15,7 @@ public abstract class Worker extends Thread {
     private String groupIp = "*";
     private int port = NetUtils.SERVER_PORT;
 
-    private ExAckClient ackClient;
+//    private ExAckClient ackClient;
 
     public String workerId = "";
 
@@ -57,8 +57,8 @@ public abstract class Worker extends Thread {
             // inform broker that i am ready
             worker.send(NetUtils.WORKER_READY);
 
-            // initiate ACK client - to listen to DRL request from brokers
-            ackClient = new ExAckClient(context, this.groupIp, worker.getIdentity());
+//            // initiate ACK client - to listen to DRL request from brokers
+//            ackClient = new ExAckClient(context, this.groupIp, worker.getIdentity());
 
             // this part is to wait for broker to send job to execute
             String clientAddr;
@@ -102,54 +102,54 @@ public abstract class Worker extends Thread {
         }
     }
 
-    /**
-     * default
-     *
-     * @param packageBytes
-     * @return
-     */
-    protected byte[] defaultResolveRequest(byte[] packageBytes) {
-        try {
-//            // get back the job package sent by broker
-//            JobPackage request = (JobPackage) Utils.deserialize(packageBytes);
-//
-//            // report out that worker receives a request
-//            receivedTask(request.clientId, request.dataBytes.length);
-//
-//            // ====== ====== ====== EXAMPLE SECTION ====== ====== ======
-//
-//            // // ====== image-processing example ======
-//            // // initiate data parser and job objects from the request package
-//            JobDataParser dataParser = new JobDataParserImpl(); // JobHelper.getDataParser(this.context, this.workerId, request.jobBytes);
-//            // Job job = new JobImpl(); // JobHelper.getJob(this.context, this.workerId, request.jobBytes);
-//            Job job = new BitmapJobImpl();
-//
-//            // // ====== word-count example ======
-//            // JobDataParser dataParser = new WordDataParserImpl();
-//            // Job job = new WordJobImpl();
-//
-//            // // ====== internet-share example ======
-//            // JobDataParser dataParser = new NetDataParserImpl();
-//            // Job job = new NetJobImpl();
-//
-//            // // ====== internet-share example ======
-//            // JobDataParser dataParser = new EmptyDataParserImpl();
-//            // Job job = new EmptyJobImpl();
-//
-//            // ====== ====== ====== END EXAMPLE ====== ====== ======
-//
-//            // execute the job
-//            Object dataObject = dataParser.parseBytesToObject(request.dataBytes);
-//            Object result = job.exec(dataObject);
-//
-//            return dataParser.parseObjectToBytes(result);
-        	
-        	return workerId.getBytes();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new byte[0];
-        }
-    }
+//    /**
+//     * default
+//     *
+//     * @param packageBytes
+//     * @return
+//     */
+//    protected byte[] defaultResolveRequest(byte[] packageBytes) {
+//        try {
+////            // get back the job package sent by broker
+////            JobPackage request = (JobPackage) Utils.deserialize(packageBytes);
+////
+////            // report out that worker receives a request
+////            receivedTask(request.clientId, request.dataBytes.length);
+////
+////            // ====== ====== ====== EXAMPLE SECTION ====== ====== ======
+////
+////            // // ====== image-processing example ======
+////            // // initiate data parser and job objects from the request package
+////            JobDataParser dataParser = new JobDataParserImpl(); // JobHelper.getDataParser(this.context, this.workerId, request.jobBytes);
+////            // Job job = new JobImpl(); // JobHelper.getJob(this.context, this.workerId, request.jobBytes);
+////            Job job = new BitmapJobImpl();
+////
+////            // // ====== word-count example ======
+////            // JobDataParser dataParser = new WordDataParserImpl();
+////            // Job job = new WordJobImpl();
+////
+////            // // ====== internet-share example ======
+////            // JobDataParser dataParser = new NetDataParserImpl();
+////            // Job job = new NetJobImpl();
+////
+////            // // ====== internet-share example ======
+////            // JobDataParser dataParser = new EmptyDataParserImpl();
+////            // Job job = new EmptyJobImpl();
+////
+////            // ====== ====== ====== END EXAMPLE ====== ====== ======
+////
+////            // execute the job
+////            Object dataObject = dataParser.parseBytesToObject(request.dataBytes);
+////            Object result = job.exec(dataObject);
+////
+////            return dataParser.parseObjectToBytes(result);
+//        	
+//        	return workerId.getBytes();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return new byte[0];
+//        }
+//    }
 
 //    /**
 //     * initiate worker without broker at the middle.
@@ -157,25 +157,25 @@ public abstract class Worker extends Thread {
 //     */
 //    private void initWithoutBroker() { }
 
-    class ExAckClient extends AckClient {
-        public ExAckClient(ZMQ.Context context, String ip, byte[] id) {
-            super(context, ip, id);
-        }
-
-        @Override
-        public void sendResponse(String topic, byte[] request) {
-            // this delegate function is called when client detects a DRL request
-            // from server and try responding to it with DRL info
-
-            // this is the place to send back device info
-            String reqStr = new String(request);
-            if (reqStr.equals("ack_request")) {
-                // receive device resource information, and calculate DRL value here
-                String drl = "";
-                this.sendMessage(drl.getBytes());
-            }
-        }
-    }
+//    class ExAckClient extends AckClient {
+//        public ExAckClient(ZMQ.Context context, String ip, byte[] id) {
+//            super(context, ip, id);
+//        }
+//
+//        @Override
+//        public void sendResponse(String topic, byte[] request) {
+//            // this delegate function is called when client detects a DRL request
+//            // from server and try responding to it with DRL info
+//
+//            // this is the place to send back device info
+//            String reqStr = new String(request);
+//            if (reqStr.equals("ack_request")) {
+//                // receive device resource information, and calculate DRL value here
+//                String drl = "";
+//                this.sendMessage(drl.getBytes());
+//            }
+//        }
+//    }
 
     /**
      * similar to the <i>clientStarted</i> event in client, this event will be happened
