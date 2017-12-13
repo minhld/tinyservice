@@ -31,23 +31,6 @@ public class test_client_worker extends Thread {
 			}
 		};
 		
-		new Client() {
-			
-			@Override
-			public void send() {
-				this.sendMessage(("[" + clientId + "] Client Sends A Request").getBytes());
-			}
-			
-			@Override
-			public void resolveResult(byte[] result) {
-				System.out.println("[" + clientId + "] Resolved Result: " + new String(result));
-			}
-			
-			@Override
-			public void clientStarted(String clientId) {
-				System.out.println("[" + clientId + "] Client Started!");
-			}
-		};
 	}
 	
 	public static void main(String[] args) {

@@ -17,7 +17,7 @@ public class Broker extends Thread {
     private String brokerIp = NetUtils.DEFAULT_IP;
 
     private HashMap<String, WorkerInfo> workerList;
-    private static HashMap<String, JobMergeInfo> jobMergeList;
+//    private static HashMap<String, JobMergeInfo> jobMergeList;
 
     private static ZMQ.Socket backend;
     // private AckServerListener ackServer;
@@ -39,30 +39,6 @@ public class Broker extends Thread {
         initRouterMode();
     }
 
-//    /**
-//     * this function is only called when developer invoke pub-sub mode (default)
-//     * which is for data transmission only
-//     */
-//    private void initPubSubMode() {
-//        ZMQ.Context context = ZMQ.context(1);
-//
-//        // initiate publish socket
-//        String xpubUri = "tcp://" + this.brokerIp + ":" + NetUtils.CLIENT_PORT;
-//        ZMQ.Socket xpubSk = context.socket(ZMQ.XPUB);
-//        xpubSk.bind(xpubUri);
-//
-//        // initiate subscribe socket
-//        String xsubUri = "tcp://" + this.brokerIp + ":" + NetUtils.SERVER_PORT;
-//        ZMQ.Socket xsubSk = context.socket(ZMQ.XSUB);
-//        xsubSk.bind(xsubUri);
-//
-//        // bind the two sockets together - this will suspend here to listen
-//        ZMQ.proxy(xsubSk, xpubSk, null);
-//
-//        xsubSk.close();
-//        xpubSk.close();
-//        context.term();
-//    }
 
     /**
      * this function is called when developer invoke router mode
@@ -84,13 +60,8 @@ public class Broker extends Thread {
         // Queue of available workers
         workerList = new HashMap<String, WorkerInfo>();
 
-        // Map of job placeholders - hold the placeholders of all the current executing jobs
-        Broker.jobMergeList = new HashMap<String, JobMergeInfo>();
 
-        // // initiate ACK server
-        // ackServer = new AckServerListener(parentContext, context, this.brokerIp);
-
-        String workerId, clientId;
+        String workerId = "", clientId = "";
         byte[] empty, request, reply;
         while (!Thread.currentThread().isInterrupted()) {
             ZMQ.Poller items = new ZMQ.Poller(2);
@@ -120,8 +91,8 @@ public class Broker extends Thread {
                     // WORKER has finished loading, returned DRL value
                     // update worker list
                     workerList.put(workerId, new WorkerInfo(workerId));
-                    System.err.println("[Broker - From Worker] [" + workerId + "] Worker Stored!");
-                    // ackServer.updateWorkerNumbers(workerList.size());
+                    
+                    System.err.println("[Broker] Add New Worker [" + workerId + "]");
 
                 } else {
                     // WORKER has completed the task, returned the results
@@ -134,25 +105,12 @@ public class Broker extends Thread {
                     // get LAST FRAME - main result from worker
                     reply = backend.recv();
 
-                    // retrieve the job's placeholder
-                    JobMergeInfo jobMergeInfo = mergeTaskResults(clientId, reply);
-
-                    // check if the job's placeholder is fully filled
-                    // if so, return the placeholder back to the client
-                    // otherwise, skip this one and wait for more parts to come
-                    if (jobMergeInfo.isPlaceholderFilled()) {
-                        // flush them out to the front-end
-                        frontend.sendMore(jobMergeInfo.clientId);
-                        frontend.sendMore(NetUtils.BROKER_DELIMITER);
-                        frontend.send(jobMergeInfo.getPlaceholder());
-
-                        // remove the job result out of the result map
-                        Broker.jobMergeList.remove(jobMergeInfo.clientId);
-
-                        // end the clock of total job
-                        long jobDurr = System.currentTimeMillis() - startTime;
-                        System.out.println("[broker] total time doing job is: " + jobDurr + "ms");
-                    }
+                    // return the result from worker 
+                    frontend.sendMore(clientId);
+                    frontend.sendMore(NetUtils.BROKER_DELIMITER);
+                    frontend.send(reply);
+                    
+                    System.err.println("[Broker] Send Response To Client [" + clientId + "]");
                 }
             }
 
@@ -172,8 +130,14 @@ public class Broker extends Thread {
                 // // send the requests to all the nearby workers for DRL values. After receiving
                 // // all DRL values, it will consider DRLs and divide job into tasks with
                 // // proportional data amounts to the DRL values.
-                // ackServer.queryDRL(clientId, request);
-                System.err.println("[Broker - From Client] " + new String(request));
+                
+                backend.sendMore(workerId);	// backend.sendMore(workerId);
+                backend.sendMore(NetUtils.BROKER_DELIMITER);
+                backend.sendMore(clientId); 
+                backend.sendMore(NetUtils.BROKER_DELIMITER);
+                backend.send(request);
+                
+                System.err.println("[Broker] Send Request To Worker [" + workerId + "]");
             }
 
         }
@@ -183,176 +147,6 @@ public class Broker extends Thread {
         context.term();
     }
 
-    /*
-    static class AckServerListener extends AckServer {
-        static String clientId;
-        static JobPackage request;
-        static float totalDRL = 0;
-        static HashMap<String, Float> advancedWorkerList;
-
-        public AckServerListener(final Context parentContext, ZMQ.Context context, String brokerIp) {
-            super(context, brokerIp, new AckListener() {
-                @Override
-                public void allAcksReceived() {
-                    // end the RL request clock
-                    long requestRLDurr = System.currentTimeMillis() - startRLRequestTime;
-                    System.out.println("total RL request time: " + requestRLDurr + "ms");
-
-                    // when all returning ACKs are received, this event will be invoked to dispatch
-                    // tasks (pieces) to the workers
-
-                    try {
-                        // get job classes from the JAR (in binary format)
-                        byte[] jobBytes = AckServerListener.request.jobBytes;
-
-                        // initiate the data parser from the JAR
-
-                        // ====== ====== ====== EXAMPLE SECTION ====== ====== ======
-
-                        // ====== image-processing example ======
-                        JobDataParser dataParser = new JobDataParserImpl(); // JobHelper.getDataParser(parentContext, AckServerListener.clientId, jobBytes);
-
-                        // // ====== word-count example ======
-                        // JobDataParser dataParser = new WordDataParserImpl();
-
-                        // // ====== internet-share example ======
-                        // JobDataParser dataParser = new NetDataParserImpl();
-
-                        // // ====== empty-job example ======
-                        // JobDataParser dataParser = new EmptyDataParserImpl();
-
-                        // ====== ====== ====== ====== ====== ======
-
-                        // get the whole object sent from client
-                        Object dataObject = null;
-                        try {
-                            dataObject = dataParser.parseBytesToObject(AckServerListener.request.dataBytes);
-                        } catch (Exception e) {
-                            // this case shouldn't be happened
-                            e.printStackTrace();
-                        }
-
-                        // before dividing job into parts, a placeholder to hold cumulative results
-                        // must be created and stored into the map
-                        Object emptyPlaceholder = dataParser.createPlaceHolder(dataObject);
-                        JobMergeInfo jobMergeInfo = new JobMergeInfo(AckServerListener.request.clientId, emptyPlaceholder, dataParser);
-
-                        // the total number of parts is equal to the total number of accepted workers
-                        jobMergeInfo.totalPartNum = AckServerListener.advancedWorkerList.size();
-
-                        Broker.jobMergeList.put(AckServerListener.request.clientId, jobMergeInfo);
-
-                        // send job to worker
-                        JobPackage taskPkg;
-                        float currCummDRL = 0, newCummDRL = 0;
-                        int currCummDRLNum = 0, newCummDRLNum = 0;
-                        byte[] dataPart;
-                        String useClientId;
-
-                        for (String workerId : AckServerListener.advancedWorkerList.keySet()) {
-                            // create parts with size proportional to the DRL value of each worker
-                            newCummDRL = currCummDRL + AckServerListener.advancedWorkerList.get(workerId).floatValue();
-
-                            // convert to the actual number of percentage
-                            currCummDRLNum = (int) (currCummDRL * 100 / totalDRL);
-                            newCummDRLNum = (int) (newCummDRL * 100 / totalDRL);
-
-                            dataPart = dataParser.getPartFromObject(dataObject, currCummDRLNum, newCummDRLNum);
-
-                            // reassign the cumulative DRL
-                            currCummDRL = newCummDRL;
-
-                            // and wrap up as a task
-                            taskPkg = new JobPackage(0, AckServerListener.clientId, dataPart, jobBytes);
-
-                            // wrap up and send to the appropriate worker
-                            useClientId = AckServerListener.clientId + Utils.ID_DELIMITER + currCummDRLNum + Utils.ID_DELIMITER + newCummDRLNum;
-
-                            backend.sendMore(workerId);
-                            backend.sendMore(Utils.BROKER_DELIMITER);
-                            backend.sendMore(useClientId); // backend.sendMore(AckServerListener.clientId);
-                            backend.sendMore(Utils.BROKER_DELIMITER);
-                            backend.send(taskPkg.toByteArray());
-                        }
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        // remove all existences from current work - to prepare serving form the new work
-                        AckServerListener.advancedWorkerList.clear();
-                    }
-
-                    requestRLDurr = System.currentTimeMillis() - startRLRequestTime;
-                    System.out.println("finished sending: " + requestRLDurr + "ms");
-                }
-            });
-
-            advancedWorkerList = new HashMap<>();
-        }
-
-        public void queryDRL(String clientId, byte[] request) {
-            AckServerListener.clientId = clientId;
-            try {
-                AckServerListener.request = (JobPackage) Utils.deserialize(request);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            // start the RL request clock
-            startRLRequestTime = System.currentTimeMillis();
-
-            // query resource information from remote workers
-            this.sendAck();
-        }
-
-        @Override
-        public void receiveResponse(byte[] resp) {
-            String respStr = new String(resp);
-
-            // remote device's resource info received
-            System.out.println("[broker] received " + respStr);
-
-            // analyze response and add it to the array of WorkerInfos
-            // to do here
-            float drl = (float) Utils.getResponse(respStr, "drl");
-            String workerId = (String) Utils.getResponse(respStr, "id");
-
-            // compare DRL with client's DRL and add to the list
-            // will not add more than MAX_WORKERS_PER_JOB devices (default is 3)
-            // if (drl > 0 && advancedWorkerList.size() < Utils.MAX_WORKERS_PER_JOB) {
-            if (drl >= AckServerListener.request.DRL && advancedWorkerList.size() < Utils.MAX_WORKERS_PER_JOB) {
-                totalDRL = (advancedWorkerList.size() == 0) ? drl : totalDRL + drl;
-                advancedWorkerList.put(workerId, drl);
-            }
-        }
-    }
-	*/
-
-    /**
-     * this function merge
-     *
-     * @param useClientId
-     * @param taskBytes
-     */
-    private JobMergeInfo mergeTaskResults(String useClientId, byte[] taskBytes) {
-        String[] idParts = useClientId.split(NetUtils.ID_DELIMITER);
-        String clientId = idParts[0];
-        int firstPercent = Integer.parseInt(idParts[1]);
-        int lastPercent = Integer.parseInt(idParts[2]);
-
-        JobMergeInfo jobInfo = Broker.jobMergeList.get(clientId);
-
-        // add part to the client job's placeholder
-        jobInfo.addPart(taskBytes, firstPercent, lastPercent);
-
-        if (!jobInfo.isPlaceholderFilled()) {
-            // if the placeholder of this job has not been fully filled,
-            // it will still be open for adding more parts
-            Broker.jobMergeList.put(clientId, jobInfo);
-        }
-
-        return jobInfo;
-    }
 
     /**
      * this class contains information about status of a worker
@@ -373,57 +167,5 @@ public class Broker extends Thread {
         }
     }
 
-    /**
-     * this class contains information of job combination
-     */
-    static class JobMergeInfo {
-        public String clientId;
-        public int cummPartNum;
-        public int totalPartNum;
-        public Object placeholder;
-        private JobDataParser dataParser;
 
-        public JobMergeInfo(String clientId, Object emptyPlaceholder, JobDataParser dataParser) {
-            this.clientId = clientId;
-            this.cummPartNum = 0;
-            this.totalPartNum = 0;
-            this.placeholder = emptyPlaceholder;
-            this.dataParser = dataParser;
-        }
-
-        /**
-         * copy the data part to the placeholder
-         *
-         * @param partBytes
-         * @param firstPercent
-         * @param lastPercent
-         */
-        public void addPart(byte[] partBytes, int firstPercent, int lastPercent) {
-            // copy the data part to the placeholder, the position of the part
-            // is defined by the firstPercent and lastPercent
-            dataParser.copyPartToHolder(this.placeholder, partBytes, firstPercent, lastPercent);
-
-            // and increase the number of parts that have been received.
-            this.cummPartNum++;
-        }
-
-        /**
-         * check if the placeholder is fully filled by all the parts
-         *
-         * @return
-         */
-        public boolean isPlaceholderFilled() {
-            // by checking if the cumulative part number is equal to the total part number
-            return this.cummPartNum == this.totalPartNum;
-        }
-
-        public byte[] getPlaceholder() {
-            try {
-                return dataParser.parseObjectToBytes(this.placeholder);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return new byte[0];
-            }
-        }
-    }
 }

@@ -5,7 +5,6 @@ import com.usu.tinyservice.messages.binary.RequestMessage;
 import com.usu.tinyservice.network.Client;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
-import com.usu.tinyservice.network.Requester;
 
 public class MobileServiceDemoClient {
   public ReceiveListener listener;
@@ -20,7 +19,7 @@ public class MobileServiceDemoClient {
   }
 
 
-  public void getFileList1(java.lang.String path, com.usu.tinyservice.tests.Data1[] data, boolean fileOnly) {
+  public void getFileList1(java.lang.String path, com.usu.tinyservice.network.tests.Data1[] data, boolean fileOnly) {
     // compose input parameters
     String functionName = "getFileList1";
     String outType = "com.usu.tinyservice.tests.Data1[]";
