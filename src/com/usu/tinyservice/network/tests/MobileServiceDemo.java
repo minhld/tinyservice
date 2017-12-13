@@ -5,6 +5,9 @@ import com.usu.tinyservice.annotations.MobileService;
 import com.usu.tinyservice.annotations.TransmitType;
 import com.usu.tinyservice.annotations.ServiceMethod;
 import com.usu.tinyservice.annotations.SyncMode;
+
+import java.util.Date;
+
 import com.usu.tinyservice.annotations.CommModel;
 
 /**
@@ -24,7 +27,7 @@ public class MobileServiceDemo {
 		Data1 data1 = new Data1();
 		data1.data11 = new int[] { 1, 3, 5 };
 		data1.data12 = new String[] { "hello", "there" }; 
-		data1.data13 = "my name is Creator!".getBytes();
+		data1.data13 = ("[Time-" + new Date().toString() + "]").getBytes();
 		return new Data1[] { data1 };
 	}
 }

@@ -60,14 +60,6 @@ public class MobileServiceDemoWorker {
 	  public void receivedTask(String clientId, int dataSize) {
 	  }
 	  
-	  @Override
-	  public void workerStarted(String workerId) {
-	  }
-		
-	  @Override
-	  public void workerFinished(String workerId, TaskDone taskDone) {
-	  }
-	  
 	};
   }
 

@@ -52,7 +52,8 @@ public abstract class Worker extends Thread {
             worker.connect("tcp://" + this.groupIp + ":" + this.port);
 
             // to report worker has finished the initialization
-            workerStarted(this.workerId);
+            // workerStarted(this.workerId);
+            System.out.println("[Worker-" + workerId + "] Started.");
 
             // inform broker that i am ready
             worker.send(NetUtils.WORKER_READY);
@@ -88,7 +89,10 @@ public abstract class Worker extends Thread {
                     long durr = System.currentTimeMillis() - startTime;
                     TaskDone taskInfo = new TaskDone();
                     taskInfo.durration = durr;
-                    workerFinished(workerId, taskInfo);
+                    
+                    // when worker completes the task
+                    // workerFinished(workerId, taskInfo);
+                    System.out.println("[Worker-" + workerId + "] Completed In " + taskInfo.durration + "ms");
 
                 } catch (Exception d) {
                     d.printStackTrace();
@@ -177,13 +181,13 @@ public abstract class Worker extends Thread {
 //        }
 //    }
 
-    /**
-     * similar to the <i>clientStarted</i> event in client, this event will be happened
-     * when worker completes the initiation.
-     *
-     * @param workerId
-     */
-    public abstract void workerStarted(String workerId);
+//    /**
+//     * similar to the <i>clientStarted</i> event in client, this event will be happened
+//     * when worker completes the initiation.
+//     *
+//     * @param workerId
+//     */
+//    public abstract void workerStarted(String workerId);
 
     /**
      * this event occurs when worker has completed receiving a task from client
@@ -193,13 +197,13 @@ public abstract class Worker extends Thread {
      */
     public abstract void receivedTask(String clientId, int dataSize);
 
-    /**
-     * this event occurs when worker finishes the current work
-     * 
-     * @param workerId
-     * @param taskDone
-     */
-    public abstract void workerFinished(String workerId, TaskDone taskDone);
+//    /**
+//     * this event occurs when worker finishes the current work
+//     * 
+//     * @param workerId
+//     * @param taskDone
+//     */
+//    public abstract void workerFinished(String workerId, TaskDone taskDone);
 
     /**
      * this abstract function needs to be filled. this is to

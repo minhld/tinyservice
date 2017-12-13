@@ -9,17 +9,6 @@ public class test_client_worker extends Thread {
 		new Broker();
 		
 		new Worker() {
-			
-			@Override
-			public void workerStarted(String workerId) {
-				System.out.println("[" + workerId + "] Worker Starts");
-			}
-			
-			@Override
-			public void workerFinished(String workerId, TaskDone taskDone) {
-				System.out.println("[" + workerId + "] Finish Job In " + taskDone.durration);
-			}
-			
 			@Override
 			public byte[] resolveRequest(byte[] packageBytes) {
 				return ("[" + workerId + "] Resolve Request").getBytes();

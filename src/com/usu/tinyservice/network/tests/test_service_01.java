@@ -29,6 +29,12 @@ public class test_service_01 extends Thread {
 		data1.data13 = "hello from client".getBytes();
 
 		client.getFileList1("D:\\", new Data1[] { data1 }, true);
+		
+		for (int i = 0; i < 5; i++) {
+			NetUtils.sleep(500);
+			
+			client.getFileList1("D:\\", new Data1[] { data1 }, true);
+		}
 	}
 	
 	public static void main(String[] args) {
