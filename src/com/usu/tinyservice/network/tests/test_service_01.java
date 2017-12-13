@@ -31,7 +31,7 @@ public class test_service_01 extends Thread {
 		client.getFileList1("D:\\", new Data1[] { data1 }, true);
 		
 		for (int i = 0; i < 5; i++) {
-			NetUtils.sleep(500);
+			NetUtils.sleep(1500);
 			
 			client.getFileList1("D:\\", new Data1[] { data1 }, true);
 		}
