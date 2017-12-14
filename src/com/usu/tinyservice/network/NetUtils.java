@@ -5,12 +5,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
 
@@ -19,12 +25,34 @@ public class NetUtils {
     public static final int CLIENT_PORT = 6668;
     
     public static final String DEFAULT_IP = "*";
-    public static final String WORKER_READY = "READY";
+    public static final String WORKER_REGISTER = "REGISTER";
 	public static final String BROKER_DELIMITER = "";
     public static final String DELIMITER = "@@@";
 
     private static Random rand = new Random(System.currentTimeMillis());
 
+    
+    /**
+     * get all functions provided by a worker
+     * 
+     * @param workerInfoJson worker info in JSON format
+     * @return list of functions 
+     * 
+     */
+    public static String[] getFunctions(String workerInfoJson) {
+    	List<String> funcList = new ArrayList<>();
+    	JsonElement jElement = new JsonParser().parse(workerInfoJson);
+        JsonObject jObject = jElement.getAsJsonObject();
+        JsonArray jArray = jObject.getAsJsonArray("functions");
+        
+        String funcName;
+        for (int i = 0; i < jArray.size(); i++) {
+        	funcName = jArray.get(0).getAsString();
+        	funcList.add(funcName);
+        }
+        
+        return funcList.toArray(new String[] {});
+    }
     
 	public static <T> String[] getString(T inputArray) {
     	String[] rets = new String[1];

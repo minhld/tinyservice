@@ -66,19 +66,19 @@ public class MobileServiceDemoWorker {
 //	  }
 	  
 	  @Override
-	  public String toString() {
+	  public String info() {
 		String json = 
-				"{" +
-					"\"code\" : \"REGISTER\"," +
-					"\"id\" : \"" + worker.workerId + "\"," +
-					"\"functions\" : [" +
-						"{" +
-							"\"functionName\" : \"getFileList1\"," +
-							"\"inParams\" : [\"java.lang.String\",\"com.usu.tinyservice.network.tests.Data1[]\",\"boolean\"]," +
-							"\"outParam\" : \"com.usu.tinyservice.network.tests.Data1[]\"" + 
-						"}" + 
-					"]" +
-				"}";
+		  "{" +
+			"\"code\" : \"REGISTER\"," +
+			"\"id\" : \"" + worker.workerId + "\"," +
+			"\"functions\" : [" +
+			  "{" +
+			    "\"functionName\" : \"getFileList1\"," +
+				"\"inParams\" : [\"java.lang.String\",\"com.usu.tinyservice.network.tests.Data1[]\",\"boolean\"]," +
+				"\"outParam\" : \"com.usu.tinyservice.network.tests.Data1[]\"" + 
+			  "}" + 
+			"]" +
+		  "}";
 		return json;
 	  }
 	  

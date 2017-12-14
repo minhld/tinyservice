@@ -46,6 +46,23 @@ public class MobileServiceDemoWorker2 {
 	  public void receivedTask(String clientId, int dataSize) {
 	  }
 	  
+	  @Override
+	  public String info() {
+		String json = 
+		  "{" +
+			"\"code\" : \"REGISTER\"," +
+			"\"id\" : \"" + worker.workerId + "\"," +
+			"\"functions\" : [" +
+			  "{" +
+			    "\"functionName\" : \"getFileList2\"," +
+				"\"inParams\" : [\"java.lang.String\"]," +
+				"\"outParam\" : \"java.lang.String[]\"" + 
+			  "}" + 
+			"]" +
+		  "}";
+		return json;
+	  }
+	  
 	};
   }
 

@@ -198,14 +198,6 @@ public abstract class Worker extends Thread {
 //     */
 //    public abstract void register(String workerId);
     
-    /**
-     * this event occurs when worker has completed receiving a task from client
-     *
-     * @param clientId
-     * @param dataSize
-     */
-    public abstract void receivedTask(String clientId, int dataSize);
-
 //    /**
 //     * this event occurs when worker finishes the current work
 //     * 
@@ -223,6 +215,16 @@ public abstract class Worker extends Thread {
      */
     public abstract byte[] resolveRequest(byte[] packageBytes);
 
+    /**
+     * this event occurs when worker has completed receiving a task from client
+     *
+     * @param clientId
+     * @param dataSize
+     */
+    public abstract void receivedTask(String clientId, int dataSize);
+
+    public abstract String info();
+    
     /**
      * this class contains information of the task of which has just been
      * executed by the worker

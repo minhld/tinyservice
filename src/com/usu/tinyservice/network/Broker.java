@@ -16,10 +16,10 @@ import java.util.HashMap;
 public class Broker extends Thread {
     private String brokerIp = NetUtils.DEFAULT_IP;
 
-    private HashMap<String, WorkerInfo> workerList;
-//    private static HashMap<String, JobMergeInfo> jobMergeList;
+    private HashMap<String, String> funcMap;
+    // private static HashMap<String, JobMergeInfo> jobMergeList;
 
-    private static ZMQ.Socket backend;
+    // private static ZMQ.Socket backend;
     // private AckServerListener ackServer;
 
     long startTime = 0;
@@ -54,14 +54,14 @@ public class Broker extends Thread {
 
         // initiate subscribe socket
         String backendPort = "tcp://" + this.brokerIp + ":" + NetUtils.SERVER_PORT;
-        backend = context.socket(ZMQ.ROUTER);
+        ZMQ.Socket backend = context.socket(ZMQ.ROUTER);
         backend.bind(backendPort);
 
         // Queue of available workers
-        workerList = new HashMap<String, WorkerInfo>();
+        funcMap = new HashMap<String, String>();
 
 
-        String workerId = "", clientId = "";
+        // String workerId = "", clientId = "";
         byte[] empty, request, reply;
         while (!Thread.currentThread().isInterrupted()) {
             ZMQ.Poller items = new ZMQ.Poller(2);
@@ -76,7 +76,7 @@ public class Broker extends Thread {
             if (items.pollin(0)) {
                 // queue worker address for LRU routing
                 // FIRST FRAME is WORKER ID
-                workerId = backend.recvStr();
+                String workerId = backend.recvStr();
 
                 // SECOND FRAME is a DELIMITER, empty
                 empty = backend.recv();
@@ -85,13 +85,16 @@ public class Broker extends Thread {
                 // get THIRD FRAME
                 //  - is READY (worker reports with DRL)
                 //  - or CLIENT ID (worker returns results)
-                clientId = backend.recvStr();
+                String workerDataJson = backend.recvStr();
 
-                if (clientId.equals(NetUtils.WORKER_READY)) {
+                if (workerDataJson.contains(NetUtils.WORKER_REGISTER)) {
                     // WORKER has finished loading, returned DRL value
                     // update worker list
-                    workerList.put(workerId, new WorkerInfo(workerId));
-                    
+                	String[] funcs = NetUtils.getFunctions(workerDataJson);
+                	for (int i = 0; i < funcs.length; i++) {
+                		funcMap.put(funcs[i], workerId);
+                	}
+                	
                     System.err.println("[Broker] Add New Worker [" + workerId + "]");
 
                 } else {
@@ -105,6 +108,8 @@ public class Broker extends Thread {
                     // get LAST FRAME - main result from worker
                     reply = backend.recv();
 
+                    String clientId = "";
+                    
                     // return the result from worker 
                     frontend.sendMore(clientId);
                     frontend.sendMore(NetUtils.BROKER_DELIMITER);
@@ -118,7 +123,7 @@ public class Broker extends Thread {
             if (items.pollin(1)) {
                 // now get next client request, route to LRU worker
                 // client request is [address][empty][request]
-                clientId = frontend.recvStr();
+                String clientId = frontend.recvStr();
 
                 // check 2nd frame
                 empty = frontend.recv();
@@ -126,12 +131,14 @@ public class Broker extends Thread {
 
                 // get 3rd frame
                 request = frontend.recv();
-
+                
+                String workerId = "";
+                
                 // // send the requests to all the nearby workers for DRL values. After receiving
                 // // all DRL values, it will consider DRLs and divide job into tasks with
                 // // proportional data amounts to the DRL values.
                 
-                backend.sendMore(workerId);	// backend.sendMore(workerId);
+                backend.sendMore(workerId);
                 backend.sendMore(NetUtils.BROKER_DELIMITER);
                 backend.sendMore(clientId); 
                 backend.sendMore(NetUtils.BROKER_DELIMITER);
