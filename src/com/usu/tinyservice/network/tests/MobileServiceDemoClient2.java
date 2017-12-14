@@ -6,11 +6,11 @@ import com.usu.tinyservice.network.Client;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 
-public class MobileServiceDemoClient {
+public class MobileServiceDemoClient2 {
   public ReceiveListener listener;
   private RmiClient client;
 
-  public MobileServiceDemoClient(ReceiveListener listener) {
+  public MobileServiceDemoClient2(ReceiveListener listener) {
     // start listener
     this.listener = listener;
 
@@ -22,7 +22,7 @@ public class MobileServiceDemoClient {
   public void getFileList1(java.lang.String path, com.usu.tinyservice.network.tests.Data1[] data, boolean fileOnly) {
     // compose input parameters
     String functionName = "getFileList1";
-    String outType = "com.usu.tinyservice.network.tests.Data1[]";
+    String outType = "com.usu.tinyservice.tests.Data1[]";
     RequestMessage reqMsg = new RequestMessage(functionName, outType);
     
     // create request message and send
@@ -36,22 +36,6 @@ public class MobileServiceDemoClient {
     client.send(reqBytes);
   }
 
-  public void getFileList2(java.lang.String path) {
-    // compose input parameters
-    String functionName = "getFileList2";
-    String outType = "java.lang.String[]";
-    RequestMessage reqMsg = new RequestMessage(functionName, outType);
-    
-    // create request message and send
-    reqMsg.inParams = new InParam[3];
-    reqMsg.inParams[0] = new InParam("path", "java.lang.String", path);
-
-    // create a binary message
-    byte[] reqBytes = NetUtils.serialize(reqMsg);
-    client.send(reqBytes);
-  }
-  
-  
   class RmiClient extends Client {
 	@Override
 	public void receive(byte[] resp) {

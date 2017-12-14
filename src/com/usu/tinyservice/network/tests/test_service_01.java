@@ -11,12 +11,21 @@ public class test_service_01 extends Thread {
 
 		new MobileServiceDemoWorker();
 		
+		new MobileServiceDemoWorker2();
+		
 		MobileServiceDemoClient client = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override
 			public void dataReceived(byte[] data) {
 				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
-				Data1[] data1 = (Data1[]) resp.outParam.values;
-				System.out.println(new String(data1[0].data13));
+				if (resp.functionName.equals("getFileList1")) {
+					com.usu.tinyservice.network.tests.Data1[] data1 = (com.usu.tinyservice.network.tests.Data1[]) resp.outParam.values;
+					System.out.println(new String(data1[0].data13));
+				} else if (resp.functionName.equals("getFileList2")) {
+					java.lang.String[] files = (java.lang.String[]) resp.outParam.values;
+					for (int i = 0; i < files.length; i++) {
+						System.out.println("\t File: " + files[i]);
+					}
+				}
 			}
 		});
 		
@@ -29,12 +38,13 @@ public class test_service_01 extends Thread {
 		data1.data13 = "hello from client".getBytes();
 
 		client.getFileList1("D:\\", new Data1[] { data1 }, true);
+		client.getFileList2("D:\\");
 		
-		for (int i = 0; i < 5; i++) {
-			NetUtils.sleep(1500);
-			
-			client.getFileList1("D:\\", new Data1[] { data1 }, true);
-		}
+//		for (int i = 0; i < 5; i++) {
+//			NetUtils.sleep(1500);
+//			
+//			client.getFileList1("D:\\", new Data1[] { data1 }, true);
+//		}
 	}
 	
 	public static void main(String[] args) {

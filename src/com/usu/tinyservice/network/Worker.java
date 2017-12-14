@@ -56,8 +56,10 @@ public abstract class Worker extends Thread {
             System.out.println("[Worker-" + workerId + "] Started.");
 
             // inform broker that i am ready
-            worker.send(NetUtils.WORKER_READY);
-
+            // worker.send(NetUtils.WORKER_READY);
+            String registerInfo = toString();
+            worker.send(registerInfo);
+            
 //            // initiate ACK client - to listen to DRL request from brokers
 //            ackClient = new ExAckClient(context, this.groupIp, worker.getIdentity());
 
@@ -189,6 +191,13 @@ public abstract class Worker extends Thread {
 //     */
 //    public abstract void workerStarted(String workerId);
 
+    
+//    /**
+//     * 
+//     * @param workerId
+//     */
+//    public abstract void register(String workerId);
+    
     /**
      * this event occurs when worker has completed receiving a task from client
      *

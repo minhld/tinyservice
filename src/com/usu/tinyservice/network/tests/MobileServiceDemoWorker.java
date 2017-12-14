@@ -60,6 +60,28 @@ public class MobileServiceDemoWorker {
 	  public void receivedTask(String clientId, int dataSize) {
 	  }
 	  
+//	  @Override
+//	  public void register(String workerId) {
+//		  
+//	  }
+	  
+	  @Override
+	  public String toString() {
+		String json = 
+				"{" +
+					"\"code\" : \"REGISTER\"," +
+					"\"id\" : \"" + worker.workerId + "\"," +
+					"\"functions\" : [" +
+						"{" +
+							"\"functionName\" : \"getFileList1\"," +
+							"\"inParams\" : [\"java.lang.String\",\"com.usu.tinyservice.network.tests.Data1[]\",\"boolean\"]," +
+							"\"outParam\" : \"com.usu.tinyservice.network.tests.Data1[]\"" + 
+						"}" + 
+					"]" +
+				"}";
+		return json;
+	  }
+	  
 	};
   }
 

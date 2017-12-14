@@ -21,7 +21,7 @@ public class NetUtils {
     public static final String DEFAULT_IP = "*";
     public static final String WORKER_READY = "READY";
 	public static final String BROKER_DELIMITER = "";
-    public static final String ID_DELIMITER = "@@@";
+    public static final String DELIMITER = "@@@";
 
     private static Random rand = new Random(System.currentTimeMillis());
 

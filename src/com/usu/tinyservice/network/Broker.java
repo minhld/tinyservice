@@ -54,7 +54,7 @@ public class Broker extends Thread {
 
         // initiate subscribe socket
         String backendPort = "tcp://" + this.brokerIp + ":" + NetUtils.SERVER_PORT;
-        this.backend = context.socket(ZMQ.ROUTER);
+        backend = context.socket(ZMQ.ROUTER);
         backend.bind(backendPort);
 
         // Queue of available workers
