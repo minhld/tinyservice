@@ -33,8 +33,8 @@ public class MobileServiceDemoClient {
 
     // create a binary message
     byte[] reqBytes = NetUtils.serialize(reqMsg);
-    client.send("hello");
-    client.send(reqBytes);
+    // client.send("hello");
+    client.send(functionName, reqBytes);
   }
 
   public void getFileList2(java.lang.String path) {
@@ -49,7 +49,7 @@ public class MobileServiceDemoClient {
 
     // create a binary message
     byte[] reqBytes = NetUtils.serialize(reqMsg);
-    client.send(reqBytes);
+    client.send(functionName, reqBytes);
   }
   
   

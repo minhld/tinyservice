@@ -2,6 +2,8 @@ package com.usu.tinyservice.network;
 
 import org.zeromq.ZMQ;
 
+import com.usu.tinyservice.messages.binary.RequestMessage;
+
 import java.util.HashMap;
 
 /**
@@ -128,16 +130,21 @@ public class Broker extends Thread {
                 // check 2nd frame
                 empty = frontend.recv();
                 assert (empty.length == 0);
+                
+                // get function name - to find worker ID
+                String funcName = frontend.recvStr();
+                String workerId = funcMap.get(funcName);
+                
+                // check 2nd frame
+                empty = frontend.recv();
+                assert (empty.length == 0);
 
                 // get 3rd frame
                 request = frontend.recv();
-                String workerId = ""; //(String) NetUtils.deserialize(request);
-
                 
-                // // send the requests to all the nearby workers for DRL values. After receiving
-                // // all DRL values, it will consider DRLs and divide job into tasks with
-                // // proportional data amounts to the DRL values.
-                
+                // send the requests to all the nearby workers for DRL values. After receiving
+                // all DRL values, it will consider DRLs and divide job into tasks with
+                // proportional data amounts to the DRL values.
                 backend.sendMore(workerId);
                 backend.sendMore(NetUtils.BROKER_DELIMITER);
                 backend.sendMore(clientId); 

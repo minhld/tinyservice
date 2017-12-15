@@ -64,12 +64,14 @@ public abstract class Client extends Thread {
         context.term();
 	}
 
-    public void send(String data) {
-		send(data.getBytes());
+    public void send(String funcName, String data) {
+		send(funcName, data.getBytes());
 	}
     
-    public void send(byte[] data) {
+    public void send(String funcName, byte[] data) {
 		if (requester != null) {
+			requester.sendMore(funcName);
+			requester.sendMore(NetUtils.BROKER_DELIMITER);
 			requester.send(data);
 			byte[] resp = requester.recv(0);
 			receive(resp);

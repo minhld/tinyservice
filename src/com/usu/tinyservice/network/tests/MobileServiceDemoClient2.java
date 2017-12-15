@@ -33,7 +33,7 @@ public class MobileServiceDemoClient2 {
 
     // create a binary message
     byte[] reqBytes = NetUtils.serialize(reqMsg);
-    client.send(reqBytes);
+    client.send(functionName, reqBytes);
   }
 
   class RmiClient extends Client {
