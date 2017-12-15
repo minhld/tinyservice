@@ -33,6 +33,7 @@ public class MobileServiceDemoClient {
 
     // create a binary message
     byte[] reqBytes = NetUtils.serialize(reqMsg);
+    client.send("hello");
     client.send(reqBytes);
   }
 

@@ -57,7 +57,7 @@ public abstract class Worker extends Thread {
 
             // inform broker that i am ready
             // worker.send(NetUtils.WORKER_READY);
-            String registerInfo = toString();
+            String registerInfo = info();
             worker.send(registerInfo);
             
 //            // initiate ACK client - to listen to DRL request from brokers

@@ -9,7 +9,7 @@ import org.zeromq.ZMQ;
 public abstract class Client extends Thread {
     private ZMQ.Context context;
     private ZMQ.Socket requester;
-    private String clientId;
+    // private String clientId;
     
     private String groupIp = NetUtils.DEFAULT_IP;
     private int port = NetUtils.CLIENT_PORT;
@@ -36,7 +36,7 @@ public abstract class Client extends Thread {
             ZMQ.Context context = ZMQ.context(1);
             requester = context.socket(ZMQ.REQ);
             NetUtils.setId(requester);
-            this.clientId = new String(this.requester.getIdentity());
+            // this.clientId = new String(this.requester.getIdentity());
             requester.connect("tcp://" + this.groupIp + ":" + this.port);
 
 //            // client has been started, throwing an event to the holder

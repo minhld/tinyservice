@@ -131,8 +131,8 @@ public class Broker extends Thread {
 
                 // get 3rd frame
                 request = frontend.recv();
-                
-                String workerId = "";
+                String workerId = ""; //(String) NetUtils.deserialize(request);
+
                 
                 // // send the requests to all the nearby workers for DRL values. After receiving
                 // // all DRL values, it will consider DRLs and divide job into tasks with

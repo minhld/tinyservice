@@ -47,7 +47,7 @@ public class NetUtils {
         
         String funcName;
         for (int i = 0; i < jArray.size(); i++) {
-        	funcName = jArray.get(0).getAsString();
+        	funcName = jArray.get(i).getAsJsonObject().get("functionName").getAsString();
         	funcList.add(funcName);
         }
         

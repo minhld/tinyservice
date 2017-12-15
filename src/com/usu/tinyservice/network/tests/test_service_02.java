@@ -1,19 +1,12 @@
 package com.usu.tinyservice.network.tests;
 
 import com.usu.tinyservice.messages.binary.ResponseMessage;
-import com.usu.tinyservice.network.Broker;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 
-public class test_service_01 extends Thread {
+public class test_service_02 extends Thread {
 	public void run() {
-		new Broker();
-
-		new MobileServiceDemoWorker();
-		
-		new MobileServiceDemoWorker2();
-		
-		MobileServiceDemoClient client = new MobileServiceDemoClient(new ReceiveListener() {
+		MobileServiceDemoClient client2 = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override
 			public void dataReceived(byte[] data) {
 				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
@@ -37,17 +30,11 @@ public class test_service_01 extends Thread {
 		data1.data12 = new String[] { "abc", "def" };
 		data1.data13 = "hello from client".getBytes();
 
-		client.getFileList1("D:\\", new Data1[] { data1 }, true);
-		// client.getFileList2("D:\\");
-		
-//		for (int i = 0; i < 5; i++) {
-//			NetUtils.sleep(1500);
-//			
-//			client.getFileList1("D:\\", new Data1[] { data1 }, true);
-//		}
+		client2.getFileList1("D:\\", new Data1[] { data1 }, true);
+		// client2.getFileList2("D:\\");
 	}
 	
 	public static void main(String[] args) {
-		new test_service_01().start();
+		new test_service_02().start();
 	}
 }
