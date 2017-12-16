@@ -30,33 +30,14 @@ public abstract class Client extends Thread {
     }
 
     public void run() {
-//        try {
-            // create context and connect client to the broker/worker
-            // with a pre-defined Id
-            ZMQ.Context context = ZMQ.context(1);
-            requester = context.socket(ZMQ.REQ);
-            NetUtils.setId(requester);
-            // this.clientId = new String(this.requester.getIdentity());
-            requester.connect("tcp://" + this.groupIp + ":" + this.port);
+        // create context and connect client to the broker/worker
+        // with a pre-defined Id
+        ZMQ.Context context = ZMQ.context(1);
+        requester = context.socket(ZMQ.REQ);
+        NetUtils.setId(requester);
+        // this.clientId = new String(this.requester.getIdentity());
+        requester.connect("tcp://" + this.groupIp + ":" + this.port);
 
-//            // client has been started, throwing an event to the holder
-//            clientStarted(this.clientId);
-
-//            // send a request to the broker/worker
-//            send();
-
-//            // get the response from broker/worker
-//            while (!Thread.currentThread().isInterrupted()) {
-//                byte[] response = requester.recv();
-//                resolveResult(response);
-//            }
-
-//            requester.close();
-//            context.term();
-//        } catch (Exception e) {
-//            // exception there - leave it for now
-//            e.printStackTrace();
-//        }
     }
 
 	public void close() {
