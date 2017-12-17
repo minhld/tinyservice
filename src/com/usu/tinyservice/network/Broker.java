@@ -2,8 +2,6 @@ package com.usu.tinyservice.network;
 
 import org.zeromq.ZMQ;
 
-import com.usu.tinyservice.messages.binary.RequestMessage;
-
 import java.util.HashMap;
 
 /**
@@ -117,7 +115,7 @@ public class Broker extends Thread {
                     frontend.sendMore(NetUtils.BROKER_DELIMITER);
                     frontend.send(reply);
                     
-                    System.err.println("[Broker] Send Response To Client [" + clientId + "]");
+                    System.err.println("[Broker] Forward To Client [" + clientId + "]");
                 }
             }
 
@@ -134,7 +132,7 @@ public class Broker extends Thread {
                 // get function name - to find worker ID
                 String funcName = frontend.recvStr();
                 String workerId = funcMap.get(funcName);
-                
+
                 // check 2nd frame
                 empty = frontend.recv();
                 assert (empty.length == 0);
@@ -142,16 +140,31 @@ public class Broker extends Thread {
                 // get 3rd frame
                 request = frontend.recv();
                 
-                // send the requests to all the nearby workers for DRL values. After receiving
-                // all DRL values, it will consider DRLs and divide job into tasks with
-                // proportional data amounts to the DRL values.
-                backend.sendMore(workerId);
-                backend.sendMore(NetUtils.BROKER_DELIMITER);
-                backend.sendMore(clientId); 
-                backend.sendMore(NetUtils.BROKER_DELIMITER);
-                backend.send(request);
-                
-                System.err.println("[Broker] Send Request To Worker [" + workerId + "]");
+                // check if worker is available at the time of 
+                // execution 
+                if (workerId == null) {
+                	// if worker is not available, broker will
+                	// remind 
+                    frontend.sendMore(clientId);
+                    frontend.sendMore(NetUtils.BROKER_DELIMITER);
+                    
+                    byte[] deniedMsg = NetUtils.createInfoMessage(NetUtils.WORKER_NOT_READY);
+                    frontend.send(deniedMsg);
+
+                    System.err.println("[Broker] Denied Client [" + clientId + "]");
+                } else {
+	                
+	                // send the requests to all the nearby workers for DRL values. After receiving
+	                // all DRL values, it will consider DRLs and divide job into tasks with
+	                // proportional data amounts to the DRL values.
+	                backend.sendMore(workerId);
+	                backend.sendMore(NetUtils.BROKER_DELIMITER);
+	                backend.sendMore(clientId); 
+	                backend.sendMore(NetUtils.BROKER_DELIMITER);
+	                backend.send(request);
+	                
+	                System.err.println("[Broker] Forward To Worker [" + workerId + "]");
+                }
             }
 
         }

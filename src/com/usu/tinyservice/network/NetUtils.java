@@ -17,6 +17,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.usu.tinyservice.messages.binary.OutParam;
+import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
 
@@ -26,8 +28,10 @@ public class NetUtils {
     
     public static final String DEFAULT_IP = "*";
     public static final String WORKER_REGISTER = "REGISTER";
+    public static final String WORKER_NOT_READY = "WORKER_NOT_READY";
+    public static final String BROKER_INFO = "INFO";
 	public static final String BROKER_DELIMITER = "";
-    public static final String DELIMITER = "@@@";
+    // public static final String DELIMITER = "@@@";
 
     private static Random rand = new Random(System.currentTimeMillis());
 
@@ -52,6 +56,14 @@ public class NetUtils {
         }
         
         return funcList.toArray(new String[] {});
+    }
+    
+    public static byte[] createInfoMessage(String info) {
+    	ResponseMessage respMsg = new ResponseMessage(NetUtils.BROKER_INFO);
+    	respMsg.outParam = new OutParam("java.lang.String");
+    	respMsg.outParam.values = new Object[1];
+    	respMsg.outParam.values[0] = info;
+    	return NetUtils.serialize(respMsg);
     }
     
 	public static <T> String[] getString(T inputArray) {
