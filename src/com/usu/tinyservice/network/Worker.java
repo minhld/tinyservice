@@ -68,11 +68,11 @@ public abstract class Worker extends Thread {
             byte[] request, result, empty;
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    // get client address
-                    clientAddr = worker.recvStr();
-
                     // set start job clock
                     long startTime = System.currentTimeMillis();
+
+                    // get client address
+                    clientAddr = worker.recvStr();
 
                     // delimiter
                     empty = worker.recv();
@@ -84,7 +84,7 @@ public abstract class Worker extends Thread {
 
                     // return result back to front-end
                     worker.sendMore(clientAddr);
-                    worker.sendMore(NetUtils.BROKER_DELIMITER);
+                    worker.sendMore(NetUtils.DELIMITER);
                     worker.send(result);
 
                     // end the job execution clock
@@ -98,6 +98,10 @@ public abstract class Worker extends Thread {
 
                 } catch (Exception d) {
                     d.printStackTrace();
+                    worker.sendMore(NetUtils.WORKER_FAILED);
+                    worker.sendMore(NetUtils.DELIMITER);
+                    worker.send(workerId);
+
                 }
             }
             worker.close();

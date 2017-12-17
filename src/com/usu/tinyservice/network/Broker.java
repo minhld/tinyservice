@@ -85,21 +85,30 @@ public class Broker extends Thread {
                 // get THIRD FRAME
                 //  - is READY (worker reports with DRL)
                 //  - or CLIENT ID (worker returns results)
-                String workerDataJson = backend.recvStr();
+                String workerResponse = backend.recvStr();
 
-                if (workerDataJson.contains(NetUtils.WORKER_REGISTER)) {
+                if (workerResponse.contains(NetUtils.WORKER_REGISTER)) {
                     // WORKER has finished loading, returned DRL value
                     // update worker list
-                	String[] funcs = NetUtils.getFunctions(workerDataJson);
+                	String[] funcs = NetUtils.getFunctions(workerResponse);
                 	for (int i = 0; i < funcs.length; i++) {
                 		funcMap.put(funcs[i], workerId);
                 	}
                 	
                     System.err.println("[Broker] Add New Worker [" + workerId + "]");
-
+                } else if (workerResponse.equals(NetUtils.WORKER_FAILED)) {
+                	// get delimiter
+                    backend.recv();
+                    
+                    System.err.println("[Broker] Worker [" + workerId + "]");
+                	
                 } else {
+                	// WORKER SUCCESSFULLY DONE
                     // WORKER has completed the task, returned the results
                     startTime = System.currentTimeMillis();
+
+                    // retrieve client ID - to forward the result to the client
+                    String clientId = workerResponse;
 
                     // get FORTH FRAME, should be EMPTY - check the delimiter again
                     empty = backend.recv();
@@ -108,15 +117,14 @@ public class Broker extends Thread {
                     // get LAST FRAME - main result from worker
                     reply = backend.recv();
 
-                    String clientId = "";
                     
                     // return the result from worker 
                     frontend.sendMore(clientId);
-                    frontend.sendMore(NetUtils.BROKER_DELIMITER);
+                    frontend.sendMore(NetUtils.DELIMITER);
                     frontend.send(reply);
                     
                     System.err.println("[Broker] Forward To Client [" + clientId + "]");
-                }
+                } 
             }
 
             // HANDLE CLIENT'S ACTIVITIES AT FRONT-END
@@ -146,21 +154,21 @@ public class Broker extends Thread {
                 	// if worker is not available, broker will
                 	// remind 
                     frontend.sendMore(clientId);
-                    frontend.sendMore(NetUtils.BROKER_DELIMITER);
+                    frontend.sendMore(NetUtils.DELIMITER);
                     
+                    // create a denied message
                     byte[] deniedMsg = NetUtils.createInfoMessage(NetUtils.WORKER_NOT_READY);
                     frontend.send(deniedMsg);
 
                     System.err.println("[Broker] Denied Client [" + clientId + "]");
                 } else {
-	                
 	                // send the requests to all the nearby workers for DRL values. After receiving
 	                // all DRL values, it will consider DRLs and divide job into tasks with
 	                // proportional data amounts to the DRL values.
 	                backend.sendMore(workerId);
-	                backend.sendMore(NetUtils.BROKER_DELIMITER);
+	                backend.sendMore(NetUtils.DELIMITER);
 	                backend.sendMore(clientId); 
-	                backend.sendMore(NetUtils.BROKER_DELIMITER);
+	                backend.sendMore(NetUtils.DELIMITER);
 	                backend.send(request);
 	                
 	                System.err.println("[Broker] Forward To Worker [" + workerId + "]");

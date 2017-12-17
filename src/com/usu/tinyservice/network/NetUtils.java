@@ -29,8 +29,9 @@ public class NetUtils {
     public static final String DEFAULT_IP = "*";
     public static final String WORKER_REGISTER = "REGISTER";
     public static final String WORKER_NOT_READY = "WORKER_NOT_READY";
+    public static final String WORKER_FAILED = "WORKER_FAILED";
     public static final String BROKER_INFO = "INFO";
-	public static final String BROKER_DELIMITER = "";
+	public static final String DELIMITER = "";
     // public static final String DELIMITER = "@@@";
 
     private static Random rand = new Random(System.currentTimeMillis());

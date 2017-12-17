@@ -37,6 +37,7 @@ public abstract class Client extends Thread {
         NetUtils.setId(requester);
         // this.clientId = new String(this.requester.getIdentity());
         requester.connect("tcp://" + this.groupIp + ":" + this.port);
+        // print message
         System.out.println("[Client-" + new String(requester.getIdentity()) + "] Started.");
     }
 
@@ -52,7 +53,7 @@ public abstract class Client extends Thread {
     public void send(String funcName, byte[] data) {
 		if (requester != null) {
 			requester.sendMore(funcName);
-			requester.sendMore(NetUtils.BROKER_DELIMITER);
+			requester.sendMore(NetUtils.DELIMITER);
 			requester.send(data);
 			byte[] resp = requester.recv(0);
 			receive(resp);

@@ -24,10 +24,11 @@ public class test_service_01 extends Thread {
 					
 				} else if (resp.functionName.equals("getFileList1")) {
 					com.usu.tinyservice.network.tests.Data1[] data1 = (com.usu.tinyservice.network.tests.Data1[]) resp.outParam.values;
-					System.out.println(new String(data1[0].data13));
+					System.out.println("[Client] Received: " + new String(data1[0].data13));
 					
 				} else if (resp.functionName.equals("getFileList2")) {
 					java.lang.String[] files = (java.lang.String[]) resp.outParam.values;
+					System.out.println("[Client] Received: ");
 					for (int i = 0; i < files.length; i++) {
 						System.out.println("\t File: " + files[i]);
 					}
@@ -44,7 +45,7 @@ public class test_service_01 extends Thread {
 		data1.data13 = "hello from client".getBytes();
 
 		client.getFileList1("D:\\", new Data1[] { data1 }, true);
-		// client.getFileList2("D:\\");
+		client.getFileList2("D:\\");
 		
 //		for (int i = 0; i < 5; i++) {
 //			NetUtils.sleep(1500);
