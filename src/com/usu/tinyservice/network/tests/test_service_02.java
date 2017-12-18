@@ -10,6 +10,8 @@ public class test_service_02 extends Thread {
 			@Override
 			public void dataReceived(byte[] data) {
 				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
+				System.out.println("[Client] Received: ");
+				
 				if (resp.functionName.equals("getFileList1")) {
 					com.usu.tinyservice.network.tests.Data1[] data1 = (com.usu.tinyservice.network.tests.Data1[]) resp.outParam.values;
 					System.out.println(new String(data1[0].data13));
@@ -30,8 +32,8 @@ public class test_service_02 extends Thread {
 		data1.data12 = new String[] { "abc", "def" };
 		data1.data13 = "hello from client".getBytes();
 
-		client2.getFileList1("D:\\", new Data1[] { data1 }, true);
-		// client2.getFileList2("D:\\");
+		// client2.getFileList1("D:\\", new Data1[] { data1 }, true);
+		client2.getFileList2("D:\\");
 	}
 	
 	public static void main(String[] args) {

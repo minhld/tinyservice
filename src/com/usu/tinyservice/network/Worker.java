@@ -2,8 +2,6 @@ package com.usu.tinyservice.network;
 
 import org.zeromq.ZMQ;
 
-//import com.usu.tinyservice.network.utils.AckClient;
-
 /**
  * The worker serves as a servant for the broker. It receives tasks
  * from the broker and alternatively executes those tasks. The worker
@@ -112,61 +110,6 @@ public abstract class Worker extends Thread {
         }
     }
 
-//    /**
-//     * default
-//     *
-//     * @param packageBytes
-//     * @return
-//     */
-//    protected byte[] defaultResolveRequest(byte[] packageBytes) {
-//        try {
-////            // get back the job package sent by broker
-////            JobPackage request = (JobPackage) Utils.deserialize(packageBytes);
-////
-////            // report out that worker receives a request
-////            receivedTask(request.clientId, request.dataBytes.length);
-////
-////            // ====== ====== ====== EXAMPLE SECTION ====== ====== ======
-////
-////            // // ====== image-processing example ======
-////            // // initiate data parser and job objects from the request package
-////            JobDataParser dataParser = new JobDataParserImpl(); // JobHelper.getDataParser(this.context, this.workerId, request.jobBytes);
-////            // Job job = new JobImpl(); // JobHelper.getJob(this.context, this.workerId, request.jobBytes);
-////            Job job = new BitmapJobImpl();
-////
-////            // // ====== word-count example ======
-////            // JobDataParser dataParser = new WordDataParserImpl();
-////            // Job job = new WordJobImpl();
-////
-////            // // ====== internet-share example ======
-////            // JobDataParser dataParser = new NetDataParserImpl();
-////            // Job job = new NetJobImpl();
-////
-////            // // ====== internet-share example ======
-////            // JobDataParser dataParser = new EmptyDataParserImpl();
-////            // Job job = new EmptyJobImpl();
-////
-////            // ====== ====== ====== END EXAMPLE ====== ====== ======
-////
-////            // execute the job
-////            Object dataObject = dataParser.parseBytesToObject(request.dataBytes);
-////            Object result = job.exec(dataObject);
-////
-////            return dataParser.parseObjectToBytes(result);
-//        	
-//        	return workerId.getBytes();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return new byte[0];
-//        }
-//    }
-
-//    /**
-//     * initiate worker without broker at the middle.
-//     * worker also takes the role of broker
-//     */
-//    private void initWithoutBroker() { }
-
 //    class ExAckClient extends AckClient {
 //        public ExAckClient(ZMQ.Context context, String ip, byte[] id) {
 //            super(context, ip, id);
@@ -227,6 +170,15 @@ public abstract class Worker extends Thread {
      */
     public abstract void receivedTask(String clientId, int dataSize);
 
+    /**
+     * this holds information of the current Worker. The information may 
+     * include code (REGISTER/FORWARD), worker ID and function list that
+     * worker provides.
+     * <br/><br/>
+     * please see the example for the detail.
+     * 
+     * @return worker information in JSON format
+     */
     public abstract String info();
     
     /**

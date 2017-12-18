@@ -45,11 +45,35 @@ public abstract class Client extends Thread {
         requester.close();
         context.term();
 	}
+	
+	/**
+	 * the client forwards the request to the remote broker. This
+	 * feature is used when client is a part of the Bridge
+	 * 
+	 * @param requestData
+	 */
+	public void send(byte[] requestData) {
+		requester.send(requestData);
+	}
 
+	/**
+	 * the client sends a request including a function name and 
+	 * a request package to the connected broker
+	 * 
+	 * @param funcName
+	 * @param data
+	 */
     public void send(String funcName, String data) {
 		send(funcName, data.getBytes());
 	}
     
+    /**
+     * the client sends a request including a function name and
+     * a request package in binary format to the connected broker
+     * 
+     * @param funcName
+     * @param data
+     */
     public void send(String funcName, byte[] data) {
 		if (requester != null) {
 			requester.sendMore(funcName);
@@ -60,33 +84,11 @@ public abstract class Client extends Thread {
 		}
 	}
     
+    /**
+     * this handler is invoked when results come back to the client 
+     * 
+     * @param data
+     */
     public abstract void receive(byte[] data);
     
-//    protected void sendMessage(byte[] msg) {
-//        requester.send(msg);
-//    }
-//
-//    protected void sendMessage(String msg) {
-//        requester.send(msg);
-//    }
-//
-//    /**
-//     * this event occurs when client finished starting
-//     * @param clientId
-//     */
-//    public abstract void clientStarted(String clientId);
-//
-//    /**
-//     * this function defines what task to send to the broker/worker
-//     */
-//    public abstract void send();
-//
-//    /**
-//     * this function is invoked when client receives result of the
-//     * task it requested. this function must be overrode to define
-//     * how to manipulate with the output.
-//     *
-//     * @param result
-//     */
-//    public abstract void resolveResult(byte[] result);
 }
