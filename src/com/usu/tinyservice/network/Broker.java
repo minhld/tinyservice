@@ -94,14 +94,11 @@ public class Broker extends Thread {
                 	for (int i = 0; i < funcs.length; i++) {
                 		funcMap.put(funcs[i], workerId);
                 	}
-                	
-                    System.err.println("[Broker] Add New Worker [" + workerId + "]");
+                	System.err.println("[Broker] Add New Worker [" + workerId + "]");
                 } else if (workerResponse.equals(NetUtils.WORKER_FAILED)) {
                 	// get delimiter
                     backend.recv();
-                    
                     System.err.println("[Broker] Worker [" + workerId + "]");
-                	
                 } else {
                 	// WORKER SUCCESSFULLY DONE
                     // WORKER has completed the task, returned the results
@@ -117,7 +114,6 @@ public class Broker extends Thread {
                     // get LAST FRAME - main result from worker
                     reply = backend.recv();
 
-                    
                     // return the result from worker 
                     frontend.sendMore(clientId);
                     frontend.sendMore(NetUtils.DELIMITER);

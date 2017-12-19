@@ -58,8 +58,8 @@ public abstract class Worker extends Thread {
             String registerInfo = info();
             worker.send(registerInfo);
             
-//            // initiate ACK client - to listen to DRL request from brokers
-//            ackClient = new ExAckClient(context, this.groupIp, worker.getIdentity());
+            // // initiate ACK client - to listen to DRL request from brokers
+            // ackClient = new ExAckClient(context, this.groupIp, worker.getIdentity());
 
             // this part is to wait for broker to send job to execute
             String clientAddr;
@@ -130,28 +130,6 @@ public abstract class Worker extends Thread {
 //        }
 //    }
 
-//    /**
-//     * similar to the <i>clientStarted</i> event in client, this event will be happened
-//     * when worker completes the initiation.
-//     *
-//     * @param workerId
-//     */
-//    public abstract void workerStarted(String workerId);
-
-    
-//    /**
-//     * 
-//     * @param workerId
-//     */
-//    public abstract void register(String workerId);
-    
-//    /**
-//     * this event occurs when worker finishes the current work
-//     * 
-//     * @param workerId
-//     * @param taskDone
-//     */
-//    public abstract void workerFinished(String workerId, TaskDone taskDone);
 
     /**
      * this abstract function needs to be filled. this is to
@@ -162,13 +140,6 @@ public abstract class Worker extends Thread {
      */
     public abstract byte[] resolveRequest(byte[] packageBytes);
 
-    /**
-     * this event occurs when worker has completed receiving a task from client
-     *
-     * @param clientId
-     * @param dataSize
-     */
-    public abstract void receivedTask(String clientId, int dataSize);
 
     /**
      * this holds information of the current Worker. The information may 

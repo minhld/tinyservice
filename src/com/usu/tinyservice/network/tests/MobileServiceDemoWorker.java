@@ -56,15 +56,7 @@ public class MobileServiceDemoWorker {
 	    return respBytes;
 	  }
 		
-	  @Override
-	  public void receivedTask(String clientId, int dataSize) {
-	  }
-	  
-//	  @Override
-//	  public void register(String workerId) {
-//		  
-//	  }
-	  
+  
 	  @Override
 	  public String info() {
 		String json = 

@@ -40,11 +40,6 @@ public class Bridge extends Thread {
 			}
 			
 			@Override
-			public void receivedTask(String clientId, int dataSize) {
-				
-			}
-			
-			@Override
 			public String info() {
 				// define the Worker's service description of the worker
 				// under the Bridge

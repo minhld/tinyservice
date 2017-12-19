@@ -43,10 +43,6 @@ public class MobileServiceDemoWorker2 {
 	  }
 		
 	  @Override
-	  public void receivedTask(String clientId, int dataSize) {
-	  }
-	  
-	  @Override
 	  public String info() {
 		String json = 
 		  "{" +
