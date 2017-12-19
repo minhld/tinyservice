@@ -10,10 +10,19 @@ import org.zeromq.ZMQ;
  * Created by minhld on 8/18/2016.
  */
 public abstract class Worker extends Thread {
+	public static enum WorkerMode {
+		NORMAL,
+		FORWARD
+	}
+
+	// network and type information
     private String groupIp = "*";
     private int port = NetUtils.SERVER_PORT;
-
-//    private ExAckClient ackClient;
+    // worker will operate in two modes NORMAL
+    private WorkerMode mode = WorkerMode.NORMAL;
+    
+    private ZMQ.Socket worker;
+    // private ExAckClient ackClient;
 
     public String workerId = "";
 
@@ -26,11 +35,17 @@ public abstract class Worker extends Thread {
         this.start();
     }
 
-    public Worker(String groupIp, int port) {
+    public Worker(String groupIp, WorkerMode workerMode) {
         this.groupIp = groupIp;
-        this.port = port;
+        this.mode = workerMode;
         this.start();
     }
+    
+//    public Worker(String groupIp, int port) {
+//        this.groupIp = groupIp;
+//        this.port = port;
+//        this.start();
+//    }
 
     public void run() {
         initWithBroker();
@@ -44,7 +59,7 @@ public abstract class Worker extends Thread {
             ZMQ.Context context = ZMQ.context(1);
 
             //  Socket to talk to clients and set its Id
-            ZMQ.Socket worker = context.socket(ZMQ.REQ);
+            worker = context.socket(ZMQ.REQ);
             NetUtils.setId (worker);
             this.workerId = new String(worker.getIdentity());
             worker.connect("tcp://" + this.groupIp + ":" + this.port);
@@ -62,33 +77,39 @@ public abstract class Worker extends Thread {
             // ackClient = new ExAckClient(context, this.groupIp, worker.getIdentity());
 
             // this part is to wait for broker to send job to execute
-            String clientAddr;
+            String clientId;
             byte[] request, result, empty;
             while (!Thread.currentThread().isInterrupted()) {
                 try {
+                    // get client address
+                    clientId = worker.recvStr();
+
                     // set start job clock
                     long startTime = System.currentTimeMillis();
-
-                    // get client address
-                    clientAddr = worker.recvStr();
 
                     // delimiter
                     empty = worker.recv();
                     assert (empty.length == 0);
 
-                    // get request, send reply
+                    // get request and resolve the request
                     request = worker.recv();
-                    result = resolveRequest(request);
-
-                    // return result back to front-end
-                    worker.sendMore(clientAddr);
-                    worker.sendMore(NetUtils.DELIMITER);
-                    worker.send(result);
-
+                    
+                    if (mode == WorkerMode.NORMAL) {
+                    	// resolve the request by parsing the request and perform
+                    	// something on the data to retrieve result
+                    	result = resolveRequest(request);
+                    	
+                        // and return result back to the broker
+                        send(clientId, result);
+                    } else if (mode == WorkerMode.FORWARD) {
+                    	// request will be forwarded to somewhere else -  
+                    	// navigated by developer's code
+                    	forwardRequest(clientId, request);
+                    }
+                    
                     // end the job execution clock
-                    long durr = System.currentTimeMillis() - startTime;
                     TaskDone taskInfo = new TaskDone();
-                    taskInfo.durration = durr;
+                    taskInfo.durration = System.currentTimeMillis() - startTime;
                     
                     // when worker completes the task
                     // workerFinished(workerId, taskInfo);
@@ -96,10 +117,7 @@ public abstract class Worker extends Thread {
 
                 } catch (Exception d) {
                     d.printStackTrace();
-                    worker.sendMore(NetUtils.WORKER_FAILED);
-                    worker.sendMore(NetUtils.DELIMITER);
-                    worker.send(workerId);
-
+                    send(NetUtils.WORKER_FAILED, workerId);
                 }
             }
             worker.close();
@@ -109,7 +127,32 @@ public abstract class Worker extends Thread {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * forwards the result data in string format back to the broker
+     * 
+     * @param clientId
+     * @param data
+     */
+    public void send(String clientId, String data) {
+    	worker.sendMore(clientId);
+        worker.sendMore(NetUtils.DELIMITER);
+        worker.send(data);
+    }
+    
+    /**
+     * forwards a trunk of result data back to the broker
+     * 
+     * @param clientId
+     * @param data
+     */
+    public void send(String clientId, byte[] data) {
+    	worker.sendMore(clientId);
+        worker.sendMore(NetUtils.DELIMITER);
+        worker.send(data);
+    }
 
+    
 //    class ExAckClient extends AckClient {
 //        public ExAckClient(ZMQ.Context context, String ip, byte[] id) {
 //            super(context, ip, id);
@@ -133,13 +176,27 @@ public abstract class Worker extends Thread {
 
     /**
      * this abstract function needs to be filled. this is to
-     * define how worker will complete the work
+     * define how worker will complete the work.
+     * <br/><br/>
+     * default code is implemented
      *
      * @param packageBytes
      * @return
      */
-    public abstract byte[] resolveRequest(byte[] packageBytes);
+    public byte[] resolveRequest(byte[] packageBytes) {
+    	return null;
+    }
 
+    /**
+     * this function will be used by the Bridge. This forwards request message
+     * to another broker - implemented by developer's injected code
+     * <br/><br/>
+     * default code is implemented
+     * 
+     * @param clientId
+     * @param packageBytes
+     */
+    public void forwardRequest(String clientId, byte[] packageBytes) { }
 
     /**
      * this holds information of the current Worker. The information may 

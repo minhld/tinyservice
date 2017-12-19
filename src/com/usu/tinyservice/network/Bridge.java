@@ -27,16 +27,9 @@ public class Bridge extends Thread {
 		// broker to the bridge's Client
 		mWorker = new Worker(localBrokerIp) {
 			@Override
-			public byte[] resolveRequest(byte[] packageBytes) {
+			public void forwardRequest(String clientId, byte[] packageBytes) {
 				// client forwards the request to the remote broker
-				mClient.send(packageBytes);
-				
-				// wait for the results from the remote broker
-				// the results will be used to forward back to the 
-				// local broker
-				byte[] results = null;
-				
-				return results;
+				mClient.forward(mWorker.workerId, packageBytes);
 			}
 			
 			@Override
@@ -60,7 +53,8 @@ public class Bridge extends Thread {
 			@Override
 			public void receive(byte[] data) {
 				// forward this to the local broker
-				
+				String clientId = "";
+				mWorker.send(clientId, data);
 			}
 		};
 	}

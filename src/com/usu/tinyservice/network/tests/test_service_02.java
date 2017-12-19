@@ -32,9 +32,12 @@ public class test_service_02 extends Thread {
 		data1.data12 = new String[] { "abc", "def" };
 		data1.data13 = "hello from client".getBytes();
 
-		// client2.getFileList1("D:\\", new Data1[] { data1 }, true);
-		client2.getFileList2("D:\\");
+		for (int i = 0; i < 5; i++) {
+			// client2.getFileList1("D:\\", new Data1[] { data1 }, true);
+			client2.getFileList2("D:\\");
+		}
 	}
+		
 	
 	public static void main(String[] args) {
 		new test_service_02().start();

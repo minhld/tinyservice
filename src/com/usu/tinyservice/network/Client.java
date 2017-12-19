@@ -52,7 +52,7 @@ public abstract class Client extends Thread {
 	 * 
 	 * @param requestData
 	 */
-	public void send(byte[] requestData) {
+	public void forward(String clientId, byte[] requestData) {
 		requester.send(requestData);
 	}
 
