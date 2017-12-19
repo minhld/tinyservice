@@ -5,13 +5,9 @@ import org.zeromq.ZMQ;
 import java.util.HashMap;
 
 /**
- * Created by minhld on 8/4/2016.
- * This class work as a broker among the devices in mobile network.
- * The broker has several modes. To switch mode, please use the mode
- * type switcher:
- *  - Publish-Subscribe mode
- *  - Router mode
+ * Broker navigates the message flow of the system
  *
+ * @author minhld on 8/4/2016.
  */
 public class Broker extends Thread {
     private String brokerIp = NetUtils.DEFAULT_IP;

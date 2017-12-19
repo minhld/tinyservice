@@ -27,6 +27,8 @@ public class NetUtils {
     public static final int CLIENT_PORT = 6668;
     
     public static final String DEFAULT_IP = "*";
+    public static final String SERVICE_1_0 = "1.0";
+    
     public static final String WORKER_REGISTER = "REGISTER";
     public static final String WORKER_NOT_READY = "WORKER_NOT_READY";
     public static final String WORKER_FAILED = "WORKER_FAILED";

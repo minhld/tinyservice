@@ -29,7 +29,7 @@ public class Bridge extends Thread {
 			@Override
 			public void forwardRequest(String clientId, byte[] packageBytes) {
 				// client forwards the request to the remote broker
-				mClient.forward(mWorker.workerId, packageBytes);
+				mClient.forward(clientId, packageBytes);
 			}
 			
 			@Override

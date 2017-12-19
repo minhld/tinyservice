@@ -53,6 +53,8 @@ public abstract class Client extends Thread {
 	 * @param requestData
 	 */
 	public void forward(String clientId, byte[] requestData) {
+		requester.sendMore(clientId);
+		requester.sendMore(NetUtils.DELIMITER);
 		requester.send(requestData);
 	}
 
