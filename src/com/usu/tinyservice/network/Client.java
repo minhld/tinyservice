@@ -59,6 +59,15 @@ public abstract class Client extends Thread {
 	}
 
 	/**
+	 * send a request message 
+	 * 
+	 * @param requestType
+	 */
+	public void send(String requestType) {
+		send(requestType, new byte[0]);
+	}
+	
+	/**
 	 * the client sends a request including a function name and 
 	 * a request package to the connected broker
 	 * 

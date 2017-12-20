@@ -1,5 +1,6 @@
 package com.usu.tinyservice.network;
 
+import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.network.Worker.WorkerMode;
 
 /**
@@ -61,10 +62,13 @@ public class Bridge extends Thread {
 			@Override
 			public void receive(byte[] data) {
 				// forward this to the local broker
+				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
+				
 				String clientId = "";
 				mWorker.send(clientId, data);
 			}
 		};
+		mClient.send(NetUtils.REQUEST_SERVICES);
 	}
 	
 }

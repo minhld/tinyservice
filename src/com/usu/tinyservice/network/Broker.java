@@ -229,24 +229,23 @@ public class Broker extends Thread {
 //        backend.send(data);
 //    }
     
-    /**
-     * this class contains information about status of a worker
-     * at the moment worker is requested for DRL
-     */
-    class WorkerInfo {
-        public String workerId;
-        public float DRL;
-
-        public WorkerInfo(String workerId) {
-            this.workerId = workerId;
-            this.DRL = 0;
-        }
-
-        public WorkerInfo(String workerId, float drl) {
-            this.workerId = workerId;
-            this.DRL = drl;
-        }
-    }
-
+//    /**
+//     * this class contains information about status of a worker
+//     * at the moment worker is requested for DRL
+//     */
+//    class WorkerInfo {
+//        public String workerId;
+//        public float DRL;
+//
+//        public WorkerInfo(String workerId) {
+//            this.workerId = workerId;
+//            this.DRL = 0;
+//        }
+//
+//        public WorkerInfo(String workerId, float drl) {
+//            this.workerId = workerId;
+//            this.DRL = drl;
+//        }
+//    }
 
 }
