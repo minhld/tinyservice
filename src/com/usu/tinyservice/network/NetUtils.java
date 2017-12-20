@@ -33,9 +33,10 @@ public class NetUtils {
     public static final String WORKER_NOT_READY = "WORKER_NOT_READY";
     public static final String WORKER_FAILED = "WORKER_FAILED";
     public static final String BROKER_INFO = "INFO";
+    public static final String REQUEST_SERVICES = "REQUEST_SERVICES";
 	public static final String DELIMITER = "";
-    // public static final String DELIMITER = "@@@";
-
+    
+	
     private static Random rand = new Random(System.currentTimeMillis());
 
     

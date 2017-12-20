@@ -40,7 +40,7 @@ public class Broker extends Thread {
      * this function is called when developer invoke router mode
      * which is for job distribution
      */
-    private void initRouterMode() {
+    void initRouterMode() {
         ZMQ.Context context = ZMQ.context(1);
 
         // initiate publish socket
@@ -119,7 +119,7 @@ public class Broker extends Thread {
                 } 
             }
 
-            // HANDLE CLIENT'S ACTIVITIES AT FRONT-END
+            // HANDLE CLIENT REQUESTS
             if (items.pollin(1)) {
                 // now get next client request, route to LRU worker
                 // client request is [address][empty][request]
@@ -131,7 +131,7 @@ public class Broker extends Thread {
                 
                 // get function name - to find worker ID
                 String funcName = frontend.recvStr();
-                String workerId = funcMap.get(funcName);
+                String workerId = funcName.equals(NetUtils.REQUEST_SERVICES) ? funcName : funcMap.get(funcName);
 
                 // check 2nd frame
                 empty = frontend.recv();
@@ -140,11 +140,11 @@ public class Broker extends Thread {
                 // get 3rd frame
                 request = frontend.recv();
                 
-                // check if worker is available at the time of 
-                // execution 
+                // CHECK AVAILABILITY OF THE WORKER 
+                // check if worker is available at the time of execution 
                 if (workerId == null) {
-                	// if worker is not available, broker will
-                	// remind 
+                	// WORKER NOT AVAILABLE
+                	// broker will remind 
                     frontend.sendMore(clientId);
                     frontend.sendMore(NetUtils.DELIMITER);
                     
@@ -153,7 +153,12 @@ public class Broker extends Thread {
                     frontend.send(deniedMsg);
 
                     System.err.println("[Broker] Denied Client [" + clientId + "]");
+                } else if (workerId.equals(NetUtils.REQUEST_SERVICES)) {
+                	// String
+                	String services = services(); 
+                	
                 } else {
+                	// WORKER AVAILABLE
 	                // send the requests to all the nearby workers for DRL values. After receiving
 	                // all DRL values, it will consider DRLs and divide job into tasks with
 	                // proportional data amounts to the DRL values.
@@ -174,6 +179,14 @@ public class Broker extends Thread {
         context.term();
     }
 
+    /**
+     * returns the list of available services on current Broker
+     * 
+     * @return list of available services in string array
+     */
+    public String services() {
+    	return ""; ///funcMap.keySet().toArray(new String[] {});
+    }
 
     /**
      * this class contains information about status of a worker
