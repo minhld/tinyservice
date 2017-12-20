@@ -62,7 +62,7 @@ public class NetUtils {
         return funcList.toArray(new String[] {});
     }
     
-    public static byte[] createInfoMessage(String info) {
+    public static byte[] createMessage(String info) {
     	ResponseMessage respMsg = new ResponseMessage(NetUtils.BROKER_INFO);
     	respMsg.outParam = new OutParam("java.lang.String");
     	respMsg.outParam.values = new Object[1];

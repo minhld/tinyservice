@@ -51,13 +51,14 @@ public class Broker extends Thread {
         // initiate subscribe socket
         String backendPort = "tcp://" + this.brokerIp + ":" + NetUtils.SERVER_PORT;
         ZMQ.Socket backend = context.socket(ZMQ.ROUTER);
+        // backend = context.socket(ZMQ.ROUTER);
         backend.bind(backendPort);
 
         // Queue of available workers
         funcMap = new HashMap<String, String>();
 
 
-        // String workerId = "", clientId = "";
+        // INFINITE LOOP TO LISTEN TO MESSAGES FROM 
         byte[] empty, request, reply;
         while (!Thread.currentThread().isInterrupted()) {
             ZMQ.Poller items = new ZMQ.Poller(2);
@@ -68,7 +69,7 @@ public class Broker extends Thread {
             if (items.poll() < 0)
                 break;
 
-            // HANDLE WORKER'S ACTIVITY ON BACK-END
+            // ====== HANDLE WORKER'S ACTIVITY ON BACK-END ====== 
             if (items.pollin(0)) {
                 // queue worker address for LRU routing
                 // FIRST FRAME is WORKER ID
@@ -119,7 +120,7 @@ public class Broker extends Thread {
                 } 
             }
 
-            // HANDLE CLIENT REQUESTS
+            // ====== HANDLE CLIENT REQUESTS ====== 
             if (items.pollin(1)) {
                 // now get next client request, route to LRU worker
                 // client request is [address][empty][request]
@@ -140,25 +141,34 @@ public class Broker extends Thread {
                 // get 3rd frame
                 request = frontend.recv();
                 
-                // CHECK AVAILABILITY OF THE WORKER 
+                // ====== CHECK AVAILABILITY OF THE WORKER ======  
+                
                 // check if worker is available at the time of execution 
                 if (workerId == null) {
                 	// WORKER NOT AVAILABLE
-                	// broker will remind 
-                    frontend.sendMore(clientId);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    
+                	
                     // create a denied message
-                    byte[] deniedMsg = NetUtils.createInfoMessage(NetUtils.WORKER_NOT_READY);
-                    frontend.send(deniedMsg);
-
+                    byte[] deniedMsgBytes = NetUtils.createMessage(NetUtils.WORKER_NOT_READY);
+                    backend.sendMore(clientId); 
+                    backend.sendMore(NetUtils.DELIMITER);
+                    backend.send(deniedMsgBytes);
+                    // sendMsg(clientId, deniedMsgBytes);
+                    
                     System.err.println("[Broker] Denied Client [" + clientId + "]");
                 } else if (workerId.equals(NetUtils.REQUEST_SERVICES)) {
-                	// String
-                	String services = services(); 
+                	// REQUEST BROKER'S SERVICE LIST
                 	
+                	String serviceList = services();
+                	byte[] serviceListBytes = NetUtils.createMessage(serviceList);
+                    backend.sendMore(clientId); 
+                    backend.sendMore(NetUtils.DELIMITER);
+                    backend.send(serviceListBytes);
+                	// sendMsg(clientId, serviceListBytes);
+                    
+                	System.err.println("[Broker] Send Services To Client [" + clientId + "]");
                 } else {
                 	// WORKER AVAILABLE
+                	
 	                // send the requests to all the nearby workers for DRL values. After receiving
 	                // all DRL values, it will consider DRLs and divide job into tasks with
 	                // proportional data amounts to the DRL values.
@@ -185,9 +195,40 @@ public class Broker extends Thread {
      * @return list of available services in string array
      */
     public String services() {
-    	return ""; ///funcMap.keySet().toArray(new String[] {});
+    	String functionList = 
+    	  "{" + 
+    	    "\"functions\" : [";
+    	
+    	// get the list of functions
+    	String functions = "";
+    	for (String key : funcMap.keySet()) {
+    		functionList += "\"" + key + "\",";
+    	}
+    	if (functions.length() > 0) {
+    		// remove the last redundant comma
+    		functions = functions.substring(0, functions.length() - 1);
+    	}
+    	
+    	// continue with the suffix
+    	functionList += functions +
+    	    "]" + 
+    	  "}";
+    	return functionList;
     }
 
+//    /**
+//     * send a message to client or worker. This will send a message 
+//     * including an ID and data
+//     * 
+//     * @param id
+//     * @param data
+//     */
+//    void sendMsg(String id, byte[] data) {
+//        backend.sendMore(id); 
+//        backend.sendMore(NetUtils.DELIMITER);
+//        backend.send(data);
+//    }
+    
     /**
      * this class contains information about status of a worker
      * at the moment worker is requested for DRL
