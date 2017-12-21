@@ -38,41 +38,58 @@ public class Bridge extends Thread {
 		mClient = new Client(remoteBrokerIp) {
 			@Override
 			public void receive(byte[] data) {
-				// forward this to the local broker
 				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
-				
-				// create a Worker to handle communication with the local broker
-				// this Worker does nothing but forward the requests of the local
-				// broker to the bridge's Client
-				mWorker = new Worker(localBrokerIp, WorkerMode.FORWARD) {
-					@Override
-					public void forwardRequest(String clientId, byte[] packageBytes) {
-						// client forwards the request to the remote broker
-						mClient.forward(clientId, packageBytes);
-					}
+				if (resp.functionName.equals(NetUtils.BROKER_INFO)) {
+					// INFO response 
+					String funcListJson = (String) resp.outParam.values[0];
+					startWorker(funcListJson);
+				} else {
+					// other responses
 					
-					@Override
-					public String info() {
-						bridgeId = NetUtils.generateId();
-								
-						// define the Worker's service description of the worker
-						// under the Bridge
-						String json = 
-						  "{" +
-							"\"code\" : \"REGISTER\"," +
-							"\"id\" : \"" + mWorker.workerId + "\"," +
-							"\"functions\" : [\"bridge-\"" + bridgeId + "]" +
-						  "}";
-						return json;
-					}
-				};
-				String clientId = "";
-				mWorker.send(clientId, data);
-				
+					// mWorker.send(clientId, data);
+				}
 				
 			}
 		};
+		NetUtils.sleep(100);
 		mClient.send(NetUtils.REQUEST_SERVICES);
+	}
+	
+	/**
+	 * after the client receives the list of services available on the remote broker, 
+	 * it will create a worker and delegate the service list to the worker
+	 * 
+	 * @param funcListJson
+	 */
+	void startWorker(String funcListJson) {
+		// remove the '{' and '}' characters from the JSON string 
+		final String subFuncList = funcListJson.substring(1, funcListJson.length() - 1);
+		
+		// create a Worker to handle communication with the local broker
+		// this Worker does nothing but forward the requests of the local
+		// broker to the bridge's Client
+		mWorker = new Worker(localBrokerIp, WorkerMode.FORWARD) {
+			@Override
+			public void forwardRequest(byte[] packageBytes) {
+				// client forwards the request to the remote broker
+				mClient.forward(packageBytes);
+			}
+			
+			@Override
+			public String info() {
+				bridgeId = NetUtils.generateId();
+						
+				// define the Worker's service description of the worker
+				// under the Bridge
+				String json = 
+					"{" +
+						"\"code\" : \"REGISTER\"," +
+						"\"id\" : \"" + mWorker.workerId + "\"," +
+						subFuncList + 
+					"}";
+				return json;
+			}
+		};
 	}
 	
 }

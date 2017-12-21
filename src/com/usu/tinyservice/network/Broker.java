@@ -202,10 +202,11 @@ public class Broker extends Thread {
     	// get the list of functions
     	String functions = "";
     	for (String key : funcMap.keySet()) {
-    		functionList += "\"" + key + "\",";
+    		functions += "\"" + key + "\",";
     	}
+    	
+    	// remove the last redundant comma, if any
     	if (functions.length() > 0) {
-    		// remove the last redundant comma
     		functions = functions.substring(0, functions.length() - 1);
     	}
     	
