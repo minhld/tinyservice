@@ -160,9 +160,9 @@ public class Broker extends Thread {
                 	
                 	String serviceList = services();
                 	byte[] serviceListBytes = NetUtils.createMessage(serviceList);
-                    backend.sendMore(clientId); 
-                    backend.sendMore(NetUtils.DELIMITER);
-                    backend.send(serviceListBytes);
+                	frontend.sendMore(clientId); 
+                	frontend.sendMore(NetUtils.DELIMITER);
+                	frontend.send(serviceListBytes);
                 	// sendMsg(clientId, serviceListBytes);
                     
                 	System.err.println("[Broker] Send Services To Client [" + clientId + "]");

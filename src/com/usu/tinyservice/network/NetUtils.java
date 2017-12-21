@@ -272,13 +272,26 @@ public class NetUtils {
      * 
      * @param sock
      */
-    public static void setId (Socket sock)
-    {
-        String identity = String.format ("%04X-%04X", rand.nextInt (), rand.nextInt ());
-        sock.setIdentity (identity.getBytes (ZMQ.CHARSET));
+    public static void setId(Socket sock) {
+        String identity = generateId();
+        sock.setIdentity(identity.getBytes(ZMQ.CHARSET));
     }
 
+    /**
+     * generates a random string in the format XXXXX-XXXXX
+     * so that it could be used as an ID of a component
+     * 
+     * @return
+     */
+    public static String generateId() {
+    	return String.format("%04X-%04X", rand.nextInt(), rand.nextInt());
+    }
     
+    /**
+     * sleep the current thread for a certain amount of time
+     * 
+     * @param time
+     */
     public static void sleep(long time) {
 		try {
 			Thread.sleep(time);
