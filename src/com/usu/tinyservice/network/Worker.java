@@ -104,8 +104,8 @@ public abstract class Worker extends Thread {
                     } else if (mode == WorkerMode.FORWARD) {
                     	// request will be forwarded to somewhere else -  
                     	// navigated by developer's code
-                    	// forwardRequest(clientId, request);
-                    	forwardRequest(request);
+                    	forwardRequest(clientId, request);
+                    	// forwardRequest(request);
                     }
                     
                     // end the job execution clock
@@ -197,8 +197,8 @@ public abstract class Worker extends Thread {
      * @param clientId
      * @param packageBytes
      */
-    public void forwardRequest(byte[] packageBytes) { }
-    // public void forwardRequest(String clientId, byte[] packageBytes) { }
+    // public void forwardRequest(byte[] packageBytes) { }
+    public void forwardRequest(String clientId, byte[] packageBytes) { }
 
     /**
      * this holds information of the current Worker. The information may 

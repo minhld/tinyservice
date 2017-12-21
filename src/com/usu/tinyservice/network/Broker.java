@@ -147,11 +147,11 @@ public class Broker extends Thread {
                 if (workerId == null) {
                 	// WORKER NOT AVAILABLE
                 	
-                    // create a denied message
+                    // send back a denied message to the requesting client
                     byte[] deniedMsgBytes = NetUtils.createMessage(NetUtils.WORKER_NOT_READY);
-                    backend.sendMore(clientId); 
-                    backend.sendMore(NetUtils.DELIMITER);
-                    backend.send(deniedMsgBytes);
+                    frontend.sendMore(clientId); 
+                    frontend.sendMore(NetUtils.DELIMITER);
+                    frontend.send(deniedMsgBytes);
                     // sendMsg(clientId, deniedMsgBytes);
                     
                     System.err.println("[Broker] Denied Client [" + clientId + "]");
@@ -202,7 +202,7 @@ public class Broker extends Thread {
     	// get the list of functions
     	String functions = "";
     	for (String key : funcMap.keySet()) {
-    		functions += "\"" + key + "\",";
+    		functions += "{\"functionName\" : \"" + key + "\"},";
     	}
     	
     	// remove the last redundant comma, if any

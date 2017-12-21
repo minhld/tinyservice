@@ -50,10 +50,11 @@ public abstract class Client extends Thread {
 	 * the client forwards the request to the remote broker. This
 	 * feature is used when client is a part of the Bridge
 	 * 
+	 * @param clientId ID of the requesting client 
 	 * @param requestData
 	 */
-	public void forward(byte[] requestData) {
-		requester.sendMore(this.clientId);
+	public void forward(String clientId, byte[] requestData) {
+		requester.sendMore(clientId);
 		requester.sendMore(NetUtils.DELIMITER);
 		requester.send(requestData);
 	}

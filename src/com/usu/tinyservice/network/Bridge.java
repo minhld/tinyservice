@@ -15,7 +15,7 @@ public class Bridge extends Thread {
 	private String localBrokerIp = NetUtils.DEFAULT_IP;
 	private String remoteBrokerIp = "";
 	
-	private String bridgeId;
+	// private String bridgeId;
 	private Worker mWorker;
 	private Client mClient;
 	
@@ -44,9 +44,8 @@ public class Bridge extends Thread {
 					String funcListJson = (String) resp.outParam.values[0];
 					startWorker(funcListJson);
 				} else {
-					// other responses
-					
-					// mWorker.send(clientId, data);
+					// other responses - worker will send it back to the broker
+					mWorker.send("", data);
 				}
 				
 			}
@@ -70,17 +69,15 @@ public class Bridge extends Thread {
 		// broker to the bridge's Client
 		mWorker = new Worker(localBrokerIp, WorkerMode.FORWARD) {
 			@Override
-			public void forwardRequest(byte[] packageBytes) {
+			public void forwardRequest(String clientId, byte[] packageBytes) {
 				// client forwards the request to the remote broker
-				mClient.forward(packageBytes);
+				mClient.forward(clientId, packageBytes);
 			}
 			
 			@Override
 			public String info() {
-				bridgeId = NetUtils.generateId();
-						
-				// define the Worker's service description of the worker
-				// under the Bridge
+				// services of this worker are simply the services from
+				// the remote broker
 				String json = 
 					"{" +
 						"\"code\" : \"REGISTER\"," +
