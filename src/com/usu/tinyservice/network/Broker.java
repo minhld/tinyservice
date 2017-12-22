@@ -179,7 +179,7 @@ public class Broker extends Thread {
                 	// WORKER AVAILABLE
                 	
                 	// create a chain of client IDs 
-                	String clientIdChain = NetUtils.concatIds(reqClientId, clientId);
+                	String clientIdChain = NetUtils.concatIds(idChain, clientId);
                 	
 	                // send the requests to all the nearby workers for DRL values. After receiving
 	                // all DRL values, it will consider DRLs and divide job into tasks with
