@@ -123,20 +123,29 @@ public class Broker extends Thread {
             // ====== HANDLE CLIENT REQUESTS ====== 
             if (items.pollin(1)) {
                 // now get next client request, route to LRU worker
-                // client request is [address][empty][request]
+                // get the ID of the sending client, where it connect to this broker 
                 String clientId = frontend.recvStr();
 
-                // check 2nd frame
-                empty = frontend.recv();
-                assert (empty.length == 0);
+                // // check 2nd frame
+                // empty = frontend.recv();
+                // assert (empty.length == 0);
+                // skip the delimiter
+                frontend.recv();
+                
+                // get the chain IDs of the requesting clients
+                String idChain = frontend.recvStr();
+                
+                // skip the delimiter
+                frontend.recv();
                 
                 // get function name - to find worker ID
                 String funcName = frontend.recvStr();
                 String workerId = funcName.equals(NetUtils.REQUEST_SERVICES) ? funcName : funcMap.get(funcName);
 
-                // check 2nd frame
-                empty = frontend.recv();
-                assert (empty.length == 0);
+                // // check 2nd frame
+                // empty = frontend.recv();
+                // assert (empty.length == 0);
+                frontend.recv();
 
                 // get 3rd frame
                 request = frontend.recv();
@@ -169,12 +178,15 @@ public class Broker extends Thread {
                 } else {
                 	// WORKER AVAILABLE
                 	
+                	// create a chain of client IDs 
+                	String clientIdChain = NetUtils.concatIds(reqClientId, clientId);
+                	
 	                // send the requests to all the nearby workers for DRL values. After receiving
 	                // all DRL values, it will consider DRLs and divide job into tasks with
 	                // proportional data amounts to the DRL values.
 	                backend.sendMore(workerId);
 	                backend.sendMore(NetUtils.DELIMITER);
-	                backend.sendMore(clientId); 
+	                backend.sendMore(clientIdChain); 
 	                backend.sendMore(NetUtils.DELIMITER);
 	                backend.send(request);
 	                

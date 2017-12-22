@@ -43,6 +43,9 @@ public class test_service_03 extends Thread {
 		data1.data11 = new int[] { 1, 2, 3 };
 		data1.data12 = new String[] { "abc", "def" };
 		data1.data13 = "hello from client".getBytes();
+		
+		NetUtils.sleep(1000);
+
 		// client.getFileList1("D:\\", new Data1[] { data1 }, true);
 		client.getFileList2("D:\\");
 		// new MobileServiceDemoWorker();

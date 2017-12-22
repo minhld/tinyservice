@@ -47,20 +47,9 @@ public abstract class Client extends Thread {
 	}
 	
 	/**
-	 * the client forwards the request to the remote broker. This
-	 * feature is used when client is a part of the Bridge
-	 * 
-	 * @param clientId ID of the requesting client 
-	 * @param requestData
-	 */
-	public void forward(String clientId, byte[] requestData) {
-		requester.sendMore(clientId);
-		requester.sendMore(NetUtils.DELIMITER);
-		requester.send(requestData);
-	}
-
-	/**
-	 * send a request message 
+	 * send a request message for info, not for a result. This function
+	 * is used when Client want to contact the Broker for special info
+	 * from the Broker, such as service list, resource availability etc.
 	 * 
 	 * @param requestType
 	 */
@@ -88,6 +77,8 @@ public abstract class Client extends Thread {
      */
     public void send(String funcName, byte[] data) {
 		if (requester != null) {
+			requester.sendMore(clientId);
+			requester.sendMore(NetUtils.DELIMITER);
 			requester.sendMore(funcName);
 			requester.sendMore(NetUtils.DELIMITER);
 			requester.send(data);
@@ -95,7 +86,24 @@ public abstract class Client extends Thread {
 			receive(resp);
 		}
 	}
-    
+
+	/**
+	 * this function forwards a request to the remote Broker. This
+	 * feature is equipped for the Client to use when it becomes a
+	 * module of the Bridge.
+	 * 
+	 * @param clientId ID of the requesting client 
+	 * @param funcName function name
+	 * @param requestData
+	 */
+	public void send(String clientId, String funcName, byte[] requestData) {
+		requester.sendMore(clientId);
+		requester.sendMore(NetUtils.DELIMITER);
+		requester.sendMore(funcName);
+		requester.sendMore(NetUtils.DELIMITER);
+		requester.send(requestData);
+	}
+
     /**
      * this handler is invoked when results come back to the client 
      * 

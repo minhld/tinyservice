@@ -62,12 +62,32 @@ public class NetUtils {
         return funcList.toArray(new String[] {});
     }
     
+    /**
+     * create a simple message for requesting info from broker or worker 
+     * 
+     * @param info
+     * @return
+     */
     public static byte[] createMessage(String info) {
     	ResponseMessage respMsg = new ResponseMessage(NetUtils.BROKER_INFO);
     	respMsg.outParam = new OutParam("java.lang.String");
     	respMsg.outParam.values = new Object[1];
     	respMsg.outParam.values[0] = info;
     	return NetUtils.serialize(respMsg);
+    }
+    
+    /**
+     * 
+     * @param chain
+     * @param clientId
+     * @return
+     */
+    public static String concatIds(String chain, String clientId) {
+    	return chain.equals(clientId) ? clientId : chain + "/" + clientId;
+    }
+    
+    public static String getImmediateClientId(String chain) {
+    	return null;
     }
     
 	public static <T> String[] getString(T inputArray) {

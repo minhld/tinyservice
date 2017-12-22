@@ -58,7 +58,7 @@ public abstract class Worker extends Thread {
         try {
             ZMQ.Context context = ZMQ.context(1);
 
-            //  Socket to talk to clients and set its Id
+            // socket to talk to clients and set its Id
             worker = context.socket(ZMQ.REQ);
             NetUtils.setId (worker);
             this.workerId = new String(worker.getIdentity());
