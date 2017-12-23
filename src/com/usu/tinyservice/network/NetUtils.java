@@ -29,6 +29,7 @@ public class NetUtils {
     public static final String DEFAULT_IP = "*";
     public static final String SERVICE_1_0 = "1.0";
     
+    public static final String EMPTY = "";
     public static final String WORKER_REGISTER = "REGISTER";
     public static final String WORKER_NOT_READY = "WORKER_NOT_READY";
     public static final String WORKER_FAILED = "WORKER_FAILED";
@@ -77,17 +78,37 @@ public class NetUtils {
     }
     
     /**
+     * concatenates new client ID to the ID chain
      * 
      * @param chain
      * @param clientId
      * @return
      */
     public static String concatIds(String chain, String clientId) {
-    	return chain.equals(clientId) ? clientId : chain + "/" + clientId;
+    	return chain.equals(NetUtils.EMPTY) ? clientId : chain + "/" + clientId;
     }
     
-    public static String getImmediateClientId(String chain) {
-    	return null;
+    /**
+     * get the last client ID in the ID chain. Also returns the shorten 
+     * ID chain which excluded the last ID
+     * 
+     * @param chain
+     * @return a string array including 2 items.<br/>
+     * 	- first item: last client ID<br/>
+     * 	- second item: shorten ID chain<br/>
+     * 
+     */
+    public static String[] getLastClientId(String chain) {
+    	int lastIdx = chain.lastIndexOf("/");
+    	if (chain == null || chain.isEmpty()) {
+    		return new String[] { NetUtils.EMPTY, NetUtils.EMPTY }; 
+    	} else if (!chain.isEmpty() && lastIdx < 0) {
+    		return new String[] { chain, NetUtils.EMPTY }; 
+    	} else {
+	    	String newChain = chain.substring(0, lastIdx);
+	    	String lastClientId = chain.substring(lastIdx + 1);
+	    	return new String[] { lastClientId, newChain };
+    	}
     }
     
 	public static <T> String[] getString(T inputArray) {

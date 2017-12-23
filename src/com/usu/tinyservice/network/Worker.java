@@ -1,5 +1,7 @@
 package com.usu.tinyservice.network;
 
+import java.sql.Ref;
+
 import org.zeromq.ZMQ;
 
 /**
@@ -71,26 +73,25 @@ public abstract class Worker extends Thread {
             // inform broker that i am ready
             // worker.send(NetUtils.WORKER_READY);
             String registerInfo = info();
-            worker.send(registerInfo);
+            send(registerInfo, new byte[0]);
             
             // // initiate ACK client - to listen to DRL request from brokers
             // ackClient = new ExAckClient(context, this.groupIp, worker.getIdentity());
 
             // this part is to wait for broker to send job to execute
-            String clientId;
-            byte[] request, result, empty;
+            // String clientId;
+            byte[] request, result;
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    // get client address
-                    clientId = worker.recvStr();
+                    // get client ID chain
+                    String idChain = worker.recvStr();
 
                     // set start job clock
                     long startTime = System.currentTimeMillis();
 
-                    // delimiter
-                    empty = worker.recv();
-                    assert (empty.length == 0);
-
+                    // skip delimiter
+                    worker.recv();
+                    
                     // get request and resolve the request
                     request = worker.recv();
                     
@@ -100,11 +101,11 @@ public abstract class Worker extends Thread {
                     	result = resolveRequest(request);
                     	
                         // and return result back to the broker
-                        send(clientId, result);
+                        send(idChain, result);
                     } else if (mode == WorkerMode.FORWARD) {
                     	// request will be forwarded to somewhere else -  
                     	// navigated by developer's code
-                    	forwardRequest(clientId, request);
+                    	forwardRequest(idChain, request);
                     	// forwardRequest(request);
                     }
                     
@@ -118,7 +119,7 @@ public abstract class Worker extends Thread {
 
                 } catch (Exception d) {
                     d.printStackTrace();
-                    send(NetUtils.WORKER_FAILED, workerId);
+                    send(NetUtils.WORKER_FAILED);
                 }
             }
             worker.close();
@@ -129,26 +130,38 @@ public abstract class Worker extends Thread {
         }
     }
     
+    public void send(String info) {
+    	worker.sendMore(info);
+        worker.sendMore(NetUtils.DELIMITER);
+        worker.send(NetUtils.EMPTY);
+    }
+    
     /**
-     * forwards the result data in string format back to the broker
+     * forwards the result back to the broker. A response includes: <br/>
+     * 	- worker ID<br/>
+     * 	- ID chain<br/>
+     * 	- response
      * 
-     * @param clientId
-     * @param data
+     * @param idChain format {ID1}/{ID2}/... {@link Client}
+     * @param data String format
      */
-    public void send(String clientId, String data) {
-    	worker.sendMore(clientId);
+    public void send(String idChain, String data) {
+    	worker.sendMore(idChain);
         worker.sendMore(NetUtils.DELIMITER);
         worker.send(data);
     }
     
     /**
-     * forwards a trunk of result data back to the broker
+     * forwards the result back to the broker. A response includes: <br/>
+     * 	- worker ID<br/>
+     * 	- ID chain<br/>
+     * 	- response 
      * 
-     * @param clientId
-     * @param data
+     * @param idChain format {ID1}/{ID2}/... {@link Client}
+     * @param data binary format
      */
-    public void send(String clientId, byte[] data) {
-    	worker.sendMore(clientId);
+    public void send(String idChain, byte[] data) {
+    	worker.sendMore(idChain);
         worker.sendMore(NetUtils.DELIMITER);
         worker.send(data);
     }

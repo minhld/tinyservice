@@ -55,7 +55,7 @@ public class MobileServiceDemoClient {
   
   class RmiClient extends Client {
 	@Override
-	public void receive(byte[] resp) {
+	public void receive(String idChain, String funcName, byte[] resp) {
 	  listener.dataReceived(resp);
 	}
   }

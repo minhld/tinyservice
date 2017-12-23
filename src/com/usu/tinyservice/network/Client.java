@@ -9,7 +9,7 @@ import org.zeromq.ZMQ;
 public abstract class Client extends Thread {
     private ZMQ.Context context;
     private ZMQ.Socket requester;
-    private String clientId;
+    // private String clientId;
     
     private String groupIp = NetUtils.DEFAULT_IP;
     private int port = NetUtils.CLIENT_PORT;
@@ -35,7 +35,7 @@ public abstract class Client extends Thread {
         ZMQ.Context context = ZMQ.context(1);
         requester = context.socket(ZMQ.REQ);
         NetUtils.setId(requester);
-        this.clientId = new String(this.requester.getIdentity());
+        // this.clientId = new String(this.requester.getIdentity());
         requester.connect("tcp://" + this.groupIp + ":" + this.port);
         // print message
         System.out.println("[Client-" + new String(requester.getIdentity()) + "] Started.");
@@ -70,20 +70,30 @@ public abstract class Client extends Thread {
     
     /**
      * the client sends a request including a function name and
-     * a request package in binary format to the connected broker
+     * a request package in binary format to the connected broker. 
+     * A message includes 3 fields:
+     * <br/>
+     * 	- ID of the sender<br/>
+     * 	- additional ID chain, in the format of {ID1}/{ID2}/.../{IDn}<br/>
+     * 	- request body
      * 
      * @param funcName
      * @param data
      */
     public void send(String funcName, byte[] data) {
 		if (requester != null) {
-			requester.sendMore(clientId);
+			// make up a sending message
+			requester.sendMore(NetUtils.EMPTY);		// send from original client -> no need ID
 			requester.sendMore(NetUtils.DELIMITER);
 			requester.sendMore(funcName);
 			requester.sendMore(NetUtils.DELIMITER);
 			requester.send(data);
+			
+			// and start listening for the response
+			String idChain = requester.recvStr();
+			requester.recv();
 			byte[] resp = requester.recv(0);
-			receive(resp);
+			receive(idChain, funcName, resp);
 		}
 	}
 
@@ -91,13 +101,18 @@ public abstract class Client extends Thread {
 	 * this function forwards a request to the remote Broker. This
 	 * feature is equipped for the Client to use when it becomes a
 	 * module of the Bridge.
-	 * 
-	 * @param clientId ID of the requesting client 
+	 * A message includes 3 fields:
+     * <br/>
+     * 	- ID of the sender<br/>
+     * 	- additional ID chain, in the format of {ID1}/{ID2}/.../{IDn}<br/>
+     * 	- request body
+     * 
+	 * @param idChain ID chain of the requesting clients 
 	 * @param funcName function name
 	 * @param requestData
 	 */
-	public void send(String clientId, String funcName, byte[] requestData) {
-		requester.sendMore(clientId);
+	public void send(String idChain, String funcName, byte[] requestData) {
+		requester.sendMore(idChain);
 		requester.sendMore(NetUtils.DELIMITER);
 		requester.sendMore(funcName);
 		requester.sendMore(NetUtils.DELIMITER);
@@ -107,8 +122,10 @@ public abstract class Client extends Thread {
     /**
      * this handler is invoked when results come back to the client 
      * 
+     * @param idChain
+     * @param funcName
      * @param data
      */
-    public abstract void receive(byte[] data);
+    public abstract void receive(String idChain, String funcName, byte[] data);
     
 }

@@ -35,7 +35,6 @@ public class Broker extends Thread {
         initRouterMode();
     }
 
-
     /**
      * this function is called when developer invoke router mode
      * which is for job distribution
@@ -59,7 +58,7 @@ public class Broker extends Thread {
 
 
         // INFINITE LOOP TO LISTEN TO MESSAGES FROM 
-        byte[] empty, request, reply;
+        byte[] request, reply;
         while (!Thread.currentThread().isInterrupted()) {
             ZMQ.Poller items = new ZMQ.Poller(2);
             items.register(backend, ZMQ.Poller.POLLIN);
@@ -75,44 +74,50 @@ public class Broker extends Thread {
                 // FIRST FRAME is WORKER ID
                 String workerId = backend.recvStr();
 
-                // SECOND FRAME is a DELIMITER, empty
-                empty = backend.recv();
-                assert (empty.length == 0);
-
+                // skip the delimiter
+                backend.recv();
+                
                 // get THIRD FRAME
                 //  - is READY (worker reports with DRL)
                 //  - or CLIENT ID (worker returns results)
-                String workerResponse = backend.recvStr();
+                String workerInfo = backend.recvStr();
 
-                if (workerResponse.contains(NetUtils.WORKER_REGISTER)) {
+                // skip the second delimiter
+                backend.recv();
+                
+                if (workerInfo.contains(NetUtils.WORKER_REGISTER)) {
                     // WORKER has finished loading, returned DRL value
                     // update worker list
-                	String[] funcs = NetUtils.getFunctions(workerResponse);
+                	String[] funcs = NetUtils.getFunctions(workerInfo);
                 	for (int i = 0; i < funcs.length; i++) {
                 		funcMap.put(funcs[i], workerId);
                 	}
                 	System.err.println("[Broker] Add New Worker [" + workerId + "]");
-                } else if (workerResponse.equals(NetUtils.WORKER_FAILED)) {
-                	// get delimiter
+
+                	// skip the last frame
                     backend.recv();
-                    System.err.println("[Broker] Worker [" + workerId + "]");
+                } else if (workerInfo.equals(NetUtils.WORKER_FAILED)) {
+                    System.err.println("[Broker] Worker [" + workerId + "] Has Problem.");
+                	
+                    // skip the last frame
+                    backend.recv();
                 } else {
                 	// WORKER SUCCESSFULLY DONE
                     // WORKER has completed the task, returned the results
                     startTime = System.currentTimeMillis();
 
-                    // retrieve client ID - to forward the result to the client
-                    String clientId = workerResponse;
-
-                    // get FORTH FRAME, should be EMPTY - check the delimiter again
-                    empty = backend.recv();
-                    assert (empty.length == 0);
-
+                    // get ID chain (index 0) & client ID (index 1) 
+                    String[] idList = NetUtils.getLastClientId(workerInfo);
+                    String clientId = idList[0];
+                    String idChain = idList[1];
+                    
                     // get LAST FRAME - main result from worker
                     reply = backend.recv();
 
                     // return the result from worker 
                     frontend.sendMore(clientId);
+                    frontend.sendMore(NetUtils.DELIMITER);
+                    frontend.sendMore(idChain);
                     frontend.sendMore(NetUtils.DELIMITER);
                     frontend.send(reply);
                     
@@ -126,13 +131,10 @@ public class Broker extends Thread {
                 // get the ID of the sending client, where it connect to this broker 
                 String clientId = frontend.recvStr();
 
-                // // check 2nd frame
-                // empty = frontend.recv();
-                // assert (empty.length == 0);
                 // skip the delimiter
                 frontend.recv();
                 
-                // get the chain IDs of the requesting clients
+                // get the chain of IDs of the requesting clients
                 String idChain = frontend.recvStr();
                 
                 // skip the delimiter
@@ -160,6 +162,8 @@ public class Broker extends Thread {
                     byte[] deniedMsgBytes = NetUtils.createMessage(NetUtils.WORKER_NOT_READY);
                     frontend.sendMore(clientId); 
                     frontend.sendMore(NetUtils.DELIMITER);
+                    frontend.sendMore(idChain);
+                    frontend.sendMore(NetUtils.DELIMITER);
                     frontend.send(deniedMsgBytes);
                     // sendMsg(clientId, deniedMsgBytes);
                     
@@ -171,6 +175,8 @@ public class Broker extends Thread {
                 	byte[] serviceListBytes = NetUtils.createMessage(serviceList);
                 	frontend.sendMore(clientId); 
                 	frontend.sendMore(NetUtils.DELIMITER);
+                	frontend.sendMore(idChain);
+                	frontend.sendMore(NetUtils.DELIMITER);
                 	frontend.send(serviceListBytes);
                 	// sendMsg(clientId, serviceListBytes);
                     
@@ -178,15 +184,15 @@ public class Broker extends Thread {
                 } else {
                 	// WORKER AVAILABLE
                 	
-                	// create a chain of client IDs 
-                	String clientIdChain = NetUtils.concatIds(idChain, clientId);
+                	// update the ID chain with the new client ID 
+                	idChain = NetUtils.concatIds(idChain, clientId);
                 	
 	                // send the requests to all the nearby workers for DRL values. After receiving
 	                // all DRL values, it will consider DRLs and divide job into tasks with
 	                // proportional data amounts to the DRL values.
 	                backend.sendMore(workerId);
 	                backend.sendMore(NetUtils.DELIMITER);
-	                backend.sendMore(clientIdChain); 
+	                backend.sendMore(idChain); 
 	                backend.sendMore(NetUtils.DELIMITER);
 	                backend.send(request);
 	                
@@ -196,6 +202,7 @@ public class Broker extends Thread {
 
         }
 
+        // terminate all components when done
         frontend.close();
         backend.close();
         context.term();
