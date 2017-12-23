@@ -192,7 +192,9 @@ public class Broker extends Thread {
 	                // proportional data amounts to the DRL values.
 	                backend.sendMore(workerId);
 	                backend.sendMore(NetUtils.DELIMITER);
-	                backend.sendMore(idChain); 
+	                backend.sendMore(idChain);
+	                backend.sendMore(NetUtils.DELIMITER);
+	                backend.sendMore(funcName);
 	                backend.sendMore(NetUtils.DELIMITER);
 	                backend.send(request);
 	                

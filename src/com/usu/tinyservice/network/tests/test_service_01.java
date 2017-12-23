@@ -37,7 +37,7 @@ public class test_service_01 extends Thread {
 			}
 		});
 		
-		NetUtils.sleep(500);
+		NetUtils.sleep(1000);
 		
 		// prepare data
 		com.usu.tinyservice.network.tests.Data1 data1 = new com.usu.tinyservice.network.tests.Data1(); 

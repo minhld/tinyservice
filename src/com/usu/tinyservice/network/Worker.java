@@ -1,7 +1,5 @@
 package com.usu.tinyservice.network;
 
-import java.sql.Ref;
-
 import org.zeromq.ZMQ;
 
 /**
@@ -92,6 +90,11 @@ public abstract class Worker extends Thread {
                     // skip delimiter
                     worker.recv();
                     
+                    String funcName = worker.recvStr();
+                    
+                    // skip the second delimiter
+                    worker.recv();
+                    
                     // get request and resolve the request
                     request = worker.recv();
                     
@@ -105,7 +108,7 @@ public abstract class Worker extends Thread {
                     } else if (mode == WorkerMode.FORWARD) {
                     	// request will be forwarded to somewhere else -  
                     	// navigated by developer's code
-                    	forwardRequest(idChain, request);
+                    	forwardRequest(idChain, funcName, request);
                     	// forwardRequest(request);
                     }
                     
@@ -207,11 +210,11 @@ public abstract class Worker extends Thread {
      * <br/><br/>
      * default code is implemented
      * 
-     * @param clientId
+     * @param idChain
+     * @param funcName
      * @param packageBytes
      */
-    // public void forwardRequest(byte[] packageBytes) { }
-    public void forwardRequest(String clientId, byte[] packageBytes) { }
+    public void forwardRequest(String idChain, String funcName, byte[] packageBytes) { }
 
     /**
      * this holds information of the current Worker. The information may 

@@ -38,14 +38,15 @@ public class Bridge extends Thread {
 		mClient = new Client(remoteBrokerIp) {
 			@Override
 			public void receive(String idChain, String funcName, byte[] data) {
-				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
-				if (resp.functionName.equals(NetUtils.BROKER_INFO)) {
-					// INFO response 
+				if (funcName.equals(NetUtils.BROKER_INFO)) {
+					// INFO response from the Broker 
+					ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
 					String funcListJson = (String) resp.outParam.values[0];
 					startWorker(funcListJson);
 				} else {
-					// other responses - worker will send it back to the broker
-					mWorker.send("", data);
+					// other responses - worker will send it back to 
+					// the previous broker
+					mWorker.send(idChain, data);
 				}
 				
 			}
@@ -69,9 +70,9 @@ public class Bridge extends Thread {
 		// broker to the bridge's Client
 		mWorker = new Worker(localBrokerIp, WorkerMode.FORWARD) {
 			@Override
-			public void forwardRequest(String chainId, byte[] packageBytes) {
+			public void forwardRequest(String idChain, String funcName, byte[] packageBytes) {
 				// client forwards the request to the remote broker
-				mClient.send(chainId, packageBytes);
+				mClient.send(idChain, funcName, packageBytes);
 			}
 			
 			@Override
