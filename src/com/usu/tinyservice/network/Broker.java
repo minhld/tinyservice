@@ -106,6 +106,11 @@ public class Broker extends Thread {
                     // WORKER has completed the task, returned the results
                     startTime = System.currentTimeMillis();
 
+                    String funcName = backend.recvStr();
+                    
+                    // skip the third delimiter
+                    backend.recv();
+                    
                     // get ID chain (index 0) & client ID (index 1) 
                     String[] idList = NetUtils.getLastClientId(workerInfo);
                     String clientId = idList[0];
@@ -118,6 +123,8 @@ public class Broker extends Thread {
                     frontend.sendMore(clientId);
                     frontend.sendMore(NetUtils.DELIMITER);
                     frontend.sendMore(idChain);
+                    frontend.sendMore(NetUtils.DELIMITER);
+                    frontend.sendMore(funcName);
                     frontend.sendMore(NetUtils.DELIMITER);
                     frontend.send(reply);
                     

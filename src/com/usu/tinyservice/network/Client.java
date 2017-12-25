@@ -91,9 +91,13 @@ public abstract class Client extends Thread {
 			
 			// and start listening for the response
 			String idChain = requester.recvStr();
+			// skip the delimiter
+			requester.recv();
+			String retFuncName = requester.recvStr();
+			// skip the 2nd delimiter
 			requester.recv();
 			byte[] resp = requester.recv(0);
-			receive(idChain, funcName, resp);
+			receive(idChain, retFuncName, resp);
 		}
 	}
 

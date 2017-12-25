@@ -41,12 +41,6 @@ public abstract class Worker extends Thread {
         this.start();
     }
     
-//    public Worker(String groupIp, int port) {
-//        this.groupIp = groupIp;
-//        this.port = port;
-//        this.start();
-//    }
-
     public void run() {
         initWithBroker();
     }
@@ -71,7 +65,7 @@ public abstract class Worker extends Thread {
             // inform broker that i am ready
             // worker.send(NetUtils.WORKER_READY);
             String registerInfo = info();
-            send(registerInfo, new byte[0]);
+            send(registerInfo);
             
             // // initiate ACK client - to listen to DRL request from brokers
             // ackClient = new ExAckClient(context, this.groupIp, worker.getIdentity());
@@ -104,7 +98,7 @@ public abstract class Worker extends Thread {
                     	result = resolveRequest(request);
                     	
                         // and return result back to the broker
-                        send(idChain, result);
+                        send(idChain, funcName, result);
                     } else if (mode == WorkerMode.FORWARD) {
                     	// request will be forwarded to somewhere else -  
                     	// navigated by developer's code
@@ -139,20 +133,22 @@ public abstract class Worker extends Thread {
         worker.send(NetUtils.EMPTY);
     }
     
-    /**
-     * forwards the result back to the broker. A response includes: <br/>
-     * 	- worker ID<br/>
-     * 	- ID chain<br/>
-     * 	- response
-     * 
-     * @param idChain format {ID1}/{ID2}/... {@link Client}
-     * @param data String format
-     */
-    public void send(String idChain, String data) {
-    	worker.sendMore(idChain);
-        worker.sendMore(NetUtils.DELIMITER);
-        worker.send(data);
-    }
+//    /**
+//     * forwards the result back to the broker. A response includes: <br/>
+//     * 	- worker ID<br/>
+//     * 	- ID chain<br/>
+//     * 	- response
+//     * 
+//     * @param idChain format {ID1}/{ID2}/... {@link Client}
+//     * @param data String format
+//     */
+//    public void send(String idChain, String funcName, String data) {
+//    	worker.sendMore(idChain);
+//        worker.sendMore(NetUtils.DELIMITER);
+//        worker.sendMore(funcName);
+//        worker.sendMore(NetUtils.DELIMITER);
+//        worker.send(data);
+//    }
     
     /**
      * forwards the result back to the broker. A response includes: <br/>
@@ -163,8 +159,10 @@ public abstract class Worker extends Thread {
      * @param idChain format {ID1}/{ID2}/... {@link Client}
      * @param data binary format
      */
-    public void send(String idChain, byte[] data) {
+    public void send(String idChain, String funcName, byte[] data) {
     	worker.sendMore(idChain);
+        worker.sendMore(NetUtils.DELIMITER);
+        worker.sendMore(funcName);
         worker.sendMore(NetUtils.DELIMITER);
         worker.send(data);
     }
