@@ -12,7 +12,7 @@ public class test_system extends Thread {
 		// start a client
 		MobileServiceDemoClient client = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override
-			public void dataReceived(byte[] data) {
+			public void dataReceived(String idChain, String funcName, byte[] data) {
 				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
 				Data1[] data1 = (Data1[]) resp.outParam.values;
 				System.out.println(new String(data1[0].data13));

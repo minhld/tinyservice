@@ -116,7 +116,7 @@ public abstract class Worker extends Thread {
 
                 } catch (Exception d) {
                     d.printStackTrace();
-                    send(NetUtils.WORKER_FAILED);
+                    send(NetUtils.INFO_WORKER_FAILED);
                 }
             }
             worker.close();

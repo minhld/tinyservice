@@ -4,6 +4,7 @@ import org.zeromq.ZMQ;
 
 /**
  * this Client is used to send jobs to server (broker)
+ * 
  * Created by minhld on 8/18/2016.
  */
 public abstract class Client extends Thread {
@@ -23,11 +24,6 @@ public abstract class Client extends Thread {
         this.start();
     }
 
-    public Client(String groupIp, int port) {
-        this.groupIp = groupIp;
-        this.port = port;
-        this.start();
-    }
 
     public void run() {
         // create context and connect client to the broker/worker
@@ -89,15 +85,8 @@ public abstract class Client extends Thread {
 			requester.sendMore(NetUtils.DELIMITER);
 			requester.send(data);
 			
-			// and start listening for the response
-			String idChain = requester.recvStr();
-			// skip the delimiter
-			requester.recv();
-			String retFuncName = requester.recvStr();
-			// skip the 2nd delimiter
-			requester.recv();
-			byte[] resp = requester.recv(0);
-			receive(idChain, retFuncName, resp);
+			// then wait for the result
+			waitForResult();
 		}
 	}
 
@@ -121,8 +110,34 @@ public abstract class Client extends Thread {
 		requester.sendMore(funcName);
 		requester.sendMore(NetUtils.DELIMITER);
 		requester.send(requestData);
+
+		// then wait for the result
+		waitForResult();
 	}
 
+	/**
+	 * WAIT FOR THE RESULT 
+	 */
+	private void waitForResult() {
+		// and start listening for the response
+		String idChain = requester.recvStr();
+		
+		// skip the delimiter
+		requester.recv();
+		
+		// get the function name on the way back to ensure it receives
+		// the correct result for the according function name
+		String retFuncName = requester.recvStr();
+		
+		// skip the 2nd delimiter
+		requester.recv();
+		
+		// inform the receive() function which defined by developer
+		// to handle the result at the client
+		byte[] resp = requester.recv(0);
+		receive(idChain, retFuncName, resp);
+	}
+	
     /**
      * this handler is invoked when results come back to the client 
      * 

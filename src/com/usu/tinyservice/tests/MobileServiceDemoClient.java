@@ -41,7 +41,7 @@ public class MobileServiceDemoClient {
   class RequesterX extends Requester {
 	@Override
 	public void receive(byte[] resp) {
-	  listener.dataReceived(resp);
+	  // listener.dataReceived(resp);
 	}
   }
 }

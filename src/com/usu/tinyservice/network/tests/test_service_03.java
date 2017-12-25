@@ -16,7 +16,7 @@ public class test_service_03 extends Thread {
 		
 		MobileServiceDemoClient client = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override
-			public void dataReceived(byte[] data) {
+			public void dataReceived(String idChain, String funcName, byte[] data) {
 				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
 				if (resp.functionName.equals(NetUtils.BROKER_INFO)) {
 					// a denied message from the Broker

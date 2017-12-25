@@ -8,7 +8,7 @@ public class test_service_02 extends Thread {
 	public void run() {
 		MobileServiceDemoClient client2 = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override
-			public void dataReceived(byte[] data) {
+			public void dataReceived(String idChain, String funcName, byte[] data) {
 				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
 				System.out.println("[Client] Received: ");
 				

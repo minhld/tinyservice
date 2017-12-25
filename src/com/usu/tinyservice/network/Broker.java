@@ -96,7 +96,7 @@ public class Broker extends Thread {
 
                 	// skip the last frame
                     backend.recv();
-                } else if (workerInfo.equals(NetUtils.WORKER_FAILED)) {
+                } else if (workerInfo.equals(NetUtils.INFO_WORKER_FAILED)) {
                     System.err.println("[Broker] Worker [" + workerId + "] Has Problem.");
                 	
                     // skip the last frame
@@ -149,7 +149,7 @@ public class Broker extends Thread {
                 
                 // get function name - to find worker ID
                 String funcName = frontend.recvStr();
-                String workerId = funcName.equals(NetUtils.REQUEST_SERVICES) ? funcName : funcMap.get(funcName);
+                String workerId = funcName.equals(NetUtils.INFO_REQUEST_SERVICES) ? funcName : funcMap.get(funcName);
 
                 // // check 2nd frame
                 // empty = frontend.recv();
@@ -166,16 +166,18 @@ public class Broker extends Thread {
                 	// WORKER NOT AVAILABLE
                 	
                     // send back a denied message to the requesting client
-                    byte[] deniedMsgBytes = NetUtils.createMessage(NetUtils.WORKER_NOT_READY);
+                    byte[] deniedMsgBytes = NetUtils.createMessage(NetUtils.INFO_WORKER_NOT_READY);
                     frontend.sendMore(clientId); 
                     frontend.sendMore(NetUtils.DELIMITER);
                     frontend.sendMore(idChain);
+                    frontend.sendMore(NetUtils.DELIMITER);
+                    frontend.sendMore(NetUtils.INFO_WORKER_NOT_READY);
                     frontend.sendMore(NetUtils.DELIMITER);
                     frontend.send(deniedMsgBytes);
                     // sendMsg(clientId, deniedMsgBytes);
                     
                     System.err.println("[Broker] Denied Client [" + clientId + "]");
-                } else if (workerId.equals(NetUtils.REQUEST_SERVICES)) {
+                } else if (workerId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	// REQUEST BROKER'S SERVICE LIST
                 	
                 	String serviceList = services();
@@ -183,6 +185,8 @@ public class Broker extends Thread {
                 	frontend.sendMore(clientId); 
                 	frontend.sendMore(NetUtils.DELIMITER);
                 	frontend.sendMore(idChain);
+                	frontend.sendMore(NetUtils.DELIMITER);
+                	frontend.sendMore(NetUtils.INFO_REQUEST_SERVICES);
                 	frontend.sendMore(NetUtils.DELIMITER);
                 	frontend.send(serviceListBytes);
                 	// sendMsg(clientId, serviceListBytes);
