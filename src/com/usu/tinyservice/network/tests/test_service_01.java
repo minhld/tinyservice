@@ -45,8 +45,8 @@ public class test_service_01 extends Thread {
 		data1.data12 = new String[] { "abc", "def" };
 		data1.data13 = "hello from client".getBytes();
 
-		client.getFileList1("D:\\", new Data1[] { data1 }, true);
-		client.getFileList2("D:\\");
+		client.getFileList1("/", new Data1[] { data1 }, true);
+		client.getFileList2("/");
 		
 		for (int i = 0; i < 5; i++) {
 			NetUtils.sleep(10);
