@@ -10,15 +10,15 @@ public class test_service_02 extends Thread {
 			@Override
 			public void dataReceived(String idChain, String funcName, byte[] data) {
 				ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
-				System.out.println("[Client] Received: ");
+				NetUtils.print("[Client] Received: ");
 				
 				if (resp.functionName.equals("getFileList1")) {
 					com.usu.tinyservice.network.tests.Data1[] data1 = (com.usu.tinyservice.network.tests.Data1[]) resp.outParam.values;
-					System.out.println(new String(data1[0].data13));
+					NetUtils.print(new String(data1[0].data13));
 				} else if (resp.functionName.equals("getFileList2")) {
 					java.lang.String[] files = (java.lang.String[]) resp.outParam.values;
 					for (int i = 0; i < files.length; i++) {
-						System.out.println("\t File: " + files[i]);
+						NetUtils.print("\t File: " + files[i]);
 					}
 				}
 			}

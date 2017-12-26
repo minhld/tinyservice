@@ -20,18 +20,18 @@ public class test_service_01 extends Thread {
 				if (resp.functionName.equals(NetUtils.BROKER_INFO)) {
 					// a denied message from the Broker
 					String msg = (String) resp.outParam.values[0];
-					System.err.println("[Client] Error " + msg);
+					NetUtils.printX("[Client] Error " + msg);
 					
 				} else if (resp.functionName.equals("getFileList1")) {
 					com.usu.tinyservice.network.tests.Data1[] data1 = (com.usu.tinyservice.network.tests.Data1[]) resp.outParam.values;
-					System.out.println("[Client] Received: ");
-					System.out.println(new String(data1[0].data13));
+					NetUtils.print("[Client] Received: ");
+					NetUtils.print(new String(data1[0].data13));
 					
 				} else if (resp.functionName.equals("getFileList2")) {
 					java.lang.String[] files = (java.lang.String[]) resp.outParam.values;
-					System.out.println("[Client] Received: ");
+					NetUtils.print("[Client] Received: ");
 					for (int i = 0; i < files.length; i++) {
-						System.out.println("\t File: " + files[i]);
+						NetUtils.print("\t File: " + files[i]);
 					}
 				}
 			}

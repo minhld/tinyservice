@@ -92,12 +92,12 @@ public class Broker extends Thread {
                 	for (int i = 0; i < funcs.length; i++) {
                 		funcMap.put(funcs[i], workerId);
                 	}
-                	System.err.println("[Broker] Add New Worker [" + workerId + "]");
+                	NetUtils.printX("[Broker] Add New Worker [" + workerId + "]");
 
                 	// skip the last frame
                     backend.recv();
                 } else if (workerInfo.equals(NetUtils.INFO_WORKER_FAILED)) {
-                    System.err.println("[Broker] Worker [" + workerId + "] Has Problem.");
+                	NetUtils.printX("[Broker] Worker [" + workerId + "] Has Problem.");
                 	
                     // skip the last frame
                     backend.recv();
@@ -128,7 +128,7 @@ public class Broker extends Thread {
                     frontend.sendMore(NetUtils.DELIMITER);
                     frontend.send(reply);
                     
-                    System.err.println("[Broker] Forward To Client [" + clientId + "]");
+                    NetUtils.printX("[Broker] Forward To Client [" + clientId + "]");
                 } 
             }
 
@@ -176,7 +176,7 @@ public class Broker extends Thread {
                     frontend.send(deniedMsgBytes);
                     // sendMsg(clientId, deniedMsgBytes);
                     
-                    System.err.println("[Broker] Denied Client [" + clientId + "]");
+                    NetUtils.printX("[Broker] Denied Client [" + clientId + "]");
                 } else if (workerId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	// REQUEST BROKER'S SERVICE LIST
                 	
@@ -191,7 +191,7 @@ public class Broker extends Thread {
                 	frontend.send(serviceListBytes);
                 	// sendMsg(clientId, serviceListBytes);
                     
-                	System.err.println("[Broker] Send Services To Client [" + clientId + "]");
+                	NetUtils.printX("[Broker] Send Services To Client [" + clientId + "]");
                 } else {
                 	// WORKER AVAILABLE
                 	
@@ -209,7 +209,7 @@ public class Broker extends Thread {
 	                backend.sendMore(NetUtils.DELIMITER);
 	                backend.send(request);
 	                
-	                System.err.println("[Broker] Forward To Worker [" + workerId + "]");
+	                NetUtils.printX("[Broker] Forward To Worker [" + workerId + "]");
                 }
             }
 

@@ -60,7 +60,8 @@ public abstract class Worker extends Thread {
 
             // to report worker has finished the initialization
             // workerStarted(this.workerId);
-            System.out.println("[Worker-" + workerId + "] Started.");
+            NetUtils.print("[" + (this.mode == WorkerMode.FORWARD ? "Forward" : "") + 
+            				"-Worker-" + workerId + "] Started.");
 
             // inform broker that i am ready
             // worker.send(NetUtils.WORKER_READY);
@@ -112,7 +113,7 @@ public abstract class Worker extends Thread {
                     
                     // when worker completes the task
                     // workerFinished(workerId, taskInfo);
-                    System.out.println("[Worker-" + workerId + "] Completed In " + taskInfo.durration + "ms");
+                    NetUtils.print("[Worker-" + workerId + "] Completed In " + taskInfo.durration + "m\n");
 
                 } catch (Exception d) {
                     d.printStackTrace();

@@ -339,4 +339,13 @@ public class NetUtils {
 			Thread.sleep(time);
 		} catch(Exception e) { }
 	}
+    
+    public static void print(String msg) {
+		System.out.println(msg);
+    }
+    
+    public static void printX(String msg) {
+    	System.err.println(msg);
+    }
+    
 }
