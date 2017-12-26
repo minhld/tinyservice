@@ -15,15 +15,16 @@ public abstract class Worker extends Thread {
 		FORWARD
 	}
 
+	private ZMQ.Socket worker;
+    // private ExAckClient ackClient;
+	
 	// network and type information
     private String groupIp = "*";
     private int port = NetUtils.SERVER_PORT;
     // worker will operate in two modes NORMAL
     private WorkerMode mode = WorkerMode.NORMAL;
+    private String workerPrefix = "";
     
-    private ZMQ.Socket worker;
-    // private ExAckClient ackClient;
-
     public String workerId = "";
 
     public Worker() {
@@ -60,8 +61,8 @@ public abstract class Worker extends Thread {
 
             // to report worker has finished the initialization
             // workerStarted(this.workerId);
-            NetUtils.print("[" + (this.mode == WorkerMode.FORWARD ? "Forward" : "") + 
-            				"-Worker-" + workerId + "] Started.");
+            workerPrefix = (this.mode == WorkerMode.FORWARD ? "Forward" : "") + "-Worker";
+            NetUtils.print("[" + workerPrefix + "-" + workerId + "] Started.");
 
             // inform broker that i am ready
             // worker.send(NetUtils.WORKER_READY);
@@ -113,7 +114,7 @@ public abstract class Worker extends Thread {
                     
                     // when worker completes the task
                     // workerFinished(workerId, taskInfo);
-                    NetUtils.print("[Worker-" + workerId + "] Completed In " + taskInfo.durration + "m\n");
+                    NetUtils.print("[" + workerPrefix + "-" + workerId + "] Completed In " + taskInfo.durration + "m\n");
 
                 } catch (Exception d) {
                     d.printStackTrace();
