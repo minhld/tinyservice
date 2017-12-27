@@ -24,6 +24,11 @@ public abstract class Client extends Thread {
         this.start();
     }
 
+    public Client(String groupIp, int port) {
+        this.groupIp = groupIp;
+        this.port = port;
+        this.start();
+    }
 
     public void run() {
         // create context and connect client to the broker/worker

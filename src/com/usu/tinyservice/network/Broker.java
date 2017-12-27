@@ -11,7 +11,9 @@ import java.util.HashMap;
  */
 public class Broker extends Thread {
     private String brokerIp = NetUtils.DEFAULT_IP;
-
+    private int clientPort = NetUtils.CLIENT_PORT;
+    private int serverPort = NetUtils.SERVER_PORT;
+    
     private HashMap<String, String> funcMap;
     // private static HashMap<String, JobMergeInfo> jobMergeList;
 
@@ -30,6 +32,13 @@ public class Broker extends Thread {
         this.start();
     }
 
+    public Broker(String brokerIp, int clientPort, int serverPort) {
+        this.brokerIp = brokerIp;
+        this.clientPort = clientPort;
+        this.serverPort = serverPort;
+        this.start();
+    }
+    
     public void run() {
         // this switch
         initRouterMode();
@@ -43,12 +52,12 @@ public class Broker extends Thread {
         ZMQ.Context context = ZMQ.context(1);
 
         // initiate publish socket
-        String frontendPort = "tcp://" + this.brokerIp + ":" + NetUtils.CLIENT_PORT;
+        String frontendPort = "tcp://" + this.brokerIp + ":" + this.clientPort;
         ZMQ.Socket frontend = context.socket(ZMQ.ROUTER);
         frontend.bind(frontendPort);
 
         // initiate subscribe socket
-        String backendPort = "tcp://" + this.brokerIp + ":" + NetUtils.SERVER_PORT;
+        String backendPort = "tcp://" + this.brokerIp + ":" + this.serverPort;
         ZMQ.Socket backend = context.socket(ZMQ.ROUTER);
         // backend = context.socket(ZMQ.ROUTER);
         backend.bind(backendPort);

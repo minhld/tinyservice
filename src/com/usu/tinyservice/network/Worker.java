@@ -21,6 +21,7 @@ public abstract class Worker extends Thread {
 	// network and type information
     private String groupIp = "*";
     private int port = NetUtils.SERVER_PORT;
+    
     // worker will operate in two modes NORMAL
     private WorkerMode mode = WorkerMode.NORMAL;
     private String workerPrefix = "";
@@ -36,8 +37,21 @@ public abstract class Worker extends Thread {
         this.start();
     }
 
+    public Worker(String groupIp, int port) {
+        this.groupIp = groupIp;
+        this.port = port;
+        this.start();
+    }
+
     public Worker(String groupIp, WorkerMode workerMode) {
         this.groupIp = groupIp;
+        this.mode = workerMode;
+        this.start();
+    }
+
+    public Worker(String groupIp, int port, WorkerMode workerMode) {
+        this.groupIp = groupIp;
+        this.port = port;
         this.mode = workerMode;
         this.start();
     }
