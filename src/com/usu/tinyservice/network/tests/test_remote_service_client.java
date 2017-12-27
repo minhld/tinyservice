@@ -6,7 +6,21 @@ import com.usu.tinyservice.network.Broker;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 
-public class test_service_03 extends Thread {
+/**
+ * REMOTE SERVICE TEST SUITE - REMOTE SERVICE CLIENT
+ * ------
+ * - this test is the client part of REMOTE BROKER test suite: this will create
+ * a local Broker to talk to the local clients, a Bridge to talk to the remote
+ * Broker and a Client to request the local Broker.
+ * - this will connect to the REMOTE BROKER (129.123.7.41) which is started by 
+ * {@link test_remote_broker_01}
+ * - acclaimer: this should be started after {@link test_remote_broker_01}
+ * 
+ * 
+ * @author minhld
+ *
+ */
+public class test_remote_service_client extends Thread {
 	public void run() {
 		String remoteBrokerIp = "129.123.7.41";
 		
@@ -57,6 +71,6 @@ public class test_service_03 extends Thread {
 	}
 	
 	public static void main(String[] args) {
-		new test_service_03().start();
+		new test_remote_service_client().start();
 	}
 }

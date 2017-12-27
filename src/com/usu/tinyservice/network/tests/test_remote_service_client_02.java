@@ -6,7 +6,16 @@ import com.usu.tinyservice.network.Broker;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 
-public class test_service_06 extends Thread {
+/**
+ * REMOTE SERVICE TEST SUITE
+ * - the second client
+ * - this one creates a new Client and connect to the local Broker 
+ * {@link test_remote_broker_01} to request for remote service. 
+ * 
+ * @author minhld
+ *
+ */
+public class test_remote_service_client_02 extends Thread {
 	public void run() {
 		MobileServiceDemoClient client = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override
@@ -51,6 +60,6 @@ public class test_service_06 extends Thread {
 	}
 	
 	public static void main(String[] args) {
-		new test_service_06().start();
+		new test_remote_service_client_02().start();
 	}
 }
