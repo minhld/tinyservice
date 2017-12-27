@@ -23,7 +23,7 @@ import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
 
 public class NetUtils {
-    public static final int SERVER_PORT = 6666;
+    public static final int WORKER_PORT = 6666;
     public static final int CLIENT_PORT = 6668;
     
     public static final String DEFAULT_IP = "*";

@@ -5,14 +5,14 @@ import org.zeromq.ZMQ;
 import java.util.HashMap;
 
 /**
- * Broker navigates the message flow of the system
+ * Broker forwards the messages among the components in the network.
  *
  * @author minhld on 8/4/2016.
  */
 public class Broker extends Thread {
     private String brokerIp = NetUtils.DEFAULT_IP;
     private int clientPort = NetUtils.CLIENT_PORT;
-    private int serverPort = NetUtils.SERVER_PORT;
+    private int workerPort = NetUtils.WORKER_PORT;
     
     private HashMap<String, String> funcMap;
     // private static HashMap<String, JobMergeInfo> jobMergeList;
@@ -32,10 +32,10 @@ public class Broker extends Thread {
         this.start();
     }
 
-    public Broker(String brokerIp, int clientPort, int serverPort) {
+    public Broker(String brokerIp, int clientPort, int workerPort) {
         this.brokerIp = brokerIp;
         this.clientPort = clientPort;
-        this.serverPort = serverPort;
+        this.workerPort = workerPort;
         this.start();
     }
     
@@ -57,7 +57,7 @@ public class Broker extends Thread {
         frontend.bind(frontendPort);
 
         // initiate subscribe socket
-        String backendPort = "tcp://" + this.brokerIp + ":" + this.serverPort;
+        String backendPort = "tcp://" + this.brokerIp + ":" + this.workerPort;
         ZMQ.Socket backend = context.socket(ZMQ.ROUTER);
         // backend = context.socket(ZMQ.ROUTER);
         backend.bind(backendPort);

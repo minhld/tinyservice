@@ -14,7 +14,7 @@ import com.usu.tinyservice.network.Worker.WorkerMode;
 public class Bridge extends Thread {
 	private String localBrokerIp = NetUtils.DEFAULT_IP;
 	private String remoteBrokerIp = "";
-	private int localBrokerPort = NetUtils.SERVER_PORT;
+	private int localBrokerPort = NetUtils.WORKER_PORT;
 	private int remoteBrokerPort = NetUtils.CLIENT_PORT;
 	
 	// private String bridgeId;
@@ -33,8 +33,15 @@ public class Bridge extends Thread {
 		this.start();
 	}
 	
-	public Bridge(String localBrokerIp, int localBrokerPort, 
-					String remoteBrokerIp, int remoteBrokerPort) {
+	/**
+	 * 
+	 * @param localBrokerIp
+	 * @param localWorkerPort
+	 * @param remoteBrokerIp
+	 * @param remoteClientPort
+	 */
+	public Bridge(String localBrokerIp, int localWorkerPort, 
+					String remoteBrokerIp, int remoteClientPort) {
 		this.localBrokerIp = localBrokerIp;
 		this.remoteBrokerIp = remoteBrokerIp;
 		this.start();

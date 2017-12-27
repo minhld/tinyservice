@@ -20,7 +20,7 @@ public abstract class Worker extends Thread {
 	
 	// network and type information
     private String groupIp = "*";
-    private int port = NetUtils.SERVER_PORT;
+    private int port = NetUtils.WORKER_PORT;
     
     // worker will operate in two modes NORMAL
     private WorkerMode mode = WorkerMode.NORMAL;

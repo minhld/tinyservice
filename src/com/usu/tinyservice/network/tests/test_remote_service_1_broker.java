@@ -7,16 +7,34 @@ import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 
 /**
- * REMOTE SERVICE TEST SUITE
- * - the second client
- * - this one creates a new Client and connect to the local Broker 
- * {@link test_remote_broker_01} to request for remote service. 
+ * REMOTE SERVICE TEST SUITE - REMOTE SERVICE CLIENT
+ * ------
+ * - this test is the client part of REMOTE BROKER test suite: this will create
+ * a local Broker to talk to the local clients, a Bridge to talk to the remote
+ * Broker and a Client to request the local Broker.
+ * - this will connect to the REMOTE BROKER (129.123.7.41) which is started by 
+ * {@link test_remote_broker_01}
+ * - acclaimer: this should be started after {@link test_remote_broker_01}
+ * 
  * 
  * @author minhld
  *
  */
-public class test_remote_service_client_02 extends Thread {
+public class test_remote_service_1_broker extends Thread {
 	public void run() {
+		String remoteBrokerIp = "129.123.7.41";
+		
+		new Broker();
+
+		new Bridge(remoteBrokerIp);
+		
+		NetUtils.sleep(1000);
+
+		startClient();
+	}
+	
+	
+	private void startClient() {
 		MobileServiceDemoClient client = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override
 			public void dataReceived(String idChain, String funcName, byte[] data) {
@@ -47,7 +65,6 @@ public class test_remote_service_client_02 extends Thread {
 		data1.data12 = new String[] { "abc", "def" };
 		data1.data13 = "hello from client".getBytes();
 		
-		NetUtils.sleep(1000);
 
 		// client.getFileList1("D:\\", new Data1[] { data1 }, true);
 		// client.getFileList2("D:\\");
@@ -60,6 +77,6 @@ public class test_remote_service_client_02 extends Thread {
 	}
 	
 	public static void main(String[] args) {
-		new test_remote_service_client_02().start();
+		new test_remote_service_1_broker().start();
 	}
 }
