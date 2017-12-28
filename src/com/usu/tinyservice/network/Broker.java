@@ -185,7 +185,7 @@ public class Broker extends Thread {
                     frontend.send(deniedMsgBytes);
                     // sendMsg(clientId, deniedMsgBytes);
                     
-                    NetUtils.printX("[Broker] Denied Client [" + clientId + "]");
+                    NetUtils.printX("[Broker] Denied Client [" + clientId + "] - Function Not Found.");
                 } else if (workerId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	// REQUEST BROKER'S SERVICE LIST
                 	
@@ -200,7 +200,7 @@ public class Broker extends Thread {
                 	frontend.send(serviceListBytes);
                 	// sendMsg(clientId, serviceListBytes);
                     
-                	NetUtils.printX("[Broker] Send Services To Client [" + clientId + "]");
+                	NetUtils.printX("[Broker] Passed Service Info To Bridge Client [" + clientId + "]");
                 } else {
                 	// WORKER AVAILABLE
                 	
@@ -218,7 +218,7 @@ public class Broker extends Thread {
 	                backend.sendMore(NetUtils.DELIMITER);
 	                backend.send(request);
 	                
-	                NetUtils.printX("[Broker] Forward To Worker [" + workerId + "]");
+	                NetUtils.printX("[Broker] Sent To Worker [" + workerId + "]");
                 }
             }
 

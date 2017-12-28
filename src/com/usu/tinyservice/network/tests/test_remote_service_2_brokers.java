@@ -32,7 +32,6 @@ public class test_remote_service_2_brokers extends Thread {
 		// the second remote Broker. It will listen on the port 5555 for
 		// Clients and 5556 for Workers
 		new Broker(NetUtils.DEFAULT_IP, remoteClientPort, remoteWorkerPort);
-		
 		new Bridge(NetUtils.DEFAULT_IP, remoteWorkerPort, remoteServer, NetUtils.CLIENT_PORT);
 		
 		// NetUtils.sleep(1000);
@@ -49,7 +48,7 @@ public class test_remote_service_2_brokers extends Thread {
 		// startClient();
 	}
 	
-	private void startClient() {
+	void startClient() {
 		MobileServiceDemoClient client = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override
 			public void dataReceived(String idChain, String funcName, byte[] data) {

@@ -1,8 +1,6 @@
 package com.usu.tinyservice.network.tests;
 
 import com.usu.tinyservice.messages.binary.ResponseMessage;
-import com.usu.tinyservice.network.Bridge;
-import com.usu.tinyservice.network.Broker;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 
