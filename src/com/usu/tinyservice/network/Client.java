@@ -2,18 +2,24 @@ package com.usu.tinyservice.network;
 
 import org.zeromq.ZMQ;
 
+import com.usu.tinyservice.network.NetUtils.WorkMode;
+
 /**
  * this Client is used to send jobs to server (broker)
  * 
  * Created by minhld on 8/18/2016.
  */
 public abstract class Client extends Thread {
+	
     private ZMQ.Context context;
     private ZMQ.Socket requester;
-    // private String clientId;
     
     private String groupIp = NetUtils.DEFAULT_IP;
     private int port = NetUtils.CLIENT_PORT;
+    
+    private WorkMode workMode = WorkMode.NORMAL;
+    private String clientPreffix;
+    private String clientId;
     
     public Client() {
         this.start();
@@ -30,6 +36,19 @@ public abstract class Client extends Thread {
         this.start();
     }
 
+    public Client(String groupIp, WorkMode workMode) {
+        this.groupIp = groupIp;
+        this.workMode = workMode;
+        this.start();
+    }
+    
+    public Client(String groupIp, int port, WorkMode workMode) {
+        this.groupIp = groupIp;
+        this.port = port;
+        this.workMode = workMode;
+        this.start();
+    }
+    
     public void run() {
         // create context and connect client to the broker/worker
         // with a pre-defined Id
@@ -39,8 +58,10 @@ public abstract class Client extends Thread {
         // this.clientId = new String(this.requester.getIdentity());
         requester.connect("tcp://" + this.groupIp + ":" + this.port);
         // print message
-        NetUtils.print("[Client-" + new String(requester.getIdentity()) + "] Connected To " + 
-        			"'" + this.groupIp + ":" + this.port + "'.");
+        clientPreffix = (this.workMode == WorkMode.FORWARD ? "Bridge-" : "") + "Client";
+        clientId = new String(requester.getIdentity());
+        NetUtils.print("[" + clientPreffix + "-" + clientId + "] Connected To " + 
+        			"'" + this.groupIp + ":" + this.port + "'");
     }
 
 	public void close() {

@@ -47,7 +47,9 @@ public class test_remote_service_2_brokers extends Thread {
 		
 		new Bridge(NetUtils.DEFAULT_IP, remoteWorkerPort, remoteServer, NetUtils.CLIENT_PORT);
 		
-		new Bridge(NetUtils.DEFAULT_IP);
+		NetUtils.sleep(1000);
+		
+		new Bridge(NetUtils.DEFAULT_IP, NetUtils.WORKER_PORT, NetUtils.DEFAULT_IP, remoteClientPort);
 
 		// wait until all Brokers, Bridges and Workers all started
 		// NetUtils.sleep(1000);

@@ -110,7 +110,8 @@ public class Broker extends Thread {
                 		funcMap.put(funcs[i], workerId);
                 	}
                 	NetUtils.printX("[Broker-" + brokerId + "] Add New Worker [" + workerId + "]");
-
+                	NetUtils.printX("[Broker-" + brokerId + "] Added From Worker [" + workerId + "] " + services());
+                	
                 	// skip the last frame
                     backend.recv();
                 } else if (workerInfo.equals(NetUtils.INFO_WORKER_FAILED)) {
@@ -209,7 +210,7 @@ public class Broker extends Thread {
                 	// sendMsg(clientId, serviceListBytes);
                     
                 	NetUtils.printX("[Broker-" + brokerId + "] Passed Service Info To Bridge Client [" + clientId + "]");
-                	NetUtils.print(serviceList);
+                	NetUtils.printX("[Broker-" + brokerId + "] " + serviceList);
                 } else {
                 	// WORKER AVAILABLE
                 	

@@ -1,7 +1,7 @@
 package com.usu.tinyservice.network;
 
 import com.usu.tinyservice.messages.binary.ResponseMessage;
-import com.usu.tinyservice.network.Worker.WorkerMode;
+import com.usu.tinyservice.network.NetUtils.WorkMode;
 
 /**
  * Bridge is literally a bridge between two brokers. 
@@ -53,14 +53,14 @@ public class Bridge extends Thread {
 		// create a Client to handle communication with the remote broker
 		// this Client will receive request from the bridge's Worker and
 		// forward it to the remote broker 
-		mClient = new Client(remoteBrokerIp, remoteBrokerPort) {
+		mClient = new Client(remoteBrokerIp, remoteBrokerPort, WorkMode.FORWARD) {
 			@Override
 			public void receive(String idChain, String funcName, byte[] data) {
 				if (funcName.equals(NetUtils.INFO_REQUEST_SERVICES)) {
 					// INFO response from the Broker 
 					ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
 					String funcListJson = (String) resp.outParam.values[0];
-					NetUtils.print(idChain + ": " + funcListJson);
+					NetUtils.print(NetUtils.INFO_REQUEST_SERVICES + ": " + funcListJson);
 					startWorker(funcListJson);
 				} else if (funcName.equals(NetUtils.INFO_WORKER_NOT_READY)) {
 					
@@ -89,7 +89,7 @@ public class Bridge extends Thread {
 		// create a Worker to handle communication with the local broker
 		// this Worker does nothing but forward the requests of the local
 		// broker to the bridge's Client
-		mWorker = new Worker(localBrokerIp, localBrokerPort, WorkerMode.FORWARD) {
+		mWorker = new Worker(localBrokerIp, localBrokerPort, WorkMode.FORWARD) {
 			@Override
 			public void forwardRequest(String idChain, String funcName, byte[] packageBytes) {
 				// client forwards the request to the remote broker

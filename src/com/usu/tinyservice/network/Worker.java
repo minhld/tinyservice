@@ -2,6 +2,8 @@ package com.usu.tinyservice.network;
 
 import org.zeromq.ZMQ;
 
+import com.usu.tinyservice.network.NetUtils.WorkMode;
+
 /**
  * The worker serves as a servant for the broker. It receives tasks
  * from the broker and alternatively executes those tasks. The worker
@@ -10,10 +12,7 @@ import org.zeromq.ZMQ;
  * Created by minhld on 8/18/2016.
  */
 public abstract class Worker extends Thread {
-	public static enum WorkerMode {
-		NORMAL,
-		FORWARD
-	}
+	
 
 	private ZMQ.Socket worker;
     // private ExAckClient ackClient;
@@ -23,7 +22,7 @@ public abstract class Worker extends Thread {
     private int port = NetUtils.WORKER_PORT;
     
     // worker will operate in two modes NORMAL
-    private WorkerMode mode = WorkerMode.NORMAL;
+    private WorkMode workMode = WorkMode.NORMAL;
     private String workerPrefix = "";
     
     public String workerId = "";
@@ -43,16 +42,16 @@ public abstract class Worker extends Thread {
         this.start();
     }
 
-    public Worker(String groupIp, WorkerMode workerMode) {
+    public Worker(String groupIp, WorkMode workMode) {
         this.groupIp = groupIp;
-        this.mode = workerMode;
+        this.workMode = workMode;
         this.start();
     }
 
-    public Worker(String groupIp, int port, WorkerMode workerMode) {
+    public Worker(String groupIp, int port, WorkMode workMode) {
         this.groupIp = groupIp;
         this.port = port;
-        this.mode = workerMode;
+        this.workMode = workMode;
         this.start();
     }
     
@@ -75,9 +74,9 @@ public abstract class Worker extends Thread {
 
             // to report worker has finished the initialization
             // workerStarted(this.workerId);
-            workerPrefix = (this.mode == WorkerMode.FORWARD ? "Forward" : "") + "-Worker";
+            workerPrefix = (this.workMode == WorkMode.FORWARD ? "Bridge-" : "") + "Worker";
             NetUtils.print("[" + workerPrefix + "-" + workerId + "] Connected At " +
-            			"'" + this.groupIp + ":" + this.port + "'.");
+            			"'" + this.groupIp + ":" + this.port + "'");
 
             // inform broker that i am ready
             // worker.send(NetUtils.WORKER_READY);
@@ -109,14 +108,14 @@ public abstract class Worker extends Thread {
                     // get request and resolve the request
                     request = worker.recv();
                     
-                    if (mode == WorkerMode.NORMAL) {
+                    if (workMode == WorkMode.NORMAL) {
                     	// resolve the request by parsing the request and perform
                     	// something on the data to retrieve result
                     	result = resolveRequest(request);
                     	
                         // and return result back to the broker
                         send(idChain, funcName, result);
-                    } else if (mode == WorkerMode.FORWARD) {
+                    } else if (workMode == WorkMode.FORWARD) {
                     	// request will be forwarded to somewhere else -  
                     	// navigated by developer's code
                     	forwardRequest(idChain, funcName, request);
