@@ -13,8 +13,8 @@ import com.usu.tinyservice.network.ReceiveListener;
  * a local Broker to talk to the local clients, a Bridge to talk to the remote
  * Broker and a Client to request the local Broker.
  * - this will connect to the REMOTE BROKER (129.123.7.41) which is started by 
- * {@link test_remote_broker_01}
- * - acclaimer: this should be started after {@link test_remote_broker_01}
+ * {@link test_remote_service_remote_broker}
+ * - acclaimer: this should be started after {@link test_remote_service_remote_broker}
  * 
  * 
  * @author minhld

@@ -8,7 +8,7 @@ import com.usu.tinyservice.network.ReceiveListener;
  * REMOTE SERVICE TEST SUITE
  * - the second client
  * - this one creates a new Client and connect to the local Broker 
- * {@link test_remote_broker_01} to request for remote service. 
+ * {@link test_remote_service_remote_broker} to request for remote service. 
  * 
  * @author minhld
  *
@@ -26,12 +26,9 @@ public class test_remote_service_only_client extends Thread {
 					
 				} else if (resp.functionName.equals("getFileList1")) {
 					com.usu.tinyservice.network.tests.Data1[] data1 = (com.usu.tinyservice.network.tests.Data1[]) resp.outParam.values;
-					NetUtils.print("[Client] Received: ");
 					NetUtils.print(new String(data1[0].data13));
-					
 				} else if (resp.functionName.equals("getFileList2")) {
 					java.lang.String[] files = (java.lang.String[]) resp.outParam.values;
-					NetUtils.print("[Client] Received: ");
 					for (int i = 0; i < files.length; i++) {
 						NetUtils.print("\t File: " + files[i]);
 					}

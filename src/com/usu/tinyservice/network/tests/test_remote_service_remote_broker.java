@@ -13,7 +13,7 @@ import com.usu.tinyservice.network.Broker;
  * @author minhld
  *
  */
-public class test_remote_broker_01 extends Thread {
+public class test_remote_service_remote_broker extends Thread {
 	public void run() {
 		String brokerIp = "129.123.7.41";
 		
@@ -23,6 +23,6 @@ public class test_remote_broker_01 extends Thread {
 	}
 	
 	public static void main(String[] args) {
-		new test_remote_broker_01().start();
+		new test_remote_service_remote_broker().start();
 	}
 }

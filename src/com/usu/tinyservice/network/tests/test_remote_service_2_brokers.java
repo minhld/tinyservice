@@ -16,8 +16,8 @@ import com.usu.tinyservice.network.ReceiveListener;
  * - this one will create a new remote Broker running on local computer
  * to mimic the second remote Broker (with different port). This Broker
  * will be considered as a bridge between the local Broker and the final
- * remote Broker {@link test_remote_broker_01} 
- * acclaimer: the {@link test_remote_broker_01} should be started first
+ * remote Broker {@link test_remote_service_remote_broker} 
+ * acclaimer: the {@link test_remote_service_remote_broker} should be started first
  * 
  * @author minhld
  *

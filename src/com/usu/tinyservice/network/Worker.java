@@ -128,7 +128,7 @@ public abstract class Worker extends Thread {
                     
                     // when worker completes the task
                     // workerFinished(workerId, taskInfo);
-                    NetUtils.print("[" + workerPrefix + "-" + workerId + "] Completed In " + taskInfo.durration + "m\n");
+                    NetUtils.print("[" + workerPrefix + "-" + workerId + "] Completed In " + taskInfo.durration + "m");
 
                 } catch (Exception d) {
                     d.printStackTrace();

@@ -162,6 +162,7 @@ public abstract class Client extends Thread {
 		// inform the receive() function which defined by developer
 		// to handle the result at the client
 		byte[] resp = requester.recv(0);
+		NetUtils.print("[" + clientPreffix + "-" + clientId + "] Received: ");
 		receive(idChain, retFuncName, resp);
 	}
 	
