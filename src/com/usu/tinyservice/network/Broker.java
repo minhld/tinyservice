@@ -13,7 +13,8 @@ public class Broker extends Thread {
     private String brokerIp = NetUtils.DEFAULT_IP;
     private int clientPort = NetUtils.CLIENT_PORT;
     private int workerPort = NetUtils.WORKER_PORT;
-    
+
+    private String brokerId;
     private HashMap<String, String> funcMap;
     // private static HashMap<String, JobMergeInfo> jobMergeList;
 
@@ -60,8 +61,15 @@ public class Broker extends Thread {
         String backendPort = "tcp://" + this.brokerIp + ":" + this.workerPort;
         ZMQ.Socket backend = context.socket(ZMQ.ROUTER);
         // backend = context.socket(ZMQ.ROUTER);
+        NetUtils.setId(backend);
         backend.bind(backendPort);
 
+        this.brokerId = new String(backend.getIdentity());
+        
+        NetUtils.printX("[Broker-" + this.brokerId + "] Started At " +
+        			"'" + this.brokerIp + "' Client Port " + this.clientPort + " " + 
+        			"Worker Port " + this.workerPort);
+        
         // Queue of available workers
         funcMap = new HashMap<String, String>();
 
@@ -101,12 +109,12 @@ public class Broker extends Thread {
                 	for (int i = 0; i < funcs.length; i++) {
                 		funcMap.put(funcs[i], workerId);
                 	}
-                	NetUtils.printX("[Broker] Add New Worker [" + workerId + "]");
+                	NetUtils.printX("[Broker-" + brokerId + "] Add New Worker [" + workerId + "]");
 
                 	// skip the last frame
                     backend.recv();
                 } else if (workerInfo.equals(NetUtils.INFO_WORKER_FAILED)) {
-                	NetUtils.printX("[Broker] Worker [" + workerId + "] Has Problem.");
+                	NetUtils.printX("[Broker-" + brokerId + "] Worker [" + workerId + "] Has Problem.");
                 	
                     // skip the last frame
                     backend.recv();
@@ -137,7 +145,7 @@ public class Broker extends Thread {
                     frontend.sendMore(NetUtils.DELIMITER);
                     frontend.send(reply);
                     
-                    NetUtils.printX("[Broker] Forward To Client [" + clientId + "]");
+                    NetUtils.printX("[Broker-" + brokerId + "] Forward To Client [" + clientId + "]");
                 } 
             }
 
@@ -185,7 +193,7 @@ public class Broker extends Thread {
                     frontend.send(deniedMsgBytes);
                     // sendMsg(clientId, deniedMsgBytes);
                     
-                    NetUtils.printX("[Broker] Denied Client [" + clientId + "] - Function Not Found.");
+                    NetUtils.printX("[Broker-" + brokerId + "] Denied Client [" + clientId + "] - Function Not Found.");
                 } else if (workerId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	// REQUEST BROKER'S SERVICE LIST
                 	
@@ -200,7 +208,8 @@ public class Broker extends Thread {
                 	frontend.send(serviceListBytes);
                 	// sendMsg(clientId, serviceListBytes);
                     
-                	NetUtils.printX("[Broker] Passed Service Info To Bridge Client [" + clientId + "]");
+                	NetUtils.printX("[Broker-" + brokerId + "] Passed Service Info To Bridge Client [" + clientId + "]");
+                	NetUtils.print(serviceList);
                 } else {
                 	// WORKER AVAILABLE
                 	
@@ -218,7 +227,7 @@ public class Broker extends Thread {
 	                backend.sendMore(NetUtils.DELIMITER);
 	                backend.send(request);
 	                
-	                NetUtils.printX("[Broker] Sent To Worker [" + workerId + "]");
+	                NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
                 }
             }
 

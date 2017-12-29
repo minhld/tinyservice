@@ -76,7 +76,8 @@ public abstract class Worker extends Thread {
             // to report worker has finished the initialization
             // workerStarted(this.workerId);
             workerPrefix = (this.mode == WorkerMode.FORWARD ? "Forward" : "") + "-Worker";
-            NetUtils.print("[" + workerPrefix + "-" + workerId + "] Started.");
+            NetUtils.print("[" + workerPrefix + "-" + workerId + "] Connected At " +
+            			"'" + this.groupIp + ":" + this.port + "'.");
 
             // inform broker that i am ready
             // worker.send(NetUtils.WORKER_READY);

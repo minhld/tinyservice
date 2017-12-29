@@ -34,7 +34,7 @@ public class Bridge extends Thread {
 	}
 	
 	/**
-	 * 
+	 *  
 	 * @param localBrokerIp
 	 * @param localWorkerPort
 	 * @param remoteBrokerIp
@@ -43,7 +43,9 @@ public class Bridge extends Thread {
 	public Bridge(String localBrokerIp, int localWorkerPort, 
 					String remoteBrokerIp, int remoteClientPort) {
 		this.localBrokerIp = localBrokerIp;
+		this.localBrokerPort = localWorkerPort;
 		this.remoteBrokerIp = remoteBrokerIp;
+		this.remoteBrokerPort = remoteClientPort;
 		this.start();
 	}
 	
@@ -58,6 +60,7 @@ public class Bridge extends Thread {
 					// INFO response from the Broker 
 					ResponseMessage resp = (ResponseMessage) NetUtils.deserialize(data);
 					String funcListJson = (String) resp.outParam.values[0];
+					NetUtils.print(idChain + ": " + funcListJson);
 					startWorker(funcListJson);
 				} else if (funcName.equals(NetUtils.INFO_WORKER_NOT_READY)) {
 					

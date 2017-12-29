@@ -39,7 +39,8 @@ public abstract class Client extends Thread {
         // this.clientId = new String(this.requester.getIdentity());
         requester.connect("tcp://" + this.groupIp + ":" + this.port);
         // print message
-        NetUtils.print("[Client-" + new String(requester.getIdentity()) + "] Started.");
+        NetUtils.print("[Client-" + new String(requester.getIdentity()) + "] Connected To " + 
+        			"'" + this.groupIp + ":" + this.port + "'.");
     }
 
 	public void close() {
