@@ -11,7 +11,7 @@ public class test_service_01 extends Thread {
 
 		new MobileServiceDemoWorker();
 		
-		new MobileServiceDemoWorker2();
+		// new MobileServiceDemoWorker();
 		
 		MobileServiceDemoClient client = new MobileServiceDemoClient(new ReceiveListener() {
 			@Override

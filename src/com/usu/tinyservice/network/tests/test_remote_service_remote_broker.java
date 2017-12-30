@@ -19,7 +19,7 @@ public class test_remote_service_remote_broker extends Thread {
 		
 		new Broker(brokerIp);
 
-		new MobileServiceDemoWorker3(brokerIp);
+		new MobileServiceDemoWorker(brokerIp);
 	}
 	
 	public static void main(String[] args) {

@@ -11,6 +11,8 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.JavaFileObject;
 
+import com.usu.tinyservice.network.NetUtils;
+
 
 /**
  * class to create server and client objects.  
@@ -65,7 +67,10 @@ public class MobileServiceMultiCreator {
 			writer.println("  " + className + " " + classInstance + ";"); 
 			writer.println();
 			
-			// define the server constructor
+			// define the server constructors
+			writer.println("  public " + serverClassName + "() {\n" + 
+						   "    this(NetUtils.DEFAULT_IP);\n" +
+						   "  }\n");
 			writer.println("  public " + serverClassName + "(String brokerIp) {");
 			writer.println("    " + classInstance + " = new " + className + "();");
 			writer.println("    new WorkerX(brokerIp);");
@@ -74,6 +79,13 @@ public class MobileServiceMultiCreator {
 			
 			// define the extended Responder
 			writer.println("  class WorkerX extends Worker {");
+			writer.println("    public WorkerX() {\n" + 
+						   "      super();\n" +
+						   "    }\n\n" +
+						   "    public WorkerX(String brokerIp) {\n" + 
+						   "      super(brokerIp);\n" +
+						   "    }\n\n");
+			
 			writer.println("    @Override");
 			writer.println("    public byte[] resolveRequest(byte[] packageBytes) {");
 			
@@ -83,7 +95,7 @@ public class MobileServiceMultiCreator {
 			writer.println("    }\n");
 			
 			writer.println("    @Override");
-			writer.println("    public byte[] info() {");
+			writer.println("    public String info() {");
 			String infoFunc = printInfoFunc(methods);
 			writer.println(infoFunc);
 			
@@ -110,7 +122,7 @@ public class MobileServiceMultiCreator {
 		String reqConvert = "";
 		reqConvert = "      byte[] respBytes = null;\n\n" +
 					 "      // get request message\n" + 
-				 	 "      RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(req);\n\n";
+				 	 "      RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(packageBytes);\n\n";
 		
 		// define the switch - where all the functions are iterated here
 		serverResponder += reqConvert + 
@@ -142,7 +154,7 @@ public class MobileServiceMultiCreator {
 			String funcPrepare = printFuncCall(e);
 			
 			String respConvert = "        // convert to binary array\n" +
-						  	  	 "        byte[] respBytes = NetUtils.serialize(respMsg);\n";
+						  	  	 "        respBytes = NetUtils.serialize(respMsg);\n";
 			
 			funcPrepare = funcPrepare.replace(REP_STRING, respConvert);
 			return funcPrepare;
@@ -172,7 +184,7 @@ public class MobileServiceMultiCreator {
 		String retType = ee.getReturnType().toString(); 
 		
 		funcCall += "        // start calling function \"" + funcName + "\"\n";
-		funcCall += "        " + ee.getReturnType().toString() + " rets = " + classInstance + "." + funcName + "(";
+		funcCall += "        " + retType + " rets = " + classInstance + "." + funcName + "(";
 		for (int i = 0; i < ves.size(); i++) {
 			funcCall += ves.get(i).getSimpleName() + (i < ves.size() - 1 ? ", " : "");
 		}
@@ -226,43 +238,49 @@ public class MobileServiceMultiCreator {
 		return inParamsStr;
 	}
 	
-	
+	/**
+	 * 
+	 * 
+	 * @param methods
+	 * @return
+	 */
 	private static String printInfoFunc(List<? extends Element> methods) {
 		String infoStr = "      String json =\n" +
 						 "        \"{\" +\n" +
 						 "          \"\\\"code\\\" : \\\"REGISTER\\\",\" +\n" +
-						 "          \"\\\"id\\\" : \\\"\" + worker.workerId + \"\\\",\" +\n" +
+						 "          \"\\\"id\\\" : \\\"\" + workerId + \"\\\",\" +\n" +
 						 "          \"\\\"functions\\\" : [\" +\n";
 		
 		// define all the function wrapper
-		String funcDef = "";
+		String funcDef, paramsDef;
 		ExecutableElement m;
-		List<? extends VariableElement> ves;
 		for (int i = 0; i < methods.size(); i++) {
-			if (methods.get(i) instanceof ExecutableElement) {
+			if (methods.get(i).getAnnotation(ServiceMethod.class) != null && methods.get(i) instanceof ExecutableElement) {
+				// receive the method names
 				m = (ExecutableElement) methods.get(i);
 				funcDef = 
-						"            \"{\" +" +
-						"              \"\\\"functionName\\\" : \\\"" + m.getSimpleName().toString() + "\\\",\" +";
-								
-				ves = m.getParameters();
-						
-				funcDef =	
-						"              \"\\\"inParams\\\" : [\\\"java.lang.String\\\"],\" +" +
-						"              \"\\\"outParam\\\" : \\\"java.lang.String[]\\\"\" +" +
-						"            \"}" + (i < methods.size() - 1 ? "," : "") + "\" +";
+						"            \"{\" +\n" +
+						"              \"\\\"functionName\\\" : \\\"" + m.getSimpleName().toString() + "\\\",\" +\n";
+				
+				// prepare input parameters
+				paramsDef = "";
+				for (VariableElement p : m.getParameters()) {
+					paramsDef += "\\\"" + p.asType().toString() + "\\\",";
+				}
+				paramsDef = paramsDef.length() > 0 ? paramsDef.substring(0, paramsDef.length() - 1) : "";
+				
+				// gather and prepare output parameter
+				funcDef +=	
+						"              \"\\\"inParams\\\" : [" + paramsDef + "],\" +\n" +
+						"              \"\\\"outParam\\\" : \\\"" + m.getReturnType().toString() + "\\\"\" +\n" +
+						"            \"}" + (i < methods.size() - 1 ? "," : "") + "\" +\n";
 				infoStr += funcDef;
 			}
-			// infoStr += 
 		}
 		
-//						 "            \"{\" +" +
-//						 
-//						 "            \"}\" +" +
-						 
-		infoStr	= "          \"]\" +\n" +
-				  "        \"}\";\n" +
-				  "      return json;";
+		infoStr	+= "          \"]\" +\n" +
+				   "        \"}\";\n" +
+				   "      return json;";
 		return infoStr;
 	}
 	
@@ -297,7 +315,7 @@ public class MobileServiceMultiCreator {
 			writer.println("import com.usu.tinyservice.messages.binary.RequestMessage;");
 			writer.println("import com.usu.tinyservice.network.NetUtils;");
 			writer.println("import com.usu.tinyservice.network.ReceiveListener;");
-			writer.println("import com.usu.tinyservice.network.Requester;");
+			writer.println("import com.usu.tinyservice.network.Client;");
 			writer.println();
 			
 			// declare class prototype 
@@ -305,8 +323,8 @@ public class MobileServiceMultiCreator {
 			
 			// declare the original service & network class 
 			classInstance = className.toLowerCase();
-			writer.println("  public ReceiveListener listener;"); 
-			writer.println("  private RequesterX req;");
+			writer.println("  ReceiveListener listener;"); 
+			writer.println("  RmiClient client;");
 			writer.println();
 			
 			// define the server constructor
@@ -314,10 +332,9 @@ public class MobileServiceMultiCreator {
 			writer.println("    // start listener");
 			writer.println("    this.listener = listener;\n");
 			writer.println("    // create request message and send");
-			writer.println("    req = new RequesterX();");
-			writer.println("    req.start();");
+			writer.println("    client = new RmiClient();");
 			writer.println("  }");
-			writer.println();
+			// writer.println();
 			
 			// define the client function stubs
 			// get list of inner methods
@@ -331,10 +348,10 @@ public class MobileServiceMultiCreator {
 			writer.println(clientFuncs);
 			
 			// the last part
-			writer.println("  class RequesterX extends Requester {\n" + 
+			writer.println("  class RmiClient extends Client {\n" + 
 						   "	@Override\n" + 
-						   "	public void receive(byte[] resp) {\n" + 
-						   "	  listener.dataReceived(resp);\n" + 
+						   "	public void receive(String idChain, String funcName, byte[] resp) {\n" + 
+						   "	  listener.dataReceived(idChain, funcName, resp);\n" + 
 						   "	}\n" + 
 						   "  }");
 			writer.println("}");
@@ -407,7 +424,7 @@ public class MobileServiceMultiCreator {
 		// prepare the message to send to server
 		funcCaller += "    // create a binary message\n" +
 			  	  	  "    byte[] reqBytes = NetUtils.serialize(reqMsg);\n" + 
-			  	  	  "    req.send(reqBytes);\n";
+			  	  	  "    client.send(functionName, reqBytes);\n";
 		
 		// enclose part
 		funcCaller += "  }\n";
