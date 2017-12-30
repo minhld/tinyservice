@@ -56,8 +56,11 @@ public class MobileServiceProcessor extends AbstractProcessor {
             	// MobileServiceCreator.generateServer(processingEnv, type);
             	// MobileServiceCreator.generateClient(processingEnv, type);
             	
-            	MobileServiceBinCreator.generateServer(processingEnv, type);
-            	MobileServiceBinCreator.generateClient(processingEnv, type);
+            	// MobileServiceBinCreator.generateServer(processingEnv, type);
+            	// MobileServiceBinCreator.generateClient(processingEnv, type);
+            	
+            	MobileServiceMultiCreator.generateWorker(processingEnv, type);
+            	MobileServiceMultiCreator.generateClient(processingEnv, type);
             } else {
                 return true;
             }
