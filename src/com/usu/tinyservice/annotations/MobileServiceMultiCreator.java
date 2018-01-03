@@ -333,7 +333,15 @@ public class MobileServiceMultiCreator {
 			writer.println("    this.listener = listener;\n");
 			writer.println("    // create request message and send");
 			writer.println("    client = new RmiClient();");
-			writer.println("  }");
+			writer.println("  }\n");
+			
+			writer.println("  public " + clientClassName + "(String brokerIp, ReceiveListener listener) {" +
+					   	   "    // start listener\n" +
+						   "    this.listener = listener;\n\n" +
+						   "    // create request message and send\n" +
+						   "    client = new RmiClient(brokerIp);\n" +
+						   "  }");
+
 			// writer.println();
 			
 			// define the client function stubs
@@ -349,6 +357,12 @@ public class MobileServiceMultiCreator {
 			
 			// the last part
 			writer.println("  class RmiClient extends Client {\n" + 
+					   	   "    public RmiClient() {\n" +
+					   	   "      super();\n" +
+					   	   "    }\n\n" +
+					   	   "    public RmiClient(String brokerIp) {\n" +
+					   	   "      super(brokerIp);\n" +
+					   	   "    }\n\n" +
 						   "	@Override\n" + 
 						   "	public void receive(String idChain, String funcName, byte[] resp) {\n" + 
 						   "	  listener.dataReceived(idChain, funcName, resp);\n" + 
