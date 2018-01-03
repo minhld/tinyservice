@@ -52,6 +52,14 @@ public class MobileServiceDemoClient {
 
 
   class RmiClient extends Client {
+	public RmiClient() {
+	  super();
+	}
+	
+	public RmiClient(String brokerIp) {
+	  super(brokerIp);
+	}
+	
 	@Override
 	public void receive(String idChain, String funcName, byte[] resp) {
 	  listener.dataReceived(idChain, funcName, resp);
