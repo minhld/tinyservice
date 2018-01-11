@@ -6,11 +6,11 @@ import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 import com.usu.tinyservice.network.Client;
 
-public class MobileServiceDemoClient {
+public class ServiceBClient {
   ReceiveListener listener;
   RmiClient client;
 
-  public MobileServiceDemoClient(ReceiveListener listener) {
+  public ServiceBClient(ReceiveListener listener) {
     // start listener
     this.listener = listener;
 
@@ -18,33 +18,31 @@ public class MobileServiceDemoClient {
     client = new RmiClient();
   }
 
-  public MobileServiceDemoClient(String brokerIp, ReceiveListener listener) {    // start listener
+  public ServiceBClient(String brokerIp, ReceiveListener listener) {    // start listener
     this.listener = listener;
 
     // create request message and send
     client = new RmiClient(brokerIp);
   }
 
-  public void getFileList1(java.lang.String path, com.usu.tinyservice.network.tests.Data1[] data, boolean fileOnly) {
+  public void sendData(java.lang.String msg) {
     // compose input parameters
-    String functionName = "getFileList1";
-    String outType = "com.usu.tinyservice.network.tests.Data1[]";
+    String functionName = "sendData";
+    String outType = "java.lang.String[]";
     RequestMessage reqMsg = new RequestMessage(functionName, outType);
     
     // create request message and send
-    reqMsg.inParams = new InParam[3];
-    reqMsg.inParams[0] = new InParam("path", "java.lang.String", path);
-    reqMsg.inParams[1] = new InParam("data", "com.usu.tinyservice.network.tests.Data1[]", data);
-    reqMsg.inParams[2] = new InParam("fileOnly", "boolean", fileOnly);
+    reqMsg.inParams = new InParam[1];
+    reqMsg.inParams[0] = new InParam("msg", "java.lang.String", msg);
 
     // create a binary message
     byte[] reqBytes = NetUtils.serialize(reqMsg);
     client.send(functionName, reqBytes);
   }
 
-  public void getFileList2(java.lang.String path) {
+  public void getFolderList(java.lang.String path) {
     // compose input parameters
-    String functionName = "getFileList2";
+    String functionName = "getFolderList";
     String outType = "java.lang.String[]";
     RequestMessage reqMsg = new RequestMessage(functionName, outType);
     
