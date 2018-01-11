@@ -139,8 +139,8 @@ public class Broker extends Thread {
                     // WORKER has completed the task, returned the results
 
                     // startTime = System.currentTimeMillis();
-                    // duration from receiving to sending a message
-                    durForwardTime = System.currentTimeMillis() - startForwardTime;
+                    // calculate time of receiving & sending only, will exclude waiting time
+                    startForwardTime = System.currentTimeMillis();
 
                     String funcName = backend.recvStr();
                     
@@ -163,7 +163,9 @@ public class Broker extends Thread {
                     frontend.sendMore(funcName);
                     frontend.sendMore(NetUtils.DELIMITER);
                     frontend.send(reply);
-                    
+
+                    durForwardTime += System.currentTimeMillis() - startForwardTime;
+
                     NetUtils.printX("[Broker-" + brokerId + "] Forward To Client [" + clientId + "] (" + durForwardTime + "ms)");
                 } 
             }
