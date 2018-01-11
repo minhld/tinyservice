@@ -19,7 +19,7 @@ public abstract class Client extends Thread {
     
     private WorkMode workMode = WorkMode.NORMAL;
     private String clientPreffix;
-    private String clientId;
+    public String clientId;
     
     public Client() {
         this.start();
@@ -103,18 +103,23 @@ public abstract class Client extends Thread {
      * @param funcName
      * @param data
      */
-    public void send(String funcName, byte[] data) {
-		if (requester != null) {
-			// make up a sending message
-			requester.sendMore(NetUtils.EMPTY);		// send from original client -> no need ID
-			requester.sendMore(NetUtils.DELIMITER);
-			requester.sendMore(funcName);
-			requester.sendMore(NetUtils.DELIMITER);
-			requester.send(data);
-			
-			// then wait for the result
-			waitForResult();
-		}
+    public void send(final String funcName, final byte[] data) {
+    	new Thread(new Runnable() {
+			@Override
+			public void run() {
+				if (requester != null) {
+					// make up a sending message
+					requester.sendMore(NetUtils.EMPTY);		// send from original client -> no need ID
+					requester.sendMore(NetUtils.DELIMITER);
+					requester.sendMore(funcName);
+					requester.sendMore(NetUtils.DELIMITER);
+					requester.send(data);
+
+					// then wait for the result
+					waitForResult();
+				}
+			}
+		}).start();
 	}
 
 	/**
