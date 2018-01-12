@@ -1,7 +1,6 @@
 package com.usu.tinyservice.rmi;
 
 import java.io.File;
-import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -17,9 +16,8 @@ public class RmiServiceBServer extends UnicastRemoteObject implements RmiService
 	public static void main(String args[]) {
 		try {
 			Registry registry = LocateRegistry.createRegistry(1099);
-			registry.bind("129.123.7.172", new RmiServiceBServer());
+			registry.bind("ServiceB", new RmiServiceBServer());
 			
-			// Naming.rebind("//129.123.7.172/ServiceB", new RmiServiceBServer());
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
