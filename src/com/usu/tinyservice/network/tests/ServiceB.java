@@ -7,6 +7,7 @@ import com.usu.tinyservice.annotations.MobileService;
 import com.usu.tinyservice.annotations.ServiceMethod;
 import com.usu.tinyservice.annotations.SyncMode;
 import com.usu.tinyservice.annotations.TransmitType;
+import com.usu.tinyservice.network.NetUtils;
 
 /**
  * Created by lee on 9/23/17.
@@ -22,6 +23,14 @@ public class ServiceB {
         return new String[] { "receive message: ", Integer.toString(msg.length()) };
     }
 
+    @ServiceMethod(syncMode = SyncMode.Async)
+    public String[] sendData2(String msg) {
+    	// image solving 
+    	int sleepTime = (int) (Math.random() * 100) + 100;
+    	NetUtils.sleep(sleepTime);
+        return new String[] { msg, Integer.toString(msg.length()) };
+    }
+    
     @ServiceMethod(
             syncMode = SyncMode.Async,
             suffix = "2")

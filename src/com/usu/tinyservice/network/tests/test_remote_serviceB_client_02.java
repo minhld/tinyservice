@@ -9,7 +9,7 @@ import com.usu.tinyservice.network.Broker;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
 
-public class test_remote_serviceB_client extends Thread {
+public class test_remote_serviceB_client_02 extends Thread {
 	BufferedWriter writer;
 	
 	public void run() {
@@ -73,8 +73,9 @@ public class test_remote_serviceB_client extends Thread {
 		
 		int size = 0;
 		byte[] data;
-		for (int i = 0; i < 1024; i += 16) {
-			size = i * 1024;
+		for (int i = 0; i < 50; i++) {
+			// different image size
+			size = (int) (Math.random() * 25 * 1024);
 			
 			data = new byte[size];
 			for (int j = 0; j < size; j++) {
@@ -92,6 +93,6 @@ public class test_remote_serviceB_client extends Thread {
 	}
 	
 	public static void main(String args[]) {
-		new test_remote_serviceB_client().start();
+		new test_remote_serviceB_client_02().start();
 	}
 }

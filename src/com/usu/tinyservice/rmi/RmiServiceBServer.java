@@ -6,6 +6,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
+import com.usu.tinyservice.network.NetUtils;
+
 public class RmiServiceBServer extends UnicastRemoteObject implements RmiServiceB {
 	private static final long serialVersionUID = 1L;
 
@@ -26,6 +28,13 @@ public class RmiServiceBServer extends UnicastRemoteObject implements RmiService
 	public String[] sendData(String msg) throws RemoteException {
 		return new String[] { "receive message: ", Integer.toString(msg.length()) };
 	}
+	
+	public String[] sendData2(String msg) throws RemoteException {
+    	// image solving 
+    	int sleepTime = (int) (Math.random() * 100) + 100;
+    	NetUtils.sleep(sleepTime);
+        return new String[] { msg, Integer.toString(msg.length()) };
+    }
 
 	public String[] getFolderList(String path) throws RemoteException {
         File folder = new File(path);
