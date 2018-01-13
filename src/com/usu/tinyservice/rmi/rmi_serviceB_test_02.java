@@ -39,7 +39,7 @@ public class rmi_serviceB_test_02 extends Thread {
 				
 				startTime = System.nanoTime();
 				
-				String[] rets = service.sendData(new String(data));
+				String[] rets = service.sendData2(new String(data));
 				
 				totalTime = ((double) (System.nanoTime() - startTime)) / Math.pow(10, 6);
 				

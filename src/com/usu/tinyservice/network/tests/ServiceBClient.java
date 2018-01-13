@@ -40,6 +40,21 @@ public class ServiceBClient {
     client.send(functionName, reqBytes);
   }
 
+  public void sendData2(java.lang.String msg) {
+    // compose input parameters
+    String functionName = "sendData2";
+    String outType = "java.lang.String[]";
+    RequestMessage reqMsg = new RequestMessage(functionName, outType);
+    
+    // create request message and send
+    reqMsg.inParams = new InParam[1];
+    reqMsg.inParams[0] = new InParam("msg", "java.lang.String", msg);
+
+    // create a binary message
+    byte[] reqBytes = NetUtils.serialize(reqMsg);
+    client.send(functionName, reqBytes);
+  }
+
   public void getFolderList(java.lang.String path) {
     // compose input parameters
     String functionName = "getFolderList";

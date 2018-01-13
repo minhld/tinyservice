@@ -85,7 +85,7 @@ public class test_remote_serviceB_client_02 extends Thread {
 			
 			startTime = System.nanoTime();
 			
-			client.sendData(new String(data));
+			client.sendData2(new String(data));
 			
 			NetUtils.sleep(300);
 		}

@@ -52,6 +52,23 @@ public class ServiceBWorker {
         respBytes = NetUtils.serialize(respMsg);
         break;
       }
+      case "sendData2": {
+        // for variable "msg"
+        java.lang.String[] msgs = new java.lang.String[reqMsg.inParams[0].values.length];
+        for (int i = 0; i < reqMsg.inParams[0].values.length; i++) {
+          msgs[i] = (java.lang.String) reqMsg.inParams[0].values[i];
+        }
+        java.lang.String msg = msgs[0];
+
+        // start calling function "sendData2"
+        java.lang.String[] rets = serviceb.sendData2(msg);
+        String retType = "java.lang.String[]";
+        ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, rets);
+
+        // convert to binary array
+        respBytes = NetUtils.serialize(respMsg);
+        break;
+      }
       case "getFolderList": {
         // for variable "path"
         java.lang.String[] paths = new java.lang.String[reqMsg.inParams[0].values.length];
@@ -84,6 +101,11 @@ public class ServiceBWorker {
           "\"functions\" : [" +
             "{" +
               "\"functionName\" : \"sendData\"," +
+              "\"inParams\" : [\"java.lang.String\"]," +
+              "\"outParam\" : \"java.lang.String[]\"" +
+            "}," +
+            "{" +
+              "\"functionName\" : \"sendData2\"," +
               "\"inParams\" : [\"java.lang.String\"]," +
               "\"outParam\" : \"java.lang.String[]\"" +
             "}," +
