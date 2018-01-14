@@ -27,10 +27,11 @@ public class rmi_serviceB_test_03 extends Thread {
 			double totalTime = 0;
 			
 			int size = 0;
+			int basic = 1024;
 			byte[] data;
 			for (int i = 0; i < 50; i++) {
 				// different image size
-				size = (int) (Math.random() * 25 * 1024);
+				size = (int) (Math.random() * basic * 1024);
 				
 				data = new byte[size];
 				for (int j = 0; j < size; j++) {
@@ -39,7 +40,7 @@ public class rmi_serviceB_test_03 extends Thread {
 				
 				startTime = System.nanoTime();
 				
-				String[] rets = service.sendData(new String(data));
+				String[] rets = service.sendData2(new String(data));
 				
 				totalTime = ((double) (System.nanoTime() - startTime)) / Math.pow(10, 6);
 				
