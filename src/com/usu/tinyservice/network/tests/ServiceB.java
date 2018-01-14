@@ -20,6 +20,9 @@ public class ServiceB {
 
     @ServiceMethod(syncMode = SyncMode.Async)
     public String[] sendData(String msg) {
+    	// image detection mimic
+    	int sleepTime = (int) (Math.random() * 200) + 100;
+    	NetUtils.sleep(sleepTime);
         return new String[] { "receive message: ", Integer.toString(msg.length()) };
     }
 

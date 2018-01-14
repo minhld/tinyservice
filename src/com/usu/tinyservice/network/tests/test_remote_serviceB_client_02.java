@@ -58,6 +58,14 @@ public class test_remote_serviceB_client_02 extends Thread {
                     	writer.write("" + totalTime + "\r\n");
                     	writer.flush();
                     } catch (Exception e) { }
+                } else if (resp.functionName.equals("sendData2")) {
+                    String[] msgs = (String[]) resp.outParam.values;
+                    double totalTime = (double) ((double) (System.nanoTime() - startTime) / Math.pow(10, 6));
+                    NetUtils.print(msgs[0] + " " + msgs[1] + " in " + totalTime);
+                    try {
+                    	writer.write("" + totalTime + "\r\n");
+                    	writer.flush();
+                    } catch (Exception e) { }
                 } else if (resp.functionName.equals("getFolderList")) {
                     String[] files = (String[]) resp.outParam.values;
                     NetUtils.print("[Client-" + client.client.clientId + "] Received: ");
@@ -87,7 +95,7 @@ public class test_remote_serviceB_client_02 extends Thread {
 			
 			client.sendData2(new String(data));
 			
-			NetUtils.sleep(300);
+			NetUtils.sleep(500);
 		}
 
 	}

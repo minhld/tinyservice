@@ -26,6 +26,9 @@ public class RmiServiceBServer extends UnicastRemoteObject implements RmiService
 	}
 
 	public String[] sendData(String msg) throws RemoteException {
+		// image detection mimic
+    	int sleepTime = (int) (Math.random() * 200) + 100;
+    	NetUtils.sleep(sleepTime);
 		return new String[] { "receive message: ", Integer.toString(msg.length()) };
 	}
 	
