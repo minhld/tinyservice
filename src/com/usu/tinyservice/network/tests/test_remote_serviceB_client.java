@@ -86,7 +86,7 @@ public class test_remote_serviceB_client extends Thread {
 			
 			client.sendData(new String(data));
 			
-			NetUtils.sleep(300);
+			NetUtils.sleep(500);
 		}
 
 	}
