@@ -15,7 +15,7 @@ import com.usu.tinyservice.network.Broker;
  */
 public class test_remote_serviceB_remote_broker extends Thread {
 	public void run() {
-		String brokerIp = "129.123.7.172";
+		String brokerIp = "129.123.7.41";
 		
 		new Broker(brokerIp);
 
