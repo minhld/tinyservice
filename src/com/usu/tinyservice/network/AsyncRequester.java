@@ -38,12 +38,13 @@ public abstract class AsyncRequester extends Thread {
 		send(data.getBytes());
 	}
 		
-	public void send(byte[] data) {
+	public byte[] send(byte[] data) {
 		if (requester != null) {
 			requester.send(data);
 			byte[] resp = requester.recv(0);
-			receive(resp);
+			return resp;
 		}
+		return null;
 	}
 	
 	public abstract void receive(byte[] data);
