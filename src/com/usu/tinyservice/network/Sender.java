@@ -6,18 +6,18 @@ import org.zeromq.ZMQ;
  * 
  * @author minhld
  */
-public abstract class AsyncRequester extends Thread {
+public abstract class Sender extends Thread {
 	ZMQ.Context context;
 	private ZMQ.Socket requester;
 	private String serverIp;
 	private int port;
 	
-	public AsyncRequester() {
+	public Sender() {
 		this.serverIp = Constants.SERVER_GENERAL_IP;
 		this.port = Constants.REQUEST_PORT;
 	}
 	
-	public AsyncRequester(String serverIp, int port) {
+	public Sender(String serverIp, int port) {
 		this.serverIp = serverIp;
 		this.port = port;
 	}
