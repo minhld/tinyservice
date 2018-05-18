@@ -1,4 +1,4 @@
-package com.usu.tinyservice.tests;
+package com.usu.tinyservice.network.tests;
 
 import com.usu.tinyservice.messages.binary.InParam;
 import com.usu.tinyservice.messages.binary.RequestMessage;
