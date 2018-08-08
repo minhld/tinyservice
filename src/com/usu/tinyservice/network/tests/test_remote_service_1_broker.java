@@ -29,10 +29,10 @@ public class test_remote_service_1_broker extends Thread {
 		new Broker(remoteBrokerIp, 3333, 3334);
 		
 		// start a local broker
-		// 
+		// listen to client 6668 and worker 6666
 		new Broker();
 
-		new Bridge(remoteBrokerIp);
+		new Bridge(remoteBrokerIp, 6666, remoteBrokerIp, 3333);
 		
 		NetUtils.sleep(1000);
 
