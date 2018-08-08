@@ -22,8 +22,14 @@ import com.usu.tinyservice.network.ReceiveListener;
  */
 public class test_remote_service_1_broker extends Thread {
 	public void run() {
+		// start a remote broker
+		// listen to client 3333 and worker 3334
 		String remoteBrokerIp = "192.168.0.104";
 		
+		new Broker(remoteBrokerIp, 3333, 3334);
+		
+		// start a local broker
+		// 
 		new Broker();
 
 		new Bridge(remoteBrokerIp);
