@@ -18,6 +18,13 @@ public class MobileServiceDemoClient {
     client = new RmiClient();
   }
 
+  public MobileServiceDemoClient(String brokerIp, ReceiveListener listener) {    // start listener
+    this.listener = listener;
+
+    // create request message and send
+    client = new RmiClient(brokerIp);
+  }
+
   public void getFileList1(java.lang.String path, com.usu.tinyservice.network.tests.Data1[] data, boolean fileOnly) {
     // compose input parameters
     String functionName = "getFileList1";
@@ -52,14 +59,14 @@ public class MobileServiceDemoClient {
 
 
   class RmiClient extends Client {
-	public RmiClient() {
-	  super();
-	}
-	
-	public RmiClient(String brokerIp) {
-	  super(brokerIp);
-	}
-	
+    public RmiClient() {
+      super();
+    }
+
+    public RmiClient(String brokerIp) {
+      super(brokerIp);
+    }
+
 	@Override
 	public void receive(String idChain, String funcName, byte[] resp) {
 	  listener.dataReceived(idChain, funcName, resp);

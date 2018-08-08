@@ -74,6 +74,10 @@ public class MobileServiceMultiCreator {
 			writer.println("  public " + serverClassName + "(String brokerIp) {");
 			writer.println("    " + classInstance + " = new " + className + "();");
 			writer.println("    new WorkerX(brokerIp);");
+			writer.println("  }\n");
+			writer.println("  public " + serverClassName + "(String brokerIp, int workerPort) {");
+			writer.println("    " + classInstance + " = new " + className + "();");
+			writer.println("    new WorkerX(brokerIp, workerPort);");
 			writer.println("  }");
 			writer.println();
 			
@@ -84,6 +88,9 @@ public class MobileServiceMultiCreator {
 						   "    }\n\n" +
 						   "    public WorkerX(String brokerIp) {\n" + 
 						   "      super(brokerIp);\n" +
+						   "    }\n\n" +
+						   "    public WorkerX(String brokerIp, int workerPort) {\n" + 
+						   "      super(brokerIp, workerPort);\n" +
 						   "    }\n\n");
 			
 			writer.println("    @Override");

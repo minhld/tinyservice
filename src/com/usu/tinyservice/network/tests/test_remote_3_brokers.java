@@ -10,7 +10,9 @@ import com.usu.tinyservice.network.ReceiveListener;
  * REMOTE SERVICE TEST SUITE - REMOTE SERVICE CLIENT
  * ------
  * - this test is the client part of REMOTE BROKER test suite: this will create
- * a local Broker to talk to the local clients, a Bridge to talk to the remote
+ * a 2 remote Brokers and 1 local Broker to talk to the local clients, there are
+ * two Bridges to connect 3 Brokers together
+ * 
  * Broker and a Client to request the local Broker.
  * - this will connect to the REMOTE BROKER (129.123.7.41) which is started by 
  * {@link test_remote_service_remote_broker}
@@ -20,22 +22,36 @@ import com.usu.tinyservice.network.ReceiveListener;
  * @author minhld
  *
  */
-public class test_remote_service_1_broker extends Thread {
+public class test_remote_3_brokers extends Thread {
 	public void run() {
+		String remoteBrokerIp = "192.168.0.104";
+		
 		// start a remote broker
 		// listen to client 3334 and worker 3333
 		// start a remote worker
-		String remoteBrokerIp = "192.168.0.104";
 		new Broker(remoteBrokerIp, 3334, 3333);
 		new MobileServiceDemoWorker(remoteBrokerIp, 3333);
 		
+		// NetUtils.sleep(500);
+		
+		// start a remote broker
+		// listen to client 5556 and worker 5555
+		// start a remote worker
+		new Broker(remoteBrokerIp, 5556, 5555);
+		// new MobileServiceDemoWorker(remoteBrokerIp, 5555);
+		
+		NetUtils.sleep(500);
+
+		// bridge between the two brokers
+		new Bridge(remoteBrokerIp, 5555, remoteBrokerIp, 3334);
+
 		// start a local broker
 		// listen to client 6668 and worker 6666
 		new Broker();
 
-		NetUtils.sleep(1000);
+		NetUtils.sleep(500);
 		
-		new Bridge(remoteBrokerIp, 6666, remoteBrokerIp, 3334);
+		new Bridge(remoteBrokerIp, 6666, remoteBrokerIp, 5556);
 		
 		NetUtils.sleep(1000);
 
@@ -88,6 +104,6 @@ public class test_remote_service_1_broker extends Thread {
 	}
 	
 	public static void main(String[] args) {
-		new test_remote_service_1_broker().start();
+		new test_remote_3_brokers().start();
 	}
 }

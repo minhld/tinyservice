@@ -17,6 +17,11 @@ public class MobileServiceDemoWorker {
     new WorkerX(brokerIp);
   }
 
+  public MobileServiceDemoWorker(String brokerIp, int workerPort) {
+    mobileservicedemo = new MobileServiceDemo();
+    new WorkerX(brokerIp, workerPort);
+  }
+
   class WorkerX extends Worker {
     public WorkerX() {
       super();
@@ -24,6 +29,10 @@ public class MobileServiceDemoWorker {
 
     public WorkerX(String brokerIp) {
       super(brokerIp);
+    }
+
+    public WorkerX(String brokerIp, int workerPort) {
+      super(brokerIp, workerPort);
     }
 
 
