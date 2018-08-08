@@ -22,7 +22,7 @@ import com.usu.tinyservice.network.ReceiveListener;
  */
 public class test_remote_service_1_broker extends Thread {
 	public void run() {
-		String remoteBrokerIp = "129.123.7.41";
+		String remoteBrokerIp = "192.168.0.104";
 		
 		new Broker();
 

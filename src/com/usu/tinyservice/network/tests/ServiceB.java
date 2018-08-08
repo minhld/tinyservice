@@ -12,10 +12,10 @@ import com.usu.tinyservice.network.NetUtils;
 /**
  * Created by lee on 9/23/17.
  */
-@MobileService(
-        version = "1.2",
-        commModel = CommModel.ClientServer,
-        transmitType = TransmitType.Binary)
+//@MobileService(
+//        version = "1.2",
+//        commModel = CommModel.ClientServer,
+//        transmitType = TransmitType.Binary)
 public class ServiceB {
 
     @ServiceMethod(syncMode = SyncMode.Async)
