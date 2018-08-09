@@ -242,11 +242,22 @@ public abstract class Worker extends Thread {
     public abstract String info();
     
     /**
+     * returns the float number to reflect the strength of device
+     * the number. It considers either CPU, RAM or battery
+     * <br/>
+     * this function must be overwritten
+     * 
+     * @return a float number describing device's strength
+     */
+    public float getDeviceStrength() {
+    	return 1f;
+    }
+    
+    /**
      * this class contains information of the task of which has just been
      * executed by the worker
      */
     public class TaskDone {
         public long durration;
-
     }
 }

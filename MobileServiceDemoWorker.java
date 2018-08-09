@@ -104,6 +104,7 @@ public class MobileServiceDemoWorker {
         "{" +
           "\"code\" : \"REGISTER\"," +
           "\"id\" : \"" + workerId + "\"," +
+			"\"strength\" : " + getDeviceStrength() + "," +
           "\"functions\" : [" +
             "{" +
               "\"functionName\" : \"getFileList1\"," +

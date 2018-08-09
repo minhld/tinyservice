@@ -256,6 +256,7 @@ public class MobileServiceMultiCreator {
 						 "        \"{\" +\n" +
 						 "          \"\\\"code\\\" : \\\"REGISTER\\\",\" +\n" +
 						 "          \"\\\"id\\\" : \\\"\" + workerId + \"\\\",\" +\n" +
+						 "          \"\\\"strength\\\" : \" + getDeviceStrength() + \",\" +\n" +
 						 "          \"\\\"functions\\\" : [\" +\n";
 		
 		// define all the function wrapper
