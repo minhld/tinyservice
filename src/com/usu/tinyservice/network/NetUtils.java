@@ -46,7 +46,18 @@ public class NetUtils {
 	
     private static Random rand = new Random(System.currentTimeMillis());
 
-    
+    public static String getFunctions(List<String> functionList) {
+    	String funcList = "";
+    	for (String func : functionList) {
+    		funcList += "," + func;
+    	}
+    	
+    	// remove 
+    	if (funcList.length() > 0) {
+    		funcList = funcList.substring(1);
+    	}
+    	return funcList;
+    }
     /**
      * get all functions provided by a worker
      * 

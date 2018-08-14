@@ -3,6 +3,7 @@ package com.usu.tinyservice.network;
 import org.zeromq.ZMQ;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Broker forwards the messages among the components in the network.
@@ -15,7 +16,12 @@ public class Broker extends Thread {
     private int workerPort = NetUtils.WORKER_PORT;
 
     private String brokerId;
-    private HashMap<String, String> funcMap;
+    
+    /**
+     * this is a map of functions, each contains a list of Workers
+     * that providing that function
+     */
+    private HashMap<String, List<String>> funcMap;
     // private static HashMap<String, JobMergeInfo> jobMergeList;
 
     // private static ZMQ.Socket backend;
@@ -109,10 +115,19 @@ public class Broker extends Thread {
                     // WORKER has finished loading, returned DRL value
                     // update worker list
                 	String[] funcs = NetUtils.getFunctions(workerInfo);
+                	List<String> workerList;
                 	for (int i = 0; i < funcs.length; i++) {
-                		funcMap.put(funcs[i], workerId);
+                		workerList = funcMap.get(funcs[i]);
+                		if (workerList != null) {
+                			workerList.add(workerId);
+                		} else {
+                			if (!workerList.contains(workerId)) {
+                				workerList.add(workerId);
+                			}
+                		}
+                		funcMap.put(funcs[i], workerList);
                 	}
-                	NetUtils.printX("[Broker-" + brokerId + "] Add New Worker [" + workerId + "]");
+                	NetUtils.printX("[Broker-" + brokerId + "] Adding New Worker [" + workerId + "]");
                 	NetUtils.printX("[Broker-" + brokerId + "] Added From Worker [" + workerId + "] " + services());
                 	
                 	// skip the last frame
@@ -185,9 +200,13 @@ public class Broker extends Thread {
                 // skip the delimiter
                 frontend.recv();
                 
-                // get function name - to find worker ID
+                // get function name - to find worker IDs
                 String funcName = frontend.recvStr();
-                String workerId = funcName.equals(NetUtils.INFO_REQUEST_SERVICES) ? funcName : funcMap.get(funcName);
+                
+                // get the list of Workers by function name
+                String workerIds = funcName.equals(NetUtils.INFO_REQUEST_SERVICES) ? 
+                					funcName : 
+                					NetUtils.getFunctions(funcMap.get(funcName));
 
                 // // check 2nd frame
                 // empty = frontend.recv();
@@ -200,7 +219,7 @@ public class Broker extends Thread {
                 // ====== CHECK AVAILABILITY OF THE WORKER ======  
                 
                 // check if worker is available at the time of execution 
-                if (workerId == null) {
+                if (workerIds == null) {
                 	// WORKER NOT AVAILABLE
                 	
                     // send back a denied message to the requesting client
@@ -215,7 +234,7 @@ public class Broker extends Thread {
                     // sendMsg(clientId, deniedMsgBytes);
                     
                     NetUtils.printX("[Broker-" + brokerId + "] Denied Client [" + clientId + "] - Function Not Found.");
-                } else if (workerId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
+                } else if (workerIds.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	// REQUEST BROKER'S SERVICE LIST
                 	
                 	String serviceList = services();
@@ -232,13 +251,18 @@ public class Broker extends Thread {
                 	NetUtils.printX("[Broker-" + brokerId + "] Passed Service Info To Bridge Client [" + clientId + "]");
                 	NetUtils.printX("[Broker-" + brokerId + "] " + serviceList);
                 } else {
-                	// WORKER AVAILABLE
+                	// WORKERS AVAILABLE
 
                     // get the time of receiving message
                     startForwardTime = System.currentTimeMillis();
 
                 	// update the ID chain with the new client ID 
                 	idChain = NetUtils.concatIds(idChain, clientId);
+                	
+                	String workerId = "";
+                	
+                	// TODO: select a worker to forward the job
+                	
                 	
 	                // send the requests to all the nearby workers for DRL values. After receiving
 	                // all DRL values, it will consider DRLs and divide job into tasks with
@@ -265,6 +289,17 @@ public class Broker extends Thread {
         context.term();
     }
 
+    /**
+     * returns the list of available services of a Worker
+     * that connects to the current Broker
+     * 
+     * @param workerId
+     * @return
+     */
+    public String services(String workerId) {
+    	return "";
+    }
+    
     /**
      * returns the list of available services on current Broker
      * 
