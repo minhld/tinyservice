@@ -241,6 +241,7 @@ public abstract class Worker extends Thread {
      */
     public abstract String info();
     
+    
     /**
      * returns the float number to reflect the strength of device
      * the number. It considers either CPU, RAM or battery
