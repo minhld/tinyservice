@@ -247,10 +247,10 @@ public abstract class Worker extends Thread {
      * <br/>
      * this function must be overwritten
      * 
-     * @return a float number describing device's strength
+     * @return a float number (0 -> 2) describing device's strength
      */
     public float getDeviceStrength() {
-    	return 1f;
+    	return (float) (Math.random() * 2);
     }
     
     /**
