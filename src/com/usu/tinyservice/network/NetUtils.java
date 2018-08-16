@@ -21,6 +21,7 @@ import com.usu.tinyservice.messages.binary.OutParam;
 import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
+import com.usu.tinyservice.network.utils.Function;
 
 public class NetUtils {
 	public static enum WorkMode {
@@ -46,6 +47,18 @@ public class NetUtils {
 	
     private static Random rand = new Random(System.currentTimeMillis());
 
+    public static Function[] getFunctionList(String json) {
+    	Gson gson = new Gson();
+    	Function[] funcList = gson.fromJson(json, Function[].class);
+    	return funcList;
+    }
+    
+    public static String getFunctionListJson(Function[] funcList) {
+    	Gson gson = new Gson();
+    	String funcListJson = gson.toJson(funcList);
+    	return funcListJson;
+    }
+    
     public static String getFunctions(List<String> functionList) {
     	String funcList = "";
     	for (String func : functionList) {
@@ -58,6 +71,20 @@ public class NetUtils {
     	}
     	return funcList;
     }
+    
+    public static Function[] getFunctionsFromJson(String workerInfoJson) {
+    	JsonElement jElement = new JsonParser().parse(workerInfoJson);
+        JsonObject jObject = jElement.getAsJsonObject();
+        JsonArray jArray = jObject.getAsJsonArray("functions");
+        Gson gson = new Gson();
+        List<Function> funcList = new ArrayList<>();
+        for (int i = 0; i < jArray.size(); i++) {
+        	Function f = gson.fromJson(jArray.get(i).toString(), Function.class);
+        	funcList.add(f);
+        }
+        return funcList.toArray(new Function[] {});
+    }
+    
     /**
      * get all functions provided by a worker
      * 

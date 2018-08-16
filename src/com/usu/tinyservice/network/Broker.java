@@ -2,6 +2,8 @@ package com.usu.tinyservice.network;
 
 import org.zeromq.ZMQ;
 
+import com.usu.tinyservice.network.utils.Function;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -114,6 +116,9 @@ public class Broker extends Thread {
                 if (workerInfo.contains(NetUtils.WORKER_REGISTER)) {
                     // WORKER has finished loading, returned DRL value
                     // update worker list
+                	
+                	Function[] funcList = NetUtils.getFunctionsFromJson(workerInfo);
+                	
                 	String[] funcs = NetUtils.getFunctions(workerInfo);
                 	List<String> workerList;
                 	for (int i = 0; i < funcs.length; i++) {

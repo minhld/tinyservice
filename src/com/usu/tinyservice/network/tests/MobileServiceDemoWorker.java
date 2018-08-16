@@ -100,25 +100,41 @@ public class MobileServiceDemoWorker {
 
     @Override
     public String info() {
+    	
       String json =
         "{" +
           "\"code\" : \"REGISTER\"," +
           "\"id\" : \"" + workerId + "\"," +
-          "\"strength\" : " + getDeviceStrength() + "," +
           "\"functions\" : [" +
             "{" +
               "\"functionName\" : \"getFileList1\"," +
               "\"inParams\" : [\"java.lang.String\",\"com.usu.tinyservice.network.tests.Data1[]\",\"boolean\"]," +
-              "\"outParam\" : \"com.usu.tinyservice.network.tests.Data1[]\"" +
+              "\"outParam\" : \"com.usu.tinyservice.network.tests.Data1[]\"," +
+              "\"workerInfos\" : [" +
+              	"{" +
+	              "\"workerId\" : \"" + workerId + "\"," +
+	              "\"strength\" : " + strength() + "," +
+	              "\"hops\" : 1" +
+	            "}" +
+              "]" +
             "}," +
             "{" +
               "\"functionName\" : \"getFileList2\"," +
               "\"inParams\" : [\"java.lang.String\"]," +
-              "\"outParam\" : \"java.lang.String[]\"" +
+              "\"outParam\" : \"java.lang.String[]\"," +
+              "\"workerInfos\" : [" +
+            	"{" +
+	              "\"workerId\" : \"" + workerId + "\"," +
+	              "\"strength\" : " + strength() + "," +
+	              "\"hops\" : 1" +
+	            "}" +
+	          "]" +
             "}" +
           "]" +
         "}";
       return json;
     }
+    
+    
   }
 }

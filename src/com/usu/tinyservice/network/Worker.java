@@ -183,27 +183,27 @@ public abstract class Worker extends Thread {
         worker.send(data);
     }
 
-    
-//    class ExAckClient extends AckClient {
-//        public ExAckClient(ZMQ.Context context, String ip, byte[] id) {
-//            super(context, ip, id);
-//        }
-//
-//        @Override
-//        public void sendResponse(String topic, byte[] request) {
-//            // this delegate function is called when client detects a DRL request
-//            // from server and try responding to it with DRL info
-//
-//            // this is the place to send back device info
-//            String reqStr = new String(request);
-//            if (reqStr.equals("ack_request")) {
-//                // receive device resource information, and calculate DRL value here
-//                String drl = "";
-//                this.sendMessage(drl.getBytes());
-//            }
-//        }
-//    }
+    /*
+    class ExAckClient extends AckClient {
+        public ExAckClient(ZMQ.Context context, String ip, byte[] id) {
+            super(context, ip, id);
+        }
 
+        @Override
+        public void sendResponse(String topic, byte[] request) {
+            // this delegate function is called when client detects a DRL request
+            // from server and try responding to it with DRL info
+
+            // this is the place to send back device info
+            String reqStr = new String(request);
+            if (reqStr.equals("ack_request")) {
+                // receive device resource information, and calculate DRL value here
+                String drl = "";
+                this.sendMessage(drl.getBytes());
+            }
+        }
+    }
+	*/
 
     /**
      * this abstract function needs to be filled. this is to
@@ -250,7 +250,7 @@ public abstract class Worker extends Thread {
      * 
      * @return a float number (0 -> 2) describing device's strength
      */
-    public float getDeviceStrength() {
+    public float strength() {
     	return (float) (Math.random() * 2);
     }
     
