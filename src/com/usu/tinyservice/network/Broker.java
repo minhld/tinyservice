@@ -5,7 +5,6 @@ import org.zeromq.ZMQ;
 import com.usu.tinyservice.network.utils.Function;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Broker forwards the messages among the components in the network.
@@ -23,7 +22,7 @@ public class Broker extends Thread {
      * this is a map of functions, each contains a list of Workers
      * that providing that function
      */
-    private HashMap<String, List<String>> funcMap;
+    private HashMap<String, HashMap<String, Function>> funcMap;
     // private static HashMap<String, JobMergeInfo> jobMergeList;
 
     // private static ZMQ.Socket backend;
@@ -118,20 +117,31 @@ public class Broker extends Thread {
                     // update worker list
                 	
                 	Function[] funcList = NetUtils.getFunctionsFromJson(workerInfo);
-                	
-                	String[] funcs = NetUtils.getFunctions(workerInfo);
-                	List<String> workerList;
-                	for (int i = 0; i < funcs.length; i++) {
-                		workerList = funcMap.get(funcs[i]);
-                		if (workerList != null) {
-                			workerList.add(workerId);
-                		} else {
-                			if (!workerList.contains(workerId)) {
-                				workerList.add(workerId);
-                			}
+                	HashMap<String, Function> workerSubList;
+                	for (int i = 0; i < funcList.length; i++) {
+                		workerSubList = funcMap.get(funcList[i].functionName);
+                		if (workerSubList == null) {
+                			workerSubList = new HashMap<>();
                 		}
-                		funcMap.put(funcs[i], workerList);
+            			workerSubList.put(workerId, funcList[i]);
+                		funcMap.put(funcList[i].functionName, workerSubList);
                 	}
+                	
+//                	
+//                	String[] funcs = NetUtils.getFunctions(workerInfo);
+//                	List<String> workerList;
+//                	for (int i = 0; i < funcs.length; i++) {
+//                		workerList = funcMap.get(funcs[i]);
+//                		if (workerList != null) {
+//                			workerList.add(workerId);
+//                		} else {
+//                			if (!workerList.contains(workerId)) {
+//                				workerList.add(workerId);
+//                			}
+//                		}
+//                		funcMap.put(funcs[i], workerList);
+//                	}
+                	
                 	NetUtils.printX("[Broker-" + brokerId + "] Adding New Worker [" + workerId + "]");
                 	NetUtils.printX("[Broker-" + brokerId + "] Added From Worker [" + workerId + "] " + services());
                 	
@@ -209,13 +219,21 @@ public class Broker extends Thread {
                 String funcName = frontend.recvStr();
                 
                 // get the list of Workers by function name
-                String workerIds = funcName.equals(NetUtils.INFO_REQUEST_SERVICES) ? 
-                					funcName : 
-                					NetUtils.getFunctions(funcMap.get(funcName));
+                Function[] funcList = getWorkerList(funcName);
+                
+                String workerId = "";
+                if (funcName.equals(NetUtils.INFO_REQUEST_SERVICES)) {
+                	workerId = NetUtils.INFO_REQUEST_SERVICES;
+                } else {
+                	// select the workerId from the worker list
+                	
+                }
 
                 // // check 2nd frame
                 // empty = frontend.recv();
                 // assert (empty.length == 0);
+                
+                // skip the 2nd frame
                 frontend.recv();
 
                 // get 3rd frame
@@ -224,7 +242,7 @@ public class Broker extends Thread {
                 // ====== CHECK AVAILABILITY OF THE WORKER ======  
                 
                 // check if worker is available at the time of execution 
-                if (workerIds == null) {
+                if (workerId == null) {
                 	// WORKER NOT AVAILABLE
                 	
                     // send back a denied message to the requesting client
@@ -239,7 +257,7 @@ public class Broker extends Thread {
                     // sendMsg(clientId, deniedMsgBytes);
                     
                     NetUtils.printX("[Broker-" + brokerId + "] Denied Client [" + clientId + "] - Function Not Found.");
-                } else if (workerIds.equals(NetUtils.INFO_REQUEST_SERVICES)) {
+                } else if (workerId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	// REQUEST BROKER'S SERVICE LIST
                 	
                 	String serviceList = services();
@@ -262,12 +280,7 @@ public class Broker extends Thread {
                     startForwardTime = System.currentTimeMillis();
 
                 	// update the ID chain with the new client ID 
-                	idChain = NetUtils.concatIds(idChain, clientId);
-                	
-                	String workerId = "";
-                	
-                	// TODO: select a worker to forward the job
-                	
+                	idChain = NetUtils.concatIds(idChain, clientId);                	
                 	
 	                // send the requests to all the nearby workers for DRL values. After receiving
 	                // all DRL values, it will consider DRLs and divide job into tasks with
@@ -332,7 +345,19 @@ public class Broker extends Thread {
     	  "}";
     	return functionList;
     }
-
+    
+    /**
+     * [private] get the worker list having the function name
+     * 
+     * @param funcName
+     * @return
+     */
+    private Function[] getWorkerList(String funcName) {
+    	HashMap<String, Function> subFuncList = funcMap.get(funcName);
+    	return subFuncList.values() != null ? 
+    			subFuncList.values().toArray(new Function[] {}) :
+    				new Function[0];
+    }
 //    /**
 //     * send a message to client or worker. This will send a message 
 //     * including an ID and data

@@ -44,9 +44,11 @@ public class NetUtils {
     public static final String INFO_REQUEST_SERVICES = "REQUEST_SERVICES";
     public static final String INFO_WORKER_FAILED = "WORKER_FAILED";
     
+    private static Gson gson = new Gson();
 	
     private static Random rand = new Random(System.currentTimeMillis());
 
+    /*
     public static Function[] getFunctionList(String json) {
     	Gson gson = new Gson();
     	Function[] funcList = gson.fromJson(json, Function[].class);
@@ -58,6 +60,7 @@ public class NetUtils {
     	String funcListJson = gson.toJson(funcList);
     	return funcListJson;
     }
+    */
     
     public static String getFunctions(List<String> functionList) {
     	String funcList = "";
@@ -72,14 +75,20 @@ public class NetUtils {
     	return funcList;
     }
     
+    /**
+     * get the list of <b>Functions</b> provided by a worker. 
+     * 
+     * @param workerInfoJson
+     * @return
+     */
     public static Function[] getFunctionsFromJson(String workerInfoJson) {
     	JsonElement jElement = new JsonParser().parse(workerInfoJson);
         JsonObject jObject = jElement.getAsJsonObject();
         JsonArray jArray = jObject.getAsJsonArray("functions");
-        Gson gson = new Gson();
+        
         List<Function> funcList = new ArrayList<>();
         for (int i = 0; i < jArray.size(); i++) {
-        	Function f = gson.fromJson(jArray.get(i).toString(), Function.class);
+        	Function f = NetUtils.gson.fromJson(jArray.get(i).toString(), Function.class);
         	funcList.add(f);
         }
         return funcList.toArray(new Function[] {});
