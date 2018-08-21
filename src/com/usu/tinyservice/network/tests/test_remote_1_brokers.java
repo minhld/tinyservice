@@ -35,7 +35,8 @@ public class test_remote_1_brokers extends Thread {
 		
 		new MobileServiceDemoWorker(remoteBrokerIp, 3333);
 		
-		
+		startClient();
+
 	}
 	
 	

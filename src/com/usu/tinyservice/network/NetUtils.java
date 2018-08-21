@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -22,6 +23,7 @@ import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
 import com.usu.tinyservice.network.utils.Function;
+import com.usu.tinyservice.network.utils.WorkerInfo;
 
 public class NetUtils {
 	public static enum WorkMode {
@@ -48,20 +50,7 @@ public class NetUtils {
 	
     private static Random rand = new Random(System.currentTimeMillis());
 
-    /*
-    public static Function[] getFunctionList(String json) {
-    	Gson gson = new Gson();
-    	Function[] funcList = gson.fromJson(json, Function[].class);
-    	return funcList;
-    }
-    
-    public static String getFunctionListJson(Function[] funcList) {
-    	Gson gson = new Gson();
-    	String funcListJson = gson.toJson(funcList);
-    	return funcListJson;
-    }
-    */
-    
+        
     public static String getFunctions(List<String> functionList) {
     	String funcList = "";
     	for (String func : functionList) {
@@ -73,6 +62,21 @@ public class NetUtils {
     		funcList = funcList.substring(1);
     	}
     	return funcList;
+    }
+    
+//    public static Function[] getFunctionsFromJson(String functionsJson) {
+//    	JsonArray jArray = jObject.getAsJsonArray("functions");
+//        
+//        List<Function> funcList = new ArrayList<>();
+//        for (int i = 0; i < jArray.size(); i++) {
+//        	Function f = NetUtils.gson.fromJson(jArray.get(i).toString(), Function.class);
+//        	funcList.add(f);
+//        }
+//        return funcList.toArray(new Function[] {});
+//    }
+    
+    public static String getFunctionJson(HashMap<String, HashMap<String, WorkerInfo>> functionMap) {
+    	return gson.toJson(functionMap);
     }
     
     /**

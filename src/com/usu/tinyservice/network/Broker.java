@@ -22,7 +22,7 @@ public class Broker extends Thread {
      * this is a map of functions, each contains a list of Workers
      * that providing that function
      */
-    private HashMap<String, HashMap<String, Function>> funcMap;
+    private HashMap<String, HashMap<String, Function>> functionMap;
     // private static HashMap<String, JobMergeInfo> jobMergeList;
 
     // private static ZMQ.Socket backend;
@@ -78,7 +78,7 @@ public class Broker extends Thread {
         			"Worker Port " + this.workerPort);
         
         // Queue of available workers
-        funcMap = new HashMap<>();
+        functionMap = new HashMap<>();
 
 
         // INFINITE LOOP TO LISTEN TO MESSAGES FROM 
@@ -119,12 +119,12 @@ public class Broker extends Thread {
                 	Function[] funcList = NetUtils.getFunctionsFromJson(workerInfo);
                 	HashMap<String, Function> workerSubList;
                 	for (int i = 0; i < funcList.length; i++) {
-                		workerSubList = funcMap.get(funcList[i].functionName);
+                		workerSubList = functionMap.get(funcList[i].functionName);
                 		if (workerSubList == null) {
                 			workerSubList = new HashMap<>();
                 		}
             			workerSubList.put(workerId, funcList[i]);
-                		funcMap.put(funcList[i].functionName, workerSubList);
+                		functionMap.put(funcList[i].functionName, workerSubList);
                 	}
                 	
 //                	
@@ -308,17 +308,6 @@ public class Broker extends Thread {
     }
 
     /**
-     * returns the list of available services of a Worker
-     * that connects to the current Broker
-     * 
-     * @param workerId
-     * @return
-     */
-    public String services(String workerId) {
-    	return "";
-    }
-    
-    /**
      * returns the list of available services on current Broker
      * 
      * @return list of available services in string array
@@ -330,7 +319,7 @@ public class Broker extends Thread {
     	
     	// get the list of functions
     	String functions = "";
-    	for (String key : funcMap.keySet()) {
+    	for (String key : functionMap.keySet()) {
     		functions += "{\"functionName\" : \"" + key + "\"},";
     	}
     	
@@ -353,7 +342,7 @@ public class Broker extends Thread {
      * @return
      */
     private Function[] getWorkerList(String funcName) {
-    	HashMap<String, Function> subFuncList = funcMap.get(funcName);
+    	HashMap<String, Function> subFuncList = functionMap.get(funcName);
     	return subFuncList.values() != null ? 
     			subFuncList.values().toArray(new Function[] {}) :
     				new Function[0];
