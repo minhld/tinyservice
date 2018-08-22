@@ -35,6 +35,19 @@ public class test_remote_1_brokers extends Thread {
 		
 		new MobileServiceDemoWorker(remoteBrokerIp, 3333);
 		
+		NetUtils.sleep(500);
+
+		// start a local broker
+		// listen to client 6668 and worker 6666
+		new Broker();
+
+		NetUtils.sleep(500);
+		
+		// bridge between the two brokers
+		new Bridge(remoteBrokerIp, 6666, remoteBrokerIp, 3334);
+		
+		NetUtils.sleep(1000);
+		
 		startClient();
 
 	}

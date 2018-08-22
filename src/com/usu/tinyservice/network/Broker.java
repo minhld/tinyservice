@@ -219,14 +219,13 @@ public class Broker extends Thread {
                 String funcName = frontend.recvStr();
                 
                 // get the list of Workers by function name
-                Function[] funcList = getWorkerList(funcName);
-                
+                Function[] funcList = null;
                 String workerId = "";
                 if (funcName.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	workerId = NetUtils.INFO_REQUEST_SERVICES;
                 } else {
                 	// select the workerId from the worker list
-                	
+                	funcList = getWorkerList(funcName);
                 }
 
                 // // check 2nd frame
@@ -313,26 +312,7 @@ public class Broker extends Thread {
      * @return list of available services in string array
      */
     public String services() {
-    	String functionList = 
-    	  "{" + 
-    	    "\"functions\" : [";
-    	
-    	// get the list of functions
-    	String functions = "";
-    	for (String key : functionMap.keySet()) {
-    		functions += "{\"functionName\" : \"" + key + "\"},";
-    	}
-    	
-    	// remove the last redundant comma, if any
-    	if (functions.length() > 0) {
-    		functions = functions.substring(0, functions.length() - 1);
-    	}
-    	
-    	// continue with the suffix
-    	functionList += functions +
-    	    "]" + 
-    	  "}";
-    	return functionList;
+    	return NetUtils.getFunctionJson(functionMap);
     }
     
     /**
@@ -343,10 +323,11 @@ public class Broker extends Thread {
      */
     private Function[] getWorkerList(String funcName) {
     	HashMap<String, Function> subFuncList = functionMap.get(funcName);
-    	return subFuncList.values() != null ? 
+    	return subFuncList != null && subFuncList.values() != null ? 
     			subFuncList.values().toArray(new Function[] {}) :
-    				new Function[0];
+    				null;
     }
+    
 //    /**
 //     * send a message to client or worker. This will send a message 
 //     * including an ID and data
@@ -358,25 +339,6 @@ public class Broker extends Thread {
 //        backend.sendMore(id); 
 //        backend.sendMore(NetUtils.DELIMITER);
 //        backend.send(data);
-//    }
-    
-//    /**
-//     * this class contains information about status of a worker
-//     * at the moment worker is requested for DRL
-//     */
-//    class WorkerInfo {
-//        public String workerId;
-//        public float DRL;
-//
-//        public WorkerInfo(String workerId) {
-//            this.workerId = workerId;
-//            this.DRL = 0;
-//        }
-//
-//        public WorkerInfo(String workerId, float drl) {
-//            this.workerId = workerId;
-//            this.DRL = drl;
-//        }
 //    }
 
 }

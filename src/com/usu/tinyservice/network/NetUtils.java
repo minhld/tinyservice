@@ -23,7 +23,6 @@ import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
 import com.usu.tinyservice.network.utils.Function;
-import com.usu.tinyservice.network.utils.WorkerInfo;
 
 public class NetUtils {
 	public static enum WorkMode {
@@ -64,18 +63,13 @@ public class NetUtils {
     	return funcList;
     }
     
-//    public static Function[] getFunctionsFromJson(String functionsJson) {
-//    	JsonArray jArray = jObject.getAsJsonArray("functions");
-//        
-//        List<Function> funcList = new ArrayList<>();
-//        for (int i = 0; i < jArray.size(); i++) {
-//        	Function f = NetUtils.gson.fromJson(jArray.get(i).toString(), Function.class);
-//        	funcList.add(f);
-//        }
-//        return funcList.toArray(new Function[] {});
-//    }
-    
-    public static String getFunctionJson(HashMap<String, HashMap<String, WorkerInfo>> functionMap) {
+    /**
+     * convert function list to JSON string
+     * 
+     * @param functionMap
+     * @return
+     */
+    public static String getFunctionJson(HashMap<String, HashMap<String, Function>> functionMap) {
     	return gson.toJson(functionMap);
     }
     
