@@ -84,7 +84,7 @@ public class Bridge extends Thread {
 	 */
 	void startWorker(String funcListJson) {
 		// remove the '{' and '}' characters from the JSON string 
-		final String subFuncList = funcListJson.substring(1, funcListJson.length() - 1);
+		final String regInfo = funcListJson.substring(1, funcListJson.length() - 1);
 		
 		// create a Worker to handle communication with the local broker
 		// this Worker does nothing but forward the requests of the local
@@ -98,15 +98,26 @@ public class Bridge extends Thread {
 			
 			@Override
 			public String info() {
+				// NetUtils.getRegInfo(regInfo);
+				
+				/*
 				// services of this worker are simply the services from
 				// the remote broker
+				RegInfo regInfo = new RegInfo();
+				regInfo.code = "REGISTER";
+				regInfo.id = mWorker.workerId;
+				regInfo.functions = 
 				String json = 
 					"{" +
 						"\"code\" : \"REGISTER\"," +
 						"\"id\" : \"" + mWorker.workerId + "\"," +
-						subFuncList + 
+						"\"functions\" : [" + 
+							subFuncList + 
+						"]" + 
 					"}";
-				return json;
+				*/
+				
+				return regInfo;
 			}
 		};
 	}

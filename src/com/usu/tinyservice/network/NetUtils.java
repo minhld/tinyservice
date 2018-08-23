@@ -23,6 +23,8 @@ import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
 import com.usu.tinyservice.network.utils.Function;
+import com.usu.tinyservice.network.utils.RegInfo;
+import com.usu.tinyservice.network.utils.WorkerInfo;
 
 public class NetUtils {
 	public static enum WorkMode {
@@ -69,7 +71,7 @@ public class NetUtils {
      * @param functionMap
      * @return
      */
-    public static String getFunctionJson(HashMap<String, HashMap<String, Function>> functionMap) {
+    public static String getFunctionsJson(HashMap<String, HashMap<String, WorkerInfo>> functionMap) {
     	return gson.toJson(functionMap);
     }
     
@@ -79,17 +81,8 @@ public class NetUtils {
      * @param workerInfoJson
      * @return
      */
-    public static Function[] getFunctionsFromJson(String workerInfoJson) {
-    	JsonElement jElement = new JsonParser().parse(workerInfoJson);
-        JsonObject jObject = jElement.getAsJsonObject();
-        JsonArray jArray = jObject.getAsJsonArray("functions");
-        
-        List<Function> funcList = new ArrayList<>();
-        for (int i = 0; i < jArray.size(); i++) {
-        	Function f = NetUtils.gson.fromJson(jArray.get(i).toString(), Function.class);
-        	funcList.add(f);
-        }
-        return funcList.toArray(new Function[] {});
+    public static RegInfo getRegInfo(String regInfoJson) {
+    	return gson.fromJson(regInfoJson, RegInfo.class);
     }
     
     /**

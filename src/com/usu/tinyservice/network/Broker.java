@@ -3,6 +3,8 @@ package com.usu.tinyservice.network;
 import org.zeromq.ZMQ;
 
 import com.usu.tinyservice.network.utils.Function;
+import com.usu.tinyservice.network.utils.RegInfo;
+import com.usu.tinyservice.network.utils.WorkerInfo;
 
 import java.util.HashMap;
 
@@ -22,7 +24,7 @@ public class Broker extends Thread {
      * this is a map of functions, each contains a list of Workers
      * that providing that function
      */
-    private HashMap<String, HashMap<String, Function>> functionMap;
+    private HashMap<String, HashMap<String, WorkerInfo>> functionMap;
     // private static HashMap<String, JobMergeInfo> jobMergeList;
 
     // private static ZMQ.Socket backend;
@@ -116,31 +118,8 @@ public class Broker extends Thread {
                     // WORKER has finished loading, returned DRL value
                     // update worker list
                 	
-                	Function[] funcList = NetUtils.getFunctionsFromJson(workerInfo);
-                	HashMap<String, Function> workerSubList;
-                	for (int i = 0; i < funcList.length; i++) {
-                		workerSubList = functionMap.get(funcList[i].functionName);
-                		if (workerSubList == null) {
-                			workerSubList = new HashMap<>();
-                		}
-            			workerSubList.put(workerId, funcList[i]);
-                		functionMap.put(funcList[i].functionName, workerSubList);
-                	}
-                	
-//                	
-//                	String[] funcs = NetUtils.getFunctions(workerInfo);
-//                	List<String> workerList;
-//                	for (int i = 0; i < funcs.length; i++) {
-//                		workerList = funcMap.get(funcs[i]);
-//                		if (workerList != null) {
-//                			workerList.add(workerId);
-//                		} else {
-//                			if (!workerList.contains(workerId)) {
-//                				workerList.add(workerId);
-//                			}
-//                		}
-//                		funcMap.put(funcs[i], workerList);
-//                	}
+                	RegInfo regInfo = NetUtils.getRegInfo(workerInfo);
+                	addToFunctionMap(regInfo.functions);
                 	
                 	NetUtils.printX("[Broker-" + brokerId + "] Adding New Worker [" + workerId + "]");
                 	NetUtils.printX("[Broker-" + brokerId + "] Added From Worker [" + workerId + "] " + services());
@@ -219,7 +198,7 @@ public class Broker extends Thread {
                 String funcName = frontend.recvStr();
                 
                 // get the list of Workers by function name
-                Function[] funcList = null;
+                WorkerInfo[] funcList = null;
                 String workerId = "";
                 if (funcName.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	workerId = NetUtils.INFO_REQUEST_SERVICES;
@@ -312,7 +291,35 @@ public class Broker extends Thread {
      * @return list of available services in string array
      */
     public String services() {
-    	return NetUtils.getFunctionJson(functionMap);
+    	return NetUtils.getFunctionsJson(functionMap);
+    }
+    
+    /**
+     * add a function list to the map
+     * 
+     * @param funcList
+     */
+    private void addToFunctionMap(Function[] funcList) {
+    	HashMap<String, WorkerInfo> workerSubList;
+    	for (int i = 0; i < funcList.length; i++) {
+    		// find the existing worker list providing a function
+    		workerSubList = functionMap.get(funcList[i].functionName);
+    		if (workerSubList == null) {
+    			workerSubList = new HashMap<>();
+    		}
+    		
+    		// add the workers to the existing list
+    		for (WorkerInfo wi : funcList[i].workerInfos) {
+    			if (!workerSubList.containsKey(wi.workerId)) {
+    				workerSubList.put(wi.workerId, wi);
+    			} else {
+    				// stop the REG routing here
+    			}
+    		}
+			
+    		// update the worker list
+    		functionMap.put(funcList[i].functionName, workerSubList);
+    	}
     }
     
     /**
@@ -321,10 +328,10 @@ public class Broker extends Thread {
      * @param funcName
      * @return
      */
-    private Function[] getWorkerList(String funcName) {
-    	HashMap<String, Function> subFuncList = functionMap.get(funcName);
-    	return subFuncList != null && subFuncList.values() != null ? 
-    			subFuncList.values().toArray(new Function[] {}) :
+    private WorkerInfo[] getWorkerList(String funcName) {
+    	HashMap<String, WorkerInfo> workerList = functionMap.get(funcName);
+    	return workerList != null && workerList.values() != null ? 
+    			workerList.values().toArray(new WorkerInfo[] {}) :
     				null;
     }
     
