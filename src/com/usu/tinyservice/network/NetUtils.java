@@ -5,26 +5,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 import org.zeromq.ZMQ;
 import org.zeromq.ZMQ.Socket;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.usu.tinyservice.messages.binary.OutParam;
 import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
 import com.usu.tinyservice.messages.json.JsonResponseMessage;
 import com.usu.tinyservice.network.utils.Function;
 import com.usu.tinyservice.network.utils.RegInfo;
-import com.usu.tinyservice.network.utils.WorkerInfo;
 
 public class NetUtils {
 	public static enum WorkMode {
@@ -42,6 +34,7 @@ public class NetUtils {
 	public static final String DELIMITER = "";
     public static final String BROKER_INFO = "INFO";
     public static final String WORKER_REGISTER = "REGISTER";
+    public static final String WORKER_FORWARD = "FORWARD";
 
     public static final String INFO_WORKER_NOT_READY = "WORKER_NOT_READY";
     public static final String INFO_REQUEST_SERVICES = "REQUEST_SERVICES";
@@ -50,20 +43,6 @@ public class NetUtils {
     private static Gson gson = new Gson();
 	
     private static Random rand = new Random(System.currentTimeMillis());
-
-        
-    public static String getFunctions(List<String> functionList) {
-    	String funcList = "";
-    	for (String func : functionList) {
-    		funcList += "," + func;
-    	}
-    	
-    	// remove 
-    	if (funcList.length() > 0) {
-    		funcList = funcList.substring(1);
-    	}
-    	return funcList;
-    }
     
     /**
      * convert function list to JSON string
@@ -71,8 +50,12 @@ public class NetUtils {
      * @param functionMap
      * @return
      */
-    public static String getFunctionsJson(HashMap<String, HashMap<String, WorkerInfo>> functionMap) {
-    	return gson.toJson(functionMap);
+    public static String createForwardMessage(String id, Function[] functions) {
+    	RegInfo regInfo = new RegInfo();
+    	regInfo.code = "FORWARD";
+    	regInfo.id = id;
+    	regInfo.functions = functions;
+    	return gson.toJson(regInfo);
     }
     
     /**
@@ -85,26 +68,8 @@ public class NetUtils {
     	return gson.fromJson(regInfoJson, RegInfo.class);
     }
     
-    /**
-     * get all functions provided by a worker
-     * 
-     * @param workerInfoJson worker info in JSON format
-     * @return list of functions 
-     * 
-     */
-    public static String[] getFunctions(String workerInfoJson) {
-    	List<String> funcList = new ArrayList<>();
-    	JsonElement jElement = new JsonParser().parse(workerInfoJson);
-        JsonObject jObject = jElement.getAsJsonObject();
-        JsonArray jArray = jObject.getAsJsonArray("functions");
-        
-        String funcName;
-        for (int i = 0; i < jArray.size(); i++) {
-        	funcName = jArray.get(i).getAsJsonObject().get("functionName").getAsString();
-        	funcList.add(funcName);
-        }
-        
-        return funcList.toArray(new String[] {});
+    public static Function[] getFunctionsFromJson(String regInfoJson) {
+    	return gson.fromJson(regInfoJson, Function[].class);
     }
     
     /**

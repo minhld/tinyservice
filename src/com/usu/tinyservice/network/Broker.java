@@ -24,9 +24,9 @@ public class Broker extends Thread {
      * this is a map of functions, each contains a list of Workers
      * that providing that function
      */
-    private HashMap<String, HashMap<String, WorkerInfo>> functionMap;
+    private HashMap<String, Function> functionMap;
     // private static HashMap<String, JobMergeInfo> jobMergeList;
-
+    
     // private static ZMQ.Socket backend;
     // private AckServerListener ackServer;
 
@@ -82,7 +82,6 @@ public class Broker extends Thread {
         // Queue of available workers
         functionMap = new HashMap<>();
 
-
         // INFINITE LOOP TO LISTEN TO MESSAGES FROM 
         byte[] request, reply;
         String clientId = "", idChain = "";
@@ -114,7 +113,8 @@ public class Broker extends Thread {
                 // skip the second delimiter
                 backend.recv();
                 
-                if (workerInfo.contains(NetUtils.WORKER_REGISTER)) {
+                if (workerInfo.contains(NetUtils.WORKER_REGISTER) ||
+                		workerInfo.contains(NetUtils.WORKER_FORWARD)) {
                     // WORKER has finished loading, returned DRL value
                     // update worker list
                 	
@@ -197,14 +197,13 @@ public class Broker extends Thread {
                 // get function name - to find worker IDs
                 String funcName = frontend.recvStr();
                 
-                // get the list of Workers by function name
-                WorkerInfo[] funcList = null;
                 String workerId = "";
                 if (funcName.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	workerId = NetUtils.INFO_REQUEST_SERVICES;
                 } else {
                 	// select the workerId from the worker list
-                	funcList = getWorkerList(funcName);
+                	WorkerInfo[] workers = getWorkerList(funcName);
+                	workerId = selectWorker(workers);
                 }
 
                 // // check 2nd frame
@@ -291,7 +290,12 @@ public class Broker extends Thread {
      * @return list of available services in string array
      */
     public String services() {
-    	return NetUtils.getFunctionsJson(functionMap);
+    	Function[] funcList = functionMap.values().toArray(new Function[] {});
+    	return NetUtils.createForwardMessage(brokerId, funcList);
+    }
+    
+    private String selectWorker(WorkerInfo[] workers) {
+    	return workers[0].workerId;
     }
     
     /**
@@ -300,25 +304,20 @@ public class Broker extends Thread {
      * @param funcList
      */
     private void addToFunctionMap(Function[] funcList) {
-    	HashMap<String, WorkerInfo> workerSubList;
+    	Function existFunction;
     	for (int i = 0; i < funcList.length; i++) {
+    		
     		// find the existing worker list providing a function
-    		workerSubList = functionMap.get(funcList[i].functionName);
-    		if (workerSubList == null) {
-    			workerSubList = new HashMap<>();
+			existFunction = functionMap.get(funcList[i].functionName);
+    		if (existFunction == null) {
+    			existFunction = funcList[i];
+    		} else {
+    			// add the workers to the existing list
+    			existFunction.addWorkerInfos(funcList[i].workerInfos);
     		}
     		
-    		// add the workers to the existing list
-    		for (WorkerInfo wi : funcList[i].workerInfos) {
-    			if (!workerSubList.containsKey(wi.workerId)) {
-    				workerSubList.put(wi.workerId, wi);
-    			} else {
-    				// stop the REG routing here
-    			}
-    		}
-			
     		// update the worker list
-    		functionMap.put(funcList[i].functionName, workerSubList);
+    		functionMap.put(funcList[i].functionName, existFunction);
     	}
     }
     
@@ -329,23 +328,8 @@ public class Broker extends Thread {
      * @return
      */
     private WorkerInfo[] getWorkerList(String funcName) {
-    	HashMap<String, WorkerInfo> workerList = functionMap.get(funcName);
-    	return workerList != null && workerList.values() != null ? 
-    			workerList.values().toArray(new WorkerInfo[] {}) :
-    				null;
+    	Function func = functionMap.get(funcName);
+    	return func.getWorkerInfos();
     }
-    
-//    /**
-//     * send a message to client or worker. This will send a message 
-//     * including an ID and data
-//     * 
-//     * @param id
-//     * @param data
-//     */
-//    void sendMsg(String id, byte[] data) {
-//        backend.sendMore(id); 
-//        backend.sendMore(NetUtils.DELIMITER);
-//        backend.send(data);
-//    }
 
 }

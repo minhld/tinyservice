@@ -2,6 +2,8 @@ package com.usu.tinyservice.network;
 
 import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.network.NetUtils.WorkMode;
+import com.usu.tinyservice.network.utils.Function;
+import com.usu.tinyservice.network.utils.RegInfo;
 
 /**
  * Bridge is literally a bridge between two brokers. 
@@ -84,7 +86,7 @@ public class Bridge extends Thread {
 	 */
 	void startWorker(String funcListJson) {
 		// remove the '{' and '}' characters from the JSON string 
-		final String regInfo = funcListJson.substring(1, funcListJson.length() - 1);
+		// final String regInfoJson = funcListJson.substring(1, funcListJson.length() - 1);
 		
 		// create a Worker to handle communication with the local broker
 		// this Worker does nothing but forward the requests of the local
@@ -98,8 +100,11 @@ public class Bridge extends Thread {
 			
 			@Override
 			public String info() {
-				// NetUtils.getRegInfo(regInfo);
+				return funcListJson;
 				
+//				RegInfo regInfo = NetUtils.getRegInfo(funcListJson);
+//				regInfo.code = "REGISTER";
+//				return NetUtils.;
 				/*
 				// services of this worker are simply the services from
 				// the remote broker
@@ -116,8 +121,6 @@ public class Bridge extends Thread {
 						"]" + 
 					"}";
 				*/
-				
-				return regInfo;
 			}
 		};
 	}
