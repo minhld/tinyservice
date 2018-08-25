@@ -1,8 +1,13 @@
 package com.usu.tinyservice.network;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.network.NetUtils.WorkMode;
+import com.usu.tinyservice.network.utils.Function;
 import com.usu.tinyservice.network.utils.RegInfo;
+import com.usu.tinyservice.network.utils.WorkerInfo;
 
 /**
  * Bridge is literally a bridge between two brokers. 
@@ -102,6 +107,14 @@ public class Bridge extends Thread {
 				RegInfo regInfo = NetUtils.getRegInfo(funcListJson);
 				regInfo.code = "REGISTER";
 				regInfo.id = mWorker.workerId;
+				// update the functions
+				for (Function func : regInfo.functions) {
+					List<WorkerInfo> workers = func.workerInfos;
+					for (WorkerInfo wi : workers) {
+						wi.workerId += "/" + mWorker.workerId;
+					}
+				}
+				
 				return NetUtils.createForwardMessage(regInfo);
 				
 				/*

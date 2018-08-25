@@ -203,7 +203,9 @@ public class Broker extends Thread {
                 } else {
                 	// select the workerId from the worker list
                 	WorkerInfo[] workers = getWorkerList(funcName);
-                	workerId = selectWorker(workers);
+                	String workerIdChain = selectWorker(workers);
+                	String[] ids = NetUtils.getLastClientId(workerIdChain);
+                	workerId = ids[0];
                 }
 
                 // // check 2nd frame

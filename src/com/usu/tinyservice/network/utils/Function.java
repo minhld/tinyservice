@@ -45,7 +45,11 @@ public class Function {
 		}
 	}
 	
+	public void setWorkerInfo(List<WorkerInfo> workerInfos) {
+		this.workerInfos = workerInfos;
+	}
+	
 	public WorkerInfo[] getWorkerInfos() {
-		return workerInfos.toArray(new WorkerInfo[] {});
+		return this.workerInfos.toArray(new WorkerInfo[] {});
 	}
 }
