@@ -58,6 +58,12 @@ public class NetUtils {
     	return gson.toJson(regInfo);
     }
     
+    /**
+     * convert a register info to JSON
+     * 
+     * @param regInfo
+     * @return
+     */
     public static String createForwardMessage(RegInfo regInfo) {
     	return gson.toJson(regInfo);
     }
@@ -245,23 +251,11 @@ public class NetUtils {
 	}
     
     public static String createRequest(JsonRequestMessage request) {
-		Gson gson = new Gson();
 		return gson.toJson(request);
 	}
 	
 	public static JsonRequestMessage getRequest(String json) {
-		Gson gson = new Gson();
 		return gson.fromJson(json, JsonRequestMessage.class);
-	}
-	
-	public static String createResponse(JsonResponseMessage response) {
-		Gson gson = new Gson();
-		return gson.toJson(response);
-	}
-	
-	public static JsonResponseMessage getResponse(String json) {
-		Gson gson = new Gson();
-		return gson.fromJson(json, JsonResponseMessage.class);
 	}
 	
 	/**
