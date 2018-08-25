@@ -58,6 +58,10 @@ public class NetUtils {
     	return gson.toJson(regInfo);
     }
     
+    public static String createForwardMessage(RegInfo regInfo) {
+    	return gson.toJson(regInfo);
+    }
+    
     /**
      * get the list of <b>Functions</b> provided by a worker. 
      * 

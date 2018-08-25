@@ -2,7 +2,6 @@ package com.usu.tinyservice.network;
 
 import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.network.NetUtils.WorkMode;
-import com.usu.tinyservice.network.utils.Function;
 import com.usu.tinyservice.network.utils.RegInfo;
 
 /**
@@ -100,11 +99,11 @@ public class Bridge extends Thread {
 			
 			@Override
 			public String info() {
-				return funcListJson;
+				RegInfo regInfo = NetUtils.getRegInfo(funcListJson);
+				regInfo.code = "REGISTER";
+				regInfo.id = mWorker.workerId;
+				return NetUtils.createForwardMessage(regInfo);
 				
-//				RegInfo regInfo = NetUtils.getRegInfo(funcListJson);
-//				regInfo.code = "REGISTER";
-//				return NetUtils.;
 				/*
 				// services of this worker are simply the services from
 				// the remote broker
