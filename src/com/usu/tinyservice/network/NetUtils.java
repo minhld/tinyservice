@@ -72,10 +72,6 @@ public class NetUtils {
     	return gson.fromJson(regInfoJson, RegInfo.class);
     }
     
-    public static Function[] getFunctionsFromJson(String regInfoJson) {
-    	return gson.fromJson(regInfoJson, Function[].class);
-    }
-    
     /**
      * create a simple message for requesting info from broker or worker 
      * 
