@@ -14,7 +14,6 @@ import com.google.gson.Gson;
 import com.usu.tinyservice.messages.binary.OutParam;
 import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.messages.json.JsonRequestMessage;
-import com.usu.tinyservice.messages.json.JsonResponseMessage;
 import com.usu.tinyservice.network.utils.Function;
 import com.usu.tinyservice.network.utils.RegInfo;
 

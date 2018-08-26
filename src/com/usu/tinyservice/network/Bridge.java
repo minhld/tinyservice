@@ -1,6 +1,5 @@
 package com.usu.tinyservice.network;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.usu.tinyservice.messages.binary.ResponseMessage;
