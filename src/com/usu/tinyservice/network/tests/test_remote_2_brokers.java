@@ -1,10 +1,10 @@
 package com.usu.tinyservice.network.tests;
 
 import com.usu.tinyservice.messages.binary.ResponseMessage;
-import com.usu.tinyservice.network.Bridge;
 import com.usu.tinyservice.network.Broker;
 import com.usu.tinyservice.network.NetUtils;
 import com.usu.tinyservice.network.ReceiveListener;
+import com.usu.tinyservice.network.utils.DBridge;
 
 /**
  * REMOTE SERVICE TEST SUITE - REMOTE SERVICE CLIENT
@@ -32,11 +32,16 @@ public class test_remote_2_brokers extends Thread {
 		// start a local broker
 		// listen to client 6668 and worker 6666
 		new Broker();
+		
+		NetUtils.sleep(500);
+		
+		new MobileServiceDemoWorker(remoteBrokerIp, 6666);
 
 		NetUtils.sleep(500);
 		
-		// bridge between the two brokers
-		new Bridge(remoteBrokerIp, 6666, remoteBrokerIp, 3334);
+		// initializes double bridge between the two brokers
+		new DBridge(remoteBrokerIp, 6668, 6666, 
+					remoteBrokerIp, 3334, 3333);
 		
 		NetUtils.sleep(1000);
 		
