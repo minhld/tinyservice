@@ -207,10 +207,6 @@ public class Broker extends Thread {
                 	String[] ids = NetUtils.getLastClientId(workerIdChain);
                 	workerId = ids[0];
                 }
-
-                // // check 2nd frame
-                // empty = frontend.recv();
-                // assert (empty.length == 0);
                 
                 // skip the 2nd frame
                 frontend.recv();
