@@ -11,8 +11,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.tools.JavaFileObject;
 
-import com.usu.tinyservice.network.NetUtils;
-
 
 /**
  * class to create server and client objects.  

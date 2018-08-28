@@ -1,9 +1,5 @@
 package com.usu.tinyservice.tests;
 
-import com.usu.tinyservice.messages.binary.ResponseMessage;
-import com.usu.tinyservice.network.NetUtils;
-import com.usu.tinyservice.network.ReceiveListener;
-
 public class test_system extends Thread {
 	public void run() {
 //		// start a server

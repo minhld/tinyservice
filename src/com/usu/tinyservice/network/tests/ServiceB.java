@@ -2,11 +2,8 @@ package com.usu.tinyservice.network.tests;
 
 import java.io.File;
 
-import com.usu.tinyservice.annotations.CommModel;
-import com.usu.tinyservice.annotations.MobileService;
 import com.usu.tinyservice.annotations.ServiceMethod;
 import com.usu.tinyservice.annotations.SyncMode;
-import com.usu.tinyservice.annotations.TransmitType;
 import com.usu.tinyservice.network.NetUtils;
 
 /**
