@@ -2,6 +2,7 @@ package com.usu.tinyservice.network;
 
 import org.zeromq.ZMQ;
 
+import com.usu.tinyservice.messages.binary.RequestMessage;
 import com.usu.tinyservice.network.utils.Function;
 import com.usu.tinyservice.network.utils.RegInfo;
 import com.usu.tinyservice.network.utils.WorkerInfo;
@@ -198,15 +199,19 @@ public class MBroker extends Thread {
                 // get function name - to find worker IDs
                 String funcName = frontend.recvStr();
                 
-                String workerId = "";
+                // find info
+                String infoId = null;
+                WorkerInfo[] workers = null;
                 if (funcName.equals(NetUtils.INFO_REQUEST_SERVICES)) {
-                	workerId = NetUtils.INFO_REQUEST_SERVICES;
+                	infoId = NetUtils.INFO_REQUEST_SERVICES;
                 } else {
                 	// select the workerId from the worker list
-                	WorkerInfo[] workers = getWorkerList(funcName);
-                	String workerIdChain = selectWorker(workers);
-                	String[] ids = NetUtils.getLastClientId(workerIdChain);
-                	workerId = ids[0];
+                	workers = getWorkerList(funcName);
+                	infoId = workers.length > 0 ? NetUtils.INFO_WORKERS_READY : null;
+                	
+                	// String workerIdChain = selectWorker(workers);
+                	// String[] ids = NetUtils.getLastClientId(workerIdChain);
+                	// workerId = ids[0];
                 }
                 
                 // skip the 2nd frame
@@ -218,7 +223,7 @@ public class MBroker extends Thread {
                 // ====== CHECK AVAILABILITY OF THE WORKER ======  
                 
                 // check if worker is available at the time of execution 
-                if (workerId == null) {
+                if (infoId == null) {
                 	// WORKER NOT AVAILABLE
                 	
                     // send back a denied message to the requesting client
@@ -233,7 +238,7 @@ public class MBroker extends Thread {
                     // sendMsg(clientId, deniedMsgBytes);
                     
                     NetUtils.printX("[Broker-" + brokerId + "] Denied Client [" + clientId + "] - Function Not Found.");
-                } else if (workerId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
+                } else if (infoId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
                 	// REQUEST BROKER'S SERVICE LIST
                 	
                 	String serviceList = services();
@@ -255,23 +260,33 @@ public class MBroker extends Thread {
                     // get the time of receiving message
                     startForwardTime = System.currentTimeMillis();
 
-                	// update the ID chain with the new client ID 
-                	idChain = NetUtils.concatIds(idChain, clientId);                	
-                	
-	                // send the requests to all the nearby workers for DRL values. After receiving
-	                // all DRL values, it will consider DRLs and divide job into tasks with
-	                // proportional data amounts to the DRL values.
-	                backend.sendMore(workerId);
-	                backend.sendMore(NetUtils.DELIMITER);
-	                backend.sendMore(idChain);
-	                backend.sendMore(NetUtils.DELIMITER);
-	                backend.sendMore(funcName);
-	                backend.sendMore(NetUtils.DELIMITER);
-	                backend.send(request);
-
-	                durForwardTime = System.currentTimeMillis() - startForwardTime;
-
-	                NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
+                    String workerId;
+                    for (WorkerInfo workerInfo : workers) {
+                    	String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
+                    	workerId = workerIds[0];
+                    
+	                	// update the ID chain with the new client ID 
+	                	idChain = NetUtils.concatIds(idChain, clientId);                	
+	                	
+		                // send the requests to all the nearby workers for DRL values. After receiving
+		                // all DRL values, it will consider DRLs and divide job into tasks with
+		                // proportional data amounts to the DRL values.
+		                backend.sendMore(workerId);
+		                backend.sendMore(NetUtils.DELIMITER);
+		                backend.sendMore(idChain);
+		                backend.sendMore(NetUtils.DELIMITER);
+		                backend.sendMore(funcName);
+		                backend.sendMore(NetUtils.DELIMITER);
+		                
+		                // get divided request
+		                byte[] dividedRequest = divideRequest(request);
+		                
+		                backend.send(dividedRequest);
+	
+		                durForwardTime = System.currentTimeMillis() - startForwardTime;
+	
+		                NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
+                    }
                 }
             }
 
@@ -293,8 +308,23 @@ public class MBroker extends Thread {
     	return NetUtils.createForwardMessage(brokerId, funcList);
     }
     
+    /*
     private String selectWorker(WorkerInfo[] workers) {
     	return workers[0].workerId;
+    }
+    */
+    
+    
+    private byte[] divideRequest(byte[] packageBytes) {
+    	// get request message
+    	RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(packageBytes);
+	
+    	byte[] requestData = (byte[]) reqMsg.inParams[0].values[0];
+    	
+    	byte[] dividedRequestData = requestData;
+    	reqMsg.inParams[0].values[0] = dividedRequestData;
+    	
+    	return NetUtils.serialize(reqMsg);
     }
     
     /**

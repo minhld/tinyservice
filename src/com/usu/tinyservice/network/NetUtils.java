@@ -38,6 +38,7 @@ public class NetUtils {
     public static final String INFO_WORKER_NOT_READY = "WORKER_NOT_READY";
     public static final String INFO_REQUEST_SERVICES = "REQUEST_SERVICES";
     public static final String INFO_WORKER_FAILED = "WORKER_FAILED";
+    public static final String INFO_WORKERS_READY = "WORKERS_READY";
     
     private static Gson gson = new Gson();
 	
