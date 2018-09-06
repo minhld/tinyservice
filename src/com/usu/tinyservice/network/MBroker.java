@@ -3,11 +3,15 @@ package com.usu.tinyservice.network;
 import org.zeromq.ZMQ;
 
 import com.usu.tinyservice.messages.binary.RequestMessage;
+import com.usu.tinyservice.network.parsers.IDataParser;
+import com.usu.tinyservice.network.parsers.WordDataParser;
 import com.usu.tinyservice.network.utils.Function;
 import com.usu.tinyservice.network.utils.RegInfo;
+import com.usu.tinyservice.network.utils.RingBuffer;
 import com.usu.tinyservice.network.utils.WorkerInfo;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * MBroker stands for Multi-Broker which will split jobs into parts
@@ -28,6 +32,19 @@ public class MBroker extends Thread {
      */
     private HashMap<String, Function> functionMap;
     // private static HashMap<String, JobMergeInfo> jobMergeList;
+    
+    /**
+     * temporary variable to hold a data parser for all jobs.
+     * in the future, the data parser will be given by the 
+     * function call
+     */
+    private IDataParser dataParser;
+    
+    /**
+     * performance window holds the performance capture of all 
+     * Workers, 
+     */
+    private RingBuffer<HashMap<String, Float>> performanceWindow;
     
     // private static ZMQ.Socket backend;
     // private AckServerListener ackServer;
@@ -54,6 +71,12 @@ public class MBroker extends Thread {
     public void run() {
         // this switch
         initRouterMode();
+        
+        // create data parser
+        dataParser = new WordDataParser();
+        
+        // create performance window
+        performanceWindow = new RingBuffer<>(5);
     }
 
     /**
@@ -279,7 +302,7 @@ public class MBroker extends Thread {
 		                backend.sendMore(NetUtils.DELIMITER);
 		                
 		                // get divided request
-		                byte[] dividedRequest = divideRequest(request);
+		                byte[] dividedRequest = divideRequest(request, workerInfo);
 		                
 		                backend.send(dividedRequest);
 	
@@ -308,18 +331,29 @@ public class MBroker extends Thread {
     	return NetUtils.createForwardMessage(brokerId, funcList);
     }
     
-    /*
-    private String selectWorker(WorkerInfo[] workers) {
-    	return workers[0].workerId;
-    }
-    */
-    
-    
-    private byte[] divideRequest(byte[] packageBytes) {
+    /**
+     * Divides a request into parts. 
+     * We believe a function for this request should contain only 2 input 
+     * parameters, one for data and another is for data parser. 
+     * However, for the convenience, we create the data parser here at Broker
+     * 
+     * @param packageBytes
+     * @return
+     */
+    private byte[] divideRequest(byte[] packageBytes, String workerId) {
     	// get request message
     	RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(packageBytes);
-	
+    	
+    	// we believe a function to split always have 2 parameters
+    	// the first is for data and the second is for data parser
     	byte[] requestData = (byte[]) reqMsg.inParams[0].values[0];
+    	
+    	// update performance window
+    	if (performanceWindow.size() == 0) {
+    		
+    	}
+    	
+    	dataParser.getPartFromObject(objData, firstOffset, lastOffset);
     	
     	byte[] dividedRequestData = requestData;
     	reqMsg.inParams[0].values[0] = dividedRequestData;

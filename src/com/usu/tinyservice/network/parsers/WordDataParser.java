@@ -7,8 +7,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import org.json.JSONObject;
 
 @SuppressWarnings("rawtypes")
 public class WordDataParser implements IDataParser {
@@ -61,9 +60,8 @@ public class WordDataParser implements IDataParser {
         String listWords = new String(partObj);
         TopWords topWords = (TopWords) placeholderObj;
         try {
-        	JsonObject jsonWords = new JsonObject();
-            
-        	Set<String> wordKeys = jsonWords.keySet();
+        	JSONObject jsonWords = new JSONObject(listWords);
+        	Iterator<String> wordKeys = jsonWords.keys();
             String key = "";
             int count = 0;
             while (wordKeys.hasNext()) {
