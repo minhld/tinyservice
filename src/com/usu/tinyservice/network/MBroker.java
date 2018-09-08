@@ -6,6 +6,7 @@ import com.usu.tinyservice.messages.binary.RequestMessage;
 import com.usu.tinyservice.network.parsers.IDataParser;
 import com.usu.tinyservice.network.parsers.WordDataParser;
 import com.usu.tinyservice.network.utils.Function;
+import com.usu.tinyservice.network.utils.PerformanceWindow;
 import com.usu.tinyservice.network.utils.RegInfo;
 import com.usu.tinyservice.network.utils.RingBuffer;
 import com.usu.tinyservice.network.utils.WorkerInfo;
@@ -44,7 +45,7 @@ public class MBroker extends Thread {
      * performance window holds the performance capture of all 
      * Workers, 
      */
-    private RingBuffer<HashMap<String, Float>> performanceWindow;
+    private PerformanceWindow performanceWindow;
     
     // private static ZMQ.Socket backend;
     // private AckServerListener ackServer;
@@ -75,8 +76,8 @@ public class MBroker extends Thread {
         // create data parser
         dataParser = new WordDataParser();
         
-        // create performance window
-        performanceWindow = new RingBuffer<>(5);
+        // create a performance window
+        performanceWindow = new PerformanceWindow(5);
     }
 
     /**
@@ -284,6 +285,7 @@ public class MBroker extends Thread {
                     startForwardTime = System.currentTimeMillis();
 
                     String workerId;
+                    String sessionId = PerformanceWindow.createSessionId();
                     for (WorkerInfo workerInfo : workers) {
                     	String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
                     	workerId = workerIds[0];
@@ -302,7 +304,7 @@ public class MBroker extends Thread {
 		                backend.sendMore(NetUtils.DELIMITER);
 		                
 		                // get divided request
-		                byte[] dividedRequest = divideRequest(request, workerInfo);
+		                byte[] dividedRequest = divideRequest(sessionId, request, workerId);
 		                
 		                backend.send(dividedRequest);
 	
@@ -340,7 +342,7 @@ public class MBroker extends Thread {
      * @param packageBytes
      * @return
      */
-    private byte[] divideRequest(byte[] packageBytes, String workerId) {
+    private byte[] divideRequest(String sessionId, byte[] packageBytes, String workerId) {
     	// get request message
     	RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(packageBytes);
     	
@@ -348,12 +350,10 @@ public class MBroker extends Thread {
     	// the first is for data and the second is for data parser
     	byte[] requestData = (byte[]) reqMsg.inParams[0].values[0];
     	
-    	// update performance window
-    	if (performanceWindow.size() == 0) {
-    		
-    	}
+    	// get the average worker value    	
+    	float avgWorkerValue = performanceWindow.getPerformance(workerId);
     	
-    	dataParser.getPartFromObject(objData, firstOffset, lastOffset);
+    	dataParser.getPartFromObject(packageBytes, firstOffset, lastOffset);
     	
     	byte[] dividedRequestData = requestData;
     	reqMsg.inParams[0].values[0] = dividedRequestData;
