@@ -284,6 +284,14 @@ public class MBroker extends Thread {
                     // get the time of receiving message
                     startForwardTime = System.currentTimeMillis();
 
+                	// extract to get the request message object
+                	RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(request);
+                	
+                	// // we believe a function to split always have 2 parameters
+                	// // the first is for data and the second is for data parser
+                	// byte[] requestData = (byte[]) reqMsg.inParams[0].values[0];
+
+                    
                     String workerId;
                     String sessionId = PerformanceWindow.createSessionId();
                     for (WorkerInfo workerInfo : workers) {
@@ -304,7 +312,7 @@ public class MBroker extends Thread {
 		                backend.sendMore(NetUtils.DELIMITER);
 		                
 		                // get divided request
-		                byte[] dividedRequest = divideRequest(sessionId, request, workerId);
+		                byte[] dividedRequest = divideRequest(sessionId, reqMsg, workerId);
 		                
 		                backend.send(dividedRequest);
 	
@@ -339,26 +347,33 @@ public class MBroker extends Thread {
      * parameters, one for data and another is for data parser. 
      * However, for the convenience, we create the data parser here at Broker
      * 
-     * @param packageBytes
+     * @param sessionId
+     * @param reqMsg
+     * @param workerId
+     * 
      * @return
      */
-    private byte[] divideRequest(String sessionId, byte[] packageBytes, String workerId) {
-    	// get request message
-    	RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(packageBytes);
-    	
+    private byte[] divideRequest(String sessionId, RequestMessage reqMsg, String workerId) {
     	// we believe a function to split always have 2 parameters
     	// the first is for data and the second is for data parser
-    	byte[] requestData = (byte[]) reqMsg.inParams[0].values[0];
+    	byte[] packageData = (byte[]) reqMsg.inParams[0].values[0];
     	
     	// get the average worker value    	
     	float avgWorkerValue = performanceWindow.getPerformance(workerId);
     	
-    	dataParser.getPartFromObject(packageBytes, firstOffset, lastOffset);
+    	int firstOffset = 0, lastOffset = 0;
     	
-    	byte[] dividedRequestData = requestData;
-    	reqMsg.inParams[0].values[0] = dividedRequestData;
+    	dataParser.getPartFromObject(packageData, firstOffset, lastOffset);
     	
-    	return NetUtils.serialize(reqMsg);
+    	byte[] dividedRequestData = (byte[]) reqMsg.inParams[0].values[0];
+    	
+    	// clone the request message
+    	
+    	RequestMessage jobReqMsg = null;	// clone here
+    	
+    	jobReqMsg.inParams[0].values[0] = reqMsg;
+    	
+    	return NetUtils.serialize(jobReqMsg);
     }
     
     /**
