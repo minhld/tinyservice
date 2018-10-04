@@ -286,12 +286,7 @@ public class MBroker extends Thread {
 
                 	// extract to get the request message object
                 	RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(request);
-                	
-                	// // we believe a function to split always have 2 parameters
-                	// // the first is for data and the second is for data parser
-                	// byte[] requestData = (byte[]) reqMsg.inParams[0].values[0];
-
-                    
+                	                    
                     String workerId;
                     String sessionId = PerformanceWindow.createSessionId();
                     for (WorkerInfo workerInfo : workers) {
@@ -311,9 +306,10 @@ public class MBroker extends Thread {
 		                backend.sendMore(funcName);
 		                backend.sendMore(NetUtils.DELIMITER);
 		                
-		                // get divided request
+		                // get divided job (sub-task) message
 		                byte[] dividedRequest = divideRequest(sessionId, reqMsg, workerId);
 		                
+		                // forward to the corresponding Worker
 		                backend.send(dividedRequest);
 	
 		                durForwardTime = System.currentTimeMillis() - startForwardTime;
@@ -363,15 +359,11 @@ public class MBroker extends Thread {
     	
     	int firstOffset = 0, lastOffset = 0;
     	
-    	dataParser.getPartFromObject(packageData, firstOffset, lastOffset);
+    	byte[] dividedPkgData = dataParser.getPartFromObject(packageData, firstOffset, lastOffset);
     	
-    	byte[] dividedRequestData = (byte[]) reqMsg.inParams[0].values[0];
-    	
-    	// clone the request message
-    	
-    	RequestMessage jobReqMsg = null;	// clone here
-    	
-    	jobReqMsg.inParams[0].values[0] = reqMsg;
+    	// create a sub task - called job
+    	RequestMessage jobReqMsg = reqMsg.cloneMessage();
+    	jobReqMsg.inParams[0].values[0] = dividedPkgData;
     	
     	return NetUtils.serialize(jobReqMsg);
     }

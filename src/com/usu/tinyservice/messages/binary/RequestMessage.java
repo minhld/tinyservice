@@ -17,4 +17,11 @@ public class RequestMessage extends Message {
 		super(functionName, outType, new String[0]);
 	}
 
+	public RequestMessage cloneMessage() {
+		try {
+			return (RequestMessage) clone();
+		} catch (Exception e) {
+			return null;
+		}
+	}
 }
