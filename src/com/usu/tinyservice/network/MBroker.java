@@ -359,6 +359,7 @@ public class MBroker extends Thread {
     	
     	int firstOffset = 0, lastOffset = 0;
     	
+    	// use data parser to divide the task
     	byte[] dividedPkgData = dataParser.getPartFromObject(packageData, firstOffset, lastOffset);
     	
     	// create a sub task - called job
