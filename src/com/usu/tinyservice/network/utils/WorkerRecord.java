@@ -5,8 +5,10 @@ package com.usu.tinyservice.network.utils;
  * @author minhld
  *
  */
-public class WorkerRecords {
+public class WorkerRecord {
 	public static final int BUFFER_SIZE = 10;
+	
+	public String workerId;
 	
 	/**
 	 * strength of the device Worker is running on. This is fixed
@@ -39,6 +41,12 @@ public class WorkerRecords {
 	public RingBuffer<Double> avgHist = new RingBuffer<>(BUFFER_SIZE);
 	
 	/**
+	 * recent average running time of each job
+	 * jobAvg = avg / jobNum
+	 */
+	public double jobAvg = 0;
+	
+	/**
 	 * recent distribution percentage (value from 0 -> 1)
 	 */
 	public double perc = 0;
@@ -49,12 +57,12 @@ public class WorkerRecords {
 	public RingBuffer<Double> percHist = new RingBuffer<>(BUFFER_SIZE);
 	
 	/**
-	 * number of jobs that Worker recently received
+	 * average number of jobs that Worker recently received
 	 */
-	public int jobNum = 0;
+	public double jobNum = 0;
 	
 	/**
 	 * accumulate history of job numbers
 	 */
-	public RingBuffer<Integer> jobNumHist = new RingBuffer<>(BUFFER_SIZE);
+	public RingBuffer<Double> jobNumHist = new RingBuffer<>(BUFFER_SIZE);
 }
