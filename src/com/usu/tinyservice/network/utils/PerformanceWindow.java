@@ -10,7 +10,9 @@ import java.util.UUID;
  */
 @SuppressWarnings({ "rawtypes", "unused" })
 public class PerformanceWindow {
-	
+	/**
+	 * holds the session ID buffer
+	 */
 	RingBuffer<String> windowBuffer;
 	
 	/**
@@ -25,6 +27,7 @@ public class PerformanceWindow {
 	
 	public void update(String sId, String wId, float v) {
 		HashMap<String, Performance> slice = window.get(sId);
+		// new slice is created if it is empty before
 		if (slice == null) {
 			slice = new HashMap<>();
 			
