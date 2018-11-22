@@ -8,11 +8,10 @@ import com.usu.tinyservice.network.parsers.WordDataParser;
 import com.usu.tinyservice.network.utils.Function;
 import com.usu.tinyservice.network.utils.PerformanceWindow;
 import com.usu.tinyservice.network.utils.RegInfo;
-import com.usu.tinyservice.network.utils.RingBuffer;
 import com.usu.tinyservice.network.utils.WorkerInfo;
+import com.usu.tinyservice.network.utils.WorkerScheduler;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * MBroker stands for Multi-Broker which will split jobs into parts
@@ -45,7 +44,7 @@ public class MBroker extends Thread {
      * performance window holds the performance capture of all 
      * Workers, 
      */
-    private PerformanceWindow performanceWindow;
+    private WorkerScheduler scheduler;
     
     // private static ZMQ.Socket backend;
     // private AckServerListener ackServer;
@@ -77,7 +76,7 @@ public class MBroker extends Thread {
         dataParser = new WordDataParser();
         
         // create a performance window
-        performanceWindow = new PerformanceWindow(5);
+        scheduler = new WorkerScheduler();
     }
 
     /**
@@ -354,8 +353,8 @@ public class MBroker extends Thread {
     	// the first is for data and the second is for data parser
     	byte[] packageData = (byte[]) reqMsg.inParams[0].values[0];
     	
-    	// get the average worker value    	
-    	float avgWorkerValue = performanceWindow.getPerformance(workerId);
+    	// get the average worker value
+    	double avgWorkerValue = scheduler.getDistributionRate(workerId);
     	
     	int firstOffset = 0, lastOffset = 0;
     	

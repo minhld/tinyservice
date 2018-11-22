@@ -18,6 +18,11 @@ public class WorkerScheduler {
 	 */
 	HashMap<String, WorkerRecord> workerRecords;
 	
+	double totalCapacity = 0d;
+	double totalJobAvgTime = 0d;
+	
+	boolean isNewWorkerJoined = false;
+	
 	public WorkerScheduler() {
 		workerRecords = new HashMap<>();
 	}
@@ -32,9 +37,14 @@ public class WorkerScheduler {
 		// retrieve the existing worker record
 		WorkerRecord existWorkerRec = workerRecords.get(workerId);
 		
+		isNewWorkerJoined = (existWorkerRec == null);
+		
 		if (existWorkerRec == null) {
 			workerRecords.put(workerId, wRec);
+			
+			// re-estimate the total capacity
 			estimateWorkerPerformance(workerId);
+			
 		} else {
 			// update strength if its value changed
 			if (wRec.strength > 0) {
@@ -47,19 +57,35 @@ public class WorkerScheduler {
 			}
 			
 			// update cap if either of above values changed
-			existWorkerRec.cap = existWorkerRec.strength / existWorkerRec.hops;
-			existWorkerRec.avg = ((existWorkerRec.avg * existWorkerRec.steps) + wRec.avg) / (existWorkerRec.steps + 1);
-			existWorkerRec.avgHist.add(wRec.avg);
-			existWorkerRec.percHist.add(wRec.perc);
+			existWorkerRec.capacity = existWorkerRec.strength / existWorkerRec.hops;
+			existWorkerRec.avgTime = ((existWorkerRec.avgTime * existWorkerRec.steps) + wRec.avgTime) / (existWorkerRec.steps + 1);
+			existWorkerRec.avgTimeHist.add(wRec.avgTime);
+			existWorkerRec.distRateHist.add(wRec.distRate);
 			existWorkerRec.jobNum = ((existWorkerRec.jobNum * existWorkerRec.steps) + wRec.jobNum) / (existWorkerRec.steps + 1);
 			existWorkerRec.jobNumHist.add(wRec.jobNum);
-			existWorkerRec.jobAvg = existWorkerRec.avg / existWorkerRec.jobNum;
-			// existWorkerRec.perc = 0;
+			existWorkerRec.jobAvgTime = existWorkerRec.avgTime / existWorkerRec.jobNum;
 			existWorkerRec.steps++;
 			
-			// re-estimate performance of all worker and give out the appropriate performance
+			// re-estimate the total job average time
 			estimateWorkerPerformance(null);
 			
+		}
+	}
+
+	/**
+	 * get distribution rate of each worker
+	 * 
+	 * @param workerId
+	 * @param isNewWorkerJoined
+	 * @return
+	 */
+	public double getDistributionRate(String workerId) {
+		WorkerRecord workerRecord = workerRecords.get(workerId);
+		
+		if (this.isNewWorkerJoined) {
+			return workerRecord.capacity / totalCapacity;
+		} else {
+			return (1 / workerRecord.jobAvgTime) / totalJobAvgTime; 
 		}
 	}
 	
@@ -67,11 +93,17 @@ public class WorkerScheduler {
 	 * this function estimate worker function
 	 * @param new worker's ID
 	 */
-	public void estimateWorkerPerformance(String workerId) {
+	void estimateWorkerPerformance(String workerId) {
 		if (workerId != null) {
-			// new worker is added, will estimate by its capacity
+			// when there is a new worker joining 
+			for (WorkerRecord rec : workerRecords.values()) {
+				totalCapacity += rec.capacity;
+			}
 		} else {
-			// no new worker is added, will use their job average time to estimate
+			// when there is no new worker joining
+			for (WorkerRecord rec : workerRecords.values()) {
+				totalJobAvgTime += 1 / rec.jobAvgTime;
+			}
 		}
 	}
 }

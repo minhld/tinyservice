@@ -23,7 +23,7 @@ public class WorkerRecord {
 	/**
 	 * capacity of Worker, estimate cap = strength / hops;
 	 */
-	public double cap;
+	public double capacity;
 	
 	/**
 	 * number of sessions (tasks, may include multiple jobs) Worker receives
@@ -33,28 +33,28 @@ public class WorkerRecord {
 	/**
 	 * recent average running time
 	 */
-	public double avg = 0;
+	public double avgTime = 0;
 	
 	/**
 	 * accumulate average running times over time
 	 */
-	public RingBuffer<Double> avgHist = new RingBuffer<>(BUFFER_SIZE);
+	public RingBuffer<Double> avgTimeHist = new RingBuffer<>(BUFFER_SIZE);
 	
 	/**
 	 * recent average running time of each job
-	 * jobAvg = avg / jobNum
+	 * jobAvg = avgTime / jobNum
 	 */
-	public double jobAvg = 0;
+	public double jobAvgTime = 0;
 	
 	/**
-	 * recent distribution percentage (value from 0 -> 1)
+	 * recent distribution rate (value from 0 -> 1)
 	 */
-	public double perc = 0;
+	public double distRate = 0;
 	
 	/**
 	 * accumulate history of distribution percentages over time
 	 */
-	public RingBuffer<Double> percHist = new RingBuffer<>(BUFFER_SIZE);
+	public RingBuffer<Double> distRateHist = new RingBuffer<>(BUFFER_SIZE);
 	
 	/**
 	 * average number of jobs that Worker recently received
