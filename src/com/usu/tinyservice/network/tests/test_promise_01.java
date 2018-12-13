@@ -13,18 +13,27 @@ public class test_promise_01 extends Thread {
 		  = new DeferredObject<>();
 		Promise<String, String, String> promise = deferred.promise();
 		 
-		promise.done(result -> {
-			System.out.println("Job done1: " + result);
-			System.out.println("Job done2: " + result);
+		promise.then(msg -> {
+			System.out.println("Job started: " + msg + ", " + getName());
+			  try {
+				  Thread.sleep(3000);
+			  } catch(Exception e) { }
 		})
-		  .fail(rejection -> System.out.println("Job fail: " + rejection))
-		  .progress(progress -> System.out.println("Job is in progress: " + progress))
+		 .done(msg -> {
+			System.out.println("Job done: " + msg + ", " + getName());
+		}).fail(rejection -> System.out.println("Job fail: " + rejection))
+		  .progress(progress -> {
+			  System.out.println("Job is in progress: " + progress);			  
+		  })
 		  .always((state, result, rejection) -> 
-		    System.out.println("Job execution started: " + state + ", " + result + ", " + rejection));
+		    System.out.println("Job execution started: " + state + 
+		    		", " + result + ", " + rejection + "," + getName()));
 		
-		deferred.notify("notice");
+		// deferred.notify("notice");
 		deferred.resolve("msg");
 		// deferred.reject("oops");
+		
+		System.out.println("Current thread: " + this.getName());
 	}
 	
 	
