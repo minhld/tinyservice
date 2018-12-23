@@ -83,8 +83,10 @@ public class WorkerScheduler {
 		WorkerRecord workerRecord = workerRecords.get(workerId);
 		
 		if (this.isNewWorkerJoined) {
+			// if the new worker joins, rate will be based on capacity
 			return workerRecord.capacity / totalCapacity;
 		} else {
+			// if no worker joins, rate will base on average times
 			return (1 / workerRecord.jobAvgTime) / totalJobAvgTime; 
 		}
 	}
