@@ -1,10 +1,7 @@
 package com.usu.tinyservice.network.tests;
 
 import com.usu.tinyservice.messages.binary.ResponseMessage;
-import com.usu.tinyservice.network.Bridge;
-import com.usu.tinyservice.network.Broker;
-import com.usu.tinyservice.network.NetUtils;
-import com.usu.tinyservice.network.ReceiveListener;
+import com.usu.tinyservice.network.*;
 
 /**
  * REMOTE SERVICE TEST SUITE - REMOTE SERVICE CLIENT
@@ -22,12 +19,12 @@ public class test_mbroker_vdm_1 extends Thread {
 		// listen to client 3334 and worker 3333
 		// start a remote worker
 		String remoteBrokerIp = "192.168.0.100";
-		new Broker(remoteBrokerIp, 3334, 3333);
+		new MBroker(remoteBrokerIp, 3334, 3333);
 		new MobileServiceDemoWorker(remoteBrokerIp, 3333);
 		
 		// start a local broker
 		// listen to client 6668 and worker 6666
-		new Broker();
+		new MBroker();
 
 		NetUtils.sleep(1000);
 		

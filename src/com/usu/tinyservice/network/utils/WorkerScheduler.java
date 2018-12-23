@@ -76,8 +76,8 @@ public class WorkerScheduler {
 	 * get distribution rate of each worker
 	 * 
 	 * @param workerId
-	 * @param isNewWorkerJoined
-	 * @return
+	 *
+	 * @return distribution rate of each worker
 	 */
 	public double getDistributionRate(String workerId) {
 		WorkerRecord workerRecord = workerRecords.get(workerId);
@@ -93,7 +93,7 @@ public class WorkerScheduler {
 	
 	/**
 	 * this function estimate worker function
-	 * @param new worker's ID
+	 * @param worker Id
 	 */
 	void estimateWorkerPerformance(String workerId) {
 		if (workerId != null) {

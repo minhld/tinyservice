@@ -1,5 +1,6 @@
 package com.usu.tinyservice.network;
 
+import com.usu.tinyservice.messages.binary.InParam;
 import org.zeromq.ZMQ;
 
 import com.usu.tinyservice.messages.binary.RequestMessage;
@@ -69,14 +70,14 @@ public class MBroker extends Thread {
     }
     
     public void run() {
-        // this switch
-        initRouterMode();
-        
         // create data parser
         dataParser = new WordDataParser();
-        
+
         // create a performance window
         scheduler = new WorkerScheduler();
+
+        // switch to router mode
+        initRouterMode();
     }
 
     /**
@@ -146,7 +147,7 @@ public class MBroker extends Thread {
                 	RegInfo regInfo = NetUtils.getRegInfo(workerInfo);
                 	addToFunctionMap(regInfo.functions);
                 	
-                	NetUtils.printX("[Broker-" + brokerId + "] Adding New Worker [" + workerId + "]");
+                	// NetUtils.printX("[Broker-" + brokerId + "] Adding New Worker [" + workerId + "]");
                 	NetUtils.printX("[Broker-" + brokerId + "] Added From Worker [" + workerId + "] " + services());
                 	
                 	// skip the last frame
@@ -262,7 +263,7 @@ public class MBroker extends Thread {
                     
                     NetUtils.printX("[Broker-" + brokerId + "] Denied Client [" + clientId + "] - Function Not Found.");
                 } else if (infoId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
-                	// REQUEST BROKER'S SERVICE LIST
+                	// REQUEST FOR BROKER'S SERVICE LIST
                 	
                 	String serviceList = services();
                 	byte[] serviceListBytes = NetUtils.createMessage(serviceList);
@@ -351,7 +352,8 @@ public class MBroker extends Thread {
     private byte[] divideRequest(String sessionId, RequestMessage reqMsg, String workerId) {
     	// we believe a function to split always have 2 parameters
     	// the first is for data and the second is for data parser
-    	byte[] packageData = (byte[]) reqMsg.inParams[0].values[0];
+    	// byte[] packageData = (byte[]) reqMsg.inParams[0].values[0];
+    	byte[] packageData = getInParamByteValue(reqMsg.inParams[0]);
     	
     	// get the average worker value
     	double avgWorkerValue = scheduler.getDistributionRate(workerId);
@@ -402,4 +404,12 @@ public class MBroker extends Thread {
     	return func.getWorkerInfos();
     }
 
+    private byte[] getInParamByteValue(InParam inParam) {
+        switch (inParam.type) {
+            case "java.lang.String": {
+                return ((java.lang.String) inParam.values[0]).getBytes();
+            }
+        }
+        return new byte[0];
+    }
 }
