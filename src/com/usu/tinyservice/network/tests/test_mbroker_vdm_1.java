@@ -25,6 +25,7 @@ public class test_mbroker_vdm_1 extends Thread {
 		// start a local broker
 		// listen to client 6668 and worker 6666
 		new MBroker();
+        new MobileServiceDemoWorker(remoteBrokerIp, 6666);
 
 		NetUtils.sleep(1000);
 		

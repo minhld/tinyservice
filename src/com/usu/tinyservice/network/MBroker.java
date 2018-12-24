@@ -371,8 +371,8 @@ public class MBroker extends Thread {
     }
     
     /**
-     * add a function list to the map
-     * 
+     * add a function list to the map, also add the new worker to the list
+     *
      * @param funcList
      */
     private void addToFunctionMap(Function[] funcList) {
@@ -390,6 +390,11 @@ public class MBroker extends Thread {
     		
     		// update the worker list
     		functionMap.put(funcList[i].functionName, existFunction);
+
+    		// update worker info list
+    		for (WorkerInfo workerInfo : funcList[i].workerInfos) {
+                scheduler.updateWorkerRecord(workerInfo.workerId, workerInfo);
+            }
     	}
     }
     

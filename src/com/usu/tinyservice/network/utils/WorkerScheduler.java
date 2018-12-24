@@ -21,27 +21,53 @@ public class WorkerScheduler {
 	double totalCapacity = 0d;
 	double totalJobAvgTime = 0d;
 	
-	boolean isNewWorkerJoined = false;
+	public static boolean isNewWorkerJoined = false;
 	
 	public WorkerScheduler() {
 		workerRecords = new HashMap<>();
 	}
-	
+
 	/**
-	 * to update worker records, will add new record if it does not 
+	 * this is called when broker has finished one session
+	 * all the flags will be reset
+	 *
+	 * @param sessionId
+	 */
+	public void finalizeSession(String sessionId) {
+		// reset the flag
+		WorkerScheduler.isNewWorkerJoined = false;
+	}
+
+	/**
+	 * to update worker records, will add new record if it does not
 	 * exist in the scheduler before
-	 * 
+	 *
 	 * @param workerId
+	 * @param wInfo
+	 */
+	public void updateWorkerRecord(String workerId, WorkerInfo wInfo) {
+		WorkerRecord wRec = mapWorkerInfoToRecord(wInfo);
+		updateWorkerRecord(workerId, wRec);
+	}
+
+	/**
+	 * to update worker records, will add new record if it does not
+	 * exist in the scheduler before
+	 *
+	 * @param workerId
+	 * @param wRec
 	 */
 	public void updateWorkerRecord(String workerId, WorkerRecord wRec) {
 		// retrieve the existing worker record
 		WorkerRecord existWorkerRec = workerRecords.get(workerId);
-		
-		isNewWorkerJoined = (existWorkerRec == null);
-		
-		if (existWorkerRec == null) {
+
+		if (existWorkerRec == null || existWorkerRec.steps == 0) {
+			wRec.capacity = wRec.strength / wRec.hops;
 			workerRecords.put(workerId, wRec);
-			
+
+			// setup flag
+			isNewWorkerJoined = true;
+
 			// re-estimate the total capacity
 			estimateWorkerPerformance(workerId);
 			
@@ -63,7 +89,8 @@ public class WorkerScheduler {
 			existWorkerRec.distRateHist.add(wRec.distRate);
 			existWorkerRec.jobNum = ((existWorkerRec.jobNum * existWorkerRec.steps) + wRec.jobNum) / (existWorkerRec.steps + 1);
 			existWorkerRec.jobNumHist.add(wRec.jobNum);
-			existWorkerRec.jobAvgTime = existWorkerRec.avgTime / existWorkerRec.jobNum;
+			existWorkerRec.jobAvgTime = existWorkerRec.jobNum != 0 ?
+						existWorkerRec.avgTime / existWorkerRec.jobNum : 0;
 			existWorkerRec.steps++;
 			
 			// re-estimate the total job average time
@@ -90,10 +117,18 @@ public class WorkerScheduler {
 			return (1 / workerRecord.jobAvgTime) / totalJobAvgTime; 
 		}
 	}
-	
+
+	WorkerRecord mapWorkerInfoToRecord(WorkerInfo wInfo) {
+		WorkerRecord wRec = new WorkerRecord();
+		wRec.workerId = wInfo.workerId;
+		wRec.strength = wInfo.strength;
+		wRec.hops = wInfo.hops;
+		return wRec;
+	}
+
 	/**
 	 * this function estimate worker function
-	 * @param worker Id
+	 * @param workerId
 	 */
 	void estimateWorkerPerformance(String workerId) {
 		if (workerId != null) {
