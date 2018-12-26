@@ -7,7 +7,6 @@ import com.usu.tinyservice.messages.binary.RequestMessage;
 import com.usu.tinyservice.network.parsers.IDataParser;
 import com.usu.tinyservice.network.parsers.WordDataParser;
 import com.usu.tinyservice.network.utils.Function;
-import com.usu.tinyservice.network.utils.PerformanceWindow;
 import com.usu.tinyservice.network.utils.RegInfo;
 import com.usu.tinyservice.network.utils.WorkerInfo;
 import com.usu.tinyservice.network.utils.WorkerScheduler;
@@ -288,39 +287,57 @@ public class MBroker extends Thread {
                     // get the time of receiving message
                     startForwardTime = System.currentTimeMillis();
 
-                	// extract to get the request message object
+                    // update the ID chain with the new client ID
+                    idChain = NetUtils.concatIds(idChain, clientId);
+
+                    // extract to get the request message object
                 	RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(request);
 
-                    // start a new session
-                    String sessionId = scheduler.startSession();
-                    String workerId;
-                    for (WorkerInfo workerInfo : workers) {
-                    	String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
-                    	workerId = workerIds[0];
-                    
-	                	// update the ID chain with the new client ID 
-	                	idChain = NetUtils.concatIds(idChain, clientId);                	
-	                	
-		                // send the requests to all the nearby workers for DRL values. After receiving
-		                // all DRL values, it will consider DRLs and divide job into tasks with
-		                // proportional data amounts to the DRL values.
-		                backend.sendMore(workerId);
-		                backend.sendMore(NetUtils.DELIMITER);
-		                backend.sendMore(idChain);
-		                backend.sendMore(NetUtils.DELIMITER);
-		                backend.sendMore(funcName);
-		                backend.sendMore(NetUtils.DELIMITER);
-		                
-		                // get divided job (sub-task) message
-		                byte[] dividedRequest = divideRequest(sessionId, reqMsg, workerId);
-		                
-		                // forward to the corresponding Worker
-		                backend.send(dividedRequest);
-	
-		                durForwardTime = System.currentTimeMillis() - startForwardTime;
-	
-		                NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
+                	if (reqMsg.requestType == RequestMessage.RequestType.ORIGINAL) {
+                        // start a new session
+                        String sessionId = scheduler.startSession();
+                        String workerId;
+                        for (WorkerInfo workerInfo : workers) {
+                            String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
+                            workerId = workerIds[0];
+
+                            // send the requests to all the nearby workers for DRL values. After receiving
+                            // all DRL values, it will consider DRLs and divide job into tasks with
+                            // proportional data amounts to the DRL values.
+                            backend.sendMore(workerId);
+                            backend.sendMore(NetUtils.DELIMITER);
+                            backend.sendMore(idChain);
+                            backend.sendMore(NetUtils.DELIMITER);
+                            backend.sendMore(funcName);
+                            backend.sendMore(NetUtils.DELIMITER);
+
+                            // get divided job (sub-task) message
+                            byte[] dividedRequest = divideRequest(sessionId, reqMsg, workerId);
+
+                            // forward to the corresponding Worker
+                            backend.send(dividedRequest);
+
+                            NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
+                        }
+                        durForwardTime = System.currentTimeMillis() - startForwardTime;
+
+                    } else if (reqMsg.requestType == RequestMessage.RequestType.FORWARDING) {
+                        // just simply forward the message to new worker
+
+                        String workerId = infoId;
+
+                        backend.sendMore(workerId);
+                        backend.sendMore(NetUtils.DELIMITER);
+                        backend.sendMore(idChain);
+                        backend.sendMore(NetUtils.DELIMITER);
+                        backend.sendMore(funcName);
+                        backend.sendMore(NetUtils.DELIMITER);
+                        backend.send(request);
+
+                        durForwardTime = System.currentTimeMillis() - startForwardTime;
+                        NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
                     }
+
                 }
             }
 

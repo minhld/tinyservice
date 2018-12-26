@@ -2,9 +2,16 @@ package com.usu.tinyservice.messages.binary;
 
 public class RequestMessage extends Message {
 	private static final long serialVersionUID = 1L;
-	
+
+	public enum RequestType {
+		ORIGINAL,
+		FORWARDING
+	}
+
+	public RequestType requestType = RequestType.ORIGINAL;
+
 	public InParam[] inParams = new InParam[0];
-	
+
 	public RequestMessage() { 
 		super();
 	}
