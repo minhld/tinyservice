@@ -190,6 +190,10 @@ public class MBroker extends Thread {
                     // get LAST FRAME - main result from worker
                     reply = backend.recv();
 
+
+                    // report that session is over
+                    scheduler.endSession();
+
                     // return the result from worker 
                     frontend.sendMore(clientId);
                     frontend.sendMore(NetUtils.DELIMITER);
@@ -286,9 +290,10 @@ public class MBroker extends Thread {
 
                 	// extract to get the request message object
                 	RequestMessage reqMsg = (RequestMessage) NetUtils.deserialize(request);
-                	                    
+
+                    // start a new session
+                    String sessionId = scheduler.startSession();
                     String workerId;
-                    String sessionId = PerformanceWindow.createSessionId();
                     for (WorkerInfo workerInfo : workers) {
                     	String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
                     	workerId = workerIds[0];

@@ -1,6 +1,7 @@
 package com.usu.tinyservice.network.utils;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * this class keeps track of worker performance and 
@@ -25,17 +26,6 @@ public class WorkerScheduler {
 	
 	public WorkerScheduler() {
 		workerRecords = new HashMap<>();
-	}
-
-	/**
-	 * this is called when broker has finished one session
-	 * all the flags will be reset
-	 *
-	 * @param sessionId
-	 */
-	public void finalizeSession(String sessionId) {
-		// reset the flag
-		WorkerScheduler.isNewWorkerJoined = false;
 	}
 
 	/**
@@ -65,8 +55,8 @@ public class WorkerScheduler {
 			wRec.capacity = wRec.strength / wRec.hops;
 			workerRecords.put(workerId, wRec);
 
-			// setup flag
-			isNewWorkerJoined = true;
+			// set the new worker flag
+			WorkerScheduler.isNewWorkerJoined = true;
 
 			// re-estimate the total capacity
 			estimateWorkerPerformance(workerId);
@@ -97,6 +87,23 @@ public class WorkerScheduler {
 			estimateWorkerPerformance(null);
 			
 		}
+	}
+
+	/**
+	 * start a new session
+	 *
+	 * @return
+	 */
+	public String startSession() {
+		return UUID.randomUUID().toString();
+	}
+
+	/**
+	 * call when session is over
+	 */
+	public void endSession() {
+		// reset the new worker flag
+		WorkerScheduler.isNewWorkerJoined = false;
 	}
 
 	/**
