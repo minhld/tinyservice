@@ -19,12 +19,12 @@ public class test_mbroker_vdm_1 extends Thread {
 		// listen to client 3334 and worker 3333
 		// start a remote worker
 		String remoteBrokerIp = "192.168.0.103";
-		new MBroker(remoteBrokerIp, 3334, 3333);
+		new MBrokerX(remoteBrokerIp, 3334, 3333);
 		new MobileServiceDemoWorker(remoteBrokerIp, 3333);
 		
 		// start a local broker
 		// listen to client 6668 and worker 6666
-		new MBroker();
+		new MBrokerX();
         new MobileServiceDemoWorker(remoteBrokerIp, 6666);
 
 		NetUtils.sleep(1000);

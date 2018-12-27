@@ -296,10 +296,10 @@ public class MBroker extends Thread {
                 	if (reqMsg.requestType == RequestMessage.RequestType.ORIGINAL) {
                         // start a new session
                         String sessionId = scheduler.startSession();
-                        String workerId;
+
                         for (WorkerInfo workerInfo : workers) {
                             String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
-                            workerId = workerIds[0];
+                            String workerId = workerIds[0];
 
                             // send the requests to all the nearby workers for DRL values. After receiving
                             // all DRL values, it will consider DRLs and divide job into tasks with
