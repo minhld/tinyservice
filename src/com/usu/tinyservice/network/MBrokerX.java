@@ -296,42 +296,22 @@ public class MBrokerX extends Thread {
                         // start a new session
                         String sessionId = scheduler.startSession();
 
+                        int jobNumber = 10;
                         for (WorkerInfo workerInfo : workers) {
                             String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
                             String workerId = workerIds[0];
 
-                            // send the requests to all the nearby workers for DRL values. After receiving
-                            // all DRL values, it will consider DRLs and divide job into tasks with
-                            // proportional data amounts to the DRL values.
-                            backend.sendMore(workerId);
-                            backend.sendMore(NetUtils.DELIMITER);
-                            backend.sendMore(idChain);
-                            backend.sendMore(NetUtils.DELIMITER);
-                            backend.sendMore(funcName);
-                            backend.sendMore(NetUtils.DELIMITER);
-
                             // get divided job (sub-task) message
-                            byte[] dividedRequest = divideRequest(sessionId, reqMsg, workerId);
-
-                            // forward to the corresponding Worker
-                            backend.send(dividedRequest);
+                            divideRequest(sessionId, reqMsg, jobNumber, backend, workerId, idChain);
 
                             NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
                         }
                         durForwardTime = System.currentTimeMillis() - startForwardTime;
 
                     } else if (reqMsg.requestType == RequestMessage.RequestType.FORWARDING) {
-                        // just simply forward the message to new worker
-
+                        // just send a single request to worker
                         String workerId = infoId;
-
-                        backend.sendMore(workerId);
-                        backend.sendMore(NetUtils.DELIMITER);
-                        backend.sendMore(idChain);
-                        backend.sendMore(NetUtils.DELIMITER);
-                        backend.sendMore(funcName);
-                        backend.sendMore(NetUtils.DELIMITER);
-                        backend.send(request);
+                        sendToPeer(backend, workerId, idChain, funcName, request);
 
                         durForwardTime = System.currentTimeMillis() - startForwardTime;
                         NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
@@ -356,6 +336,48 @@ public class MBrokerX extends Thread {
     public String services() {
     	Function[] funcList = functionMap.values().toArray(new Function[] {});
     	return NetUtils.createForwardMessage(brokerId, funcList);
+    }
+
+    void sendToPeer(ZMQ.Socket peer, String workerId, String idChain,
+                        String funcName, byte[] request) {
+        peer.sendMore(workerId);
+        peer.sendMore(NetUtils.DELIMITER);
+        peer.sendMore(idChain);
+        peer.sendMore(NetUtils.DELIMITER);
+        peer.sendMore(funcName);
+        peer.sendMore(NetUtils.DELIMITER);
+        peer.send(request);
+    }
+
+    private void divideRequest(String sessionId, RequestMessage reqMsg, int jobTotal,
+                               ZMQ.Socket peer, String workerId, String idChain) {
+        // we believe a function to split always have 2 parameters
+        // the first is for data and the second is for data parser
+        // byte[] packageData = (byte[]) reqMsg.inParams[0].values[0];
+        byte[] packageData = getInParamByteValue(reqMsg.inParams[0]);
+
+        // get the average worker value
+        double avgWorkerValue = scheduler.getDistributionRate(workerId);
+        int jobActualNumber = (int) Math.floor(jobTotal * avgWorkerValue);
+
+        // send all the sub tasks to the worker
+        for (int i = 0; i < jobActualNumber; i++) {
+            int firstOffset = 0, lastOffset = 0;
+
+            // use data parser to divide the task
+            byte[] dividedPkgData = dataParser.getPartFromObject(packageData, firstOffset, lastOffset);
+
+            // create a sub task - called job
+            RequestMessage jobReqMsg = reqMsg.cloneMessage();
+            jobReqMsg.requestType = RequestMessage.RequestType.FORWARDING;
+            jobReqMsg.inParams[0].values[0] = dividedPkgData;
+
+            byte[] taskMsgBytes = NetUtils.serialize(jobReqMsg);
+
+            // send to peer
+            sendToPeer(peer, workerId, idChain, reqMsg.functionName, taskMsgBytes);
+        }
+
     }
 
     /**
