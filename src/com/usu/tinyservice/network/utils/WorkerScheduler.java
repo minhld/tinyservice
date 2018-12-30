@@ -118,10 +118,10 @@ public class WorkerScheduler {
 		
 		if (this.isNewWorkerJoined) {
 			// if the new worker joins, rate will be based on capacity
-			return workerRecord.capacity / totalCapacity;
+			return workerRecord.capacity / this.totalCapacity;
 		} else {
 			// if no worker joins, rate will base on average times
-			return (1 / workerRecord.jobAvgTime) / totalJobAvgTime; 
+			return (1 / workerRecord.jobAvgTime) / this.totalJobAvgTime;
 		}
 	}
 
@@ -139,14 +139,16 @@ public class WorkerScheduler {
 	 */
 	void estimateWorkerPerformance(String workerId) {
 		if (workerId != null) {
-			// when there is a new worker joining 
+			// when there is a new worker joining
+			this.totalCapacity = 0;
 			for (WorkerRecord rec : workerRecords.values()) {
-				totalCapacity += rec.capacity;
+				this.totalCapacity += rec.capacity;
 			}
 		} else {
 			// when there is no new worker joining
+			this.totalJobAvgTime = 0;
 			for (WorkerRecord rec : workerRecords.values()) {
-				totalJobAvgTime += 1 / rec.jobAvgTime;
+				this.totalJobAvgTime += 1 / rec.jobAvgTime;
 			}
 		}
 	}

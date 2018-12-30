@@ -27,6 +27,8 @@ public abstract class Worker extends Thread {
     
     public String workerId = "";
 
+    private double strength = Math.random() * 2;
+
     public Worker() {
         this.start();
     }
@@ -148,24 +150,7 @@ public abstract class Worker extends Thread {
         worker.sendMore(NetUtils.DELIMITER);
         worker.send(NetUtils.EMPTY);
     }
-    
-//    /**
-//     * forwards the result back to the broker. A response includes: <br/>
-//     * 	- worker ID<br/>
-//     * 	- ID chain<br/>
-//     * 	- response
-//     * 
-//     * @param idChain format {ID1}/{ID2}/... {@link Client}
-//     * @param data String format
-//     */
-//    public void send(String idChain, String funcName, String data) {
-//    	worker.sendMore(idChain);
-//        worker.sendMore(NetUtils.DELIMITER);
-//        worker.sendMore(funcName);
-//        worker.sendMore(NetUtils.DELIMITER);
-//        worker.send(data);
-//    }
-    
+
     /**
      * forwards the result back to the broker. A response includes: <br/>
      * 	- worker ID<br/>
@@ -250,8 +235,8 @@ public abstract class Worker extends Thread {
      * 
      * @return a float number (0 -> 2) describing device's strength
      */
-    public float strength() {
-    	return (float) (Math.random() * 2);
+    public double strength() {
+    	return strength;
     }
     
     /**
