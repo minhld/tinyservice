@@ -45,4 +45,11 @@ public class MobileServiceDemo {
 		}
 		return res;
 	}
+
+	@ServiceMethod(
+			syncMode = SyncMode.Async)
+	public byte[] sendData(byte[] data) {
+		String resp = "I received bytes: " + data.length;
+		return resp.getBytes();
+	}
 }

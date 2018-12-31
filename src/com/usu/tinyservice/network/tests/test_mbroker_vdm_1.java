@@ -2,6 +2,7 @@ package com.usu.tinyservice.network.tests;
 
 import com.usu.tinyservice.messages.binary.ResponseMessage;
 import com.usu.tinyservice.network.*;
+import com.usu.tinyservice.network.parsers.ByteDataParser;
 
 /**
  * REMOTE SERVICE TEST SUITE - REMOTE SERVICE CLIENT
@@ -63,22 +64,11 @@ public class test_mbroker_vdm_1 extends Thread {
 		});
 		
 		NetUtils.sleep(500);
-		
-		// prepare data
-		com.usu.tinyservice.network.tests.Data1 data1 = new com.usu.tinyservice.network.tests.Data1(); 
-		data1.data11 = new int[] { 1, 2, 3 };
-		data1.data12 = new String[] { "abc", "def" };
-		data1.data13 = "hello from client".getBytes();
-		
 
-		// client.getFileList1("D:\\", new Data1[] { data1 }, true);
-		// client.getFileList2("D:\\");
-		// client.getFileList1("D:\\", new Data1[] { data1 }, true);
-		client.getFileList2("/");
+		ByteDataParser dataParser = new ByteDataParser();
+		byte[] data = (byte[]) dataParser.loadObject("1");
+		client.sendData(data);
 		
-		// new MobileServiceDemoWorker();
-
-		// new MobileServiceDemoWorker3(remoteBrokerIp);
 	}
 	
 	public static void main(String[] args) {

@@ -2,6 +2,7 @@ package com.usu.tinyservice.network;
 
 import com.usu.tinyservice.messages.binary.InParam;
 import com.usu.tinyservice.messages.binary.RequestMessage;
+import com.usu.tinyservice.network.parsers.ByteDataParser;
 import com.usu.tinyservice.network.parsers.IDataParser;
 import com.usu.tinyservice.network.parsers.WordDataParser;
 import com.usu.tinyservice.network.utils.Function;
@@ -69,7 +70,7 @@ public class MBrokerX extends Thread {
 
     public void run() {
         // create data parser
-        dataParser = new WordDataParser();
+        dataParser = new ByteDataParser();
 
         // create a performance window
         scheduler = new WorkerScheduler();
@@ -296,13 +297,15 @@ public class MBrokerX extends Thread {
                         // start a new session
                         String sessionId = scheduler.startSession();
 
-                        int jobNumber = 10;
+                        int taskNumber = 10;
+                        int taskIndex = 0;
                         for (WorkerInfo workerInfo : workers) {
                             String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
                             String workerId = workerIds[0];
 
                             // get divided job (sub-task) message
-                            divideRequest(sessionId, reqMsg, jobNumber, backend, workerId, idChain);
+                            taskIndex = divideRequest(sessionId, reqMsg, taskNumber, backend,
+                                                    workerId, idChain, taskIndex);
 
                             NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
                         }
@@ -349,8 +352,8 @@ public class MBrokerX extends Thread {
         peer.send(request);
     }
 
-    private void divideRequest(String sessionId, RequestMessage reqMsg, int jobTotal,
-                               ZMQ.Socket peer, String workerId, String idChain) {
+    int divideRequest(String sessionId, RequestMessage reqMsg, int taskNumber,
+                      ZMQ.Socket peer, String workerId, String idChain, int taskIndex) {
         // we believe a function to split always have 2 parameters
         // the first is for data and the second is for data parser
         // byte[] packageData = (byte[]) reqMsg.inParams[0].values[0];
@@ -358,17 +361,17 @@ public class MBrokerX extends Thread {
 
         // get the average worker value
         double avgWorkerValue = scheduler.getDistributionRate(workerId);
-        int jobActualNumber = (int) Math.floor(jobTotal * avgWorkerValue);
+        int jobActualNumber = (int) Math.floor(taskNumber * avgWorkerValue);
 
         // send all the sub tasks to the worker
         for (int i = 0; i < jobActualNumber; i++) {
-            int firstOffset = 0, lastOffset = 0;
-
             // use data parser to divide the task
-            byte[] dividedPkgData = dataParser.getPartFromObject(packageData, firstOffset, lastOffset);
+            byte[] dividedPkgData = dataParser.getPartFromObject(packageData, taskIndex, taskNumber);
+            taskIndex++;
 
             // create a sub task - called job
             RequestMessage jobReqMsg = reqMsg.cloneMessage();
+            jobReqMsg.sessionId = sessionId;
             jobReqMsg.requestType = RequestMessage.RequestType.FORWARDING;
             jobReqMsg.inParams[0].values[0] = dividedPkgData;
 
@@ -378,6 +381,7 @@ public class MBrokerX extends Thread {
             sendToPeer(peer, workerId, idChain, reqMsg.functionName, taskMsgBytes);
         }
 
+        return taskIndex;
     }
 
     /**

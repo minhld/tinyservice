@@ -92,6 +92,23 @@ public class MobileServiceDemoWorker {
         respBytes = NetUtils.serialize(respMsg);
         break;
       }
+      case "sendData": {
+        // for variable "data"
+        byte[][] datas = new byte[reqMsg.inParams[0].values.length][];
+        for (int i = 0; i < reqMsg.inParams[0].values.length; i++) {
+          datas[i] = (byte[]) reqMsg.inParams[0].values[i];
+        }
+        byte[] data = datas[0];
+
+        // start calling function "getFileList2"
+        byte[] rets = mobileservicedemo.sendData(data);
+        String retType = "byte[]";
+        ResponseMessage respMsg = new ResponseMessage(reqMsg.messageId, reqMsg.functionName, retType, new Object[] { rets });
+
+        // convert to binary array
+        respBytes = NetUtils.serialize(respMsg);
+        break;
+      }
       }
 
       return respBytes;

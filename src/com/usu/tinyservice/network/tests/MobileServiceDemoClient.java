@@ -57,6 +57,20 @@ public class MobileServiceDemoClient {
     client.send(functionName, reqBytes);
   }
 
+  public void sendData(byte[] data) {
+    // compose input parameters
+    String functionName = "sendData";
+    String outType = "byte[]";
+    RequestMessage reqMsg = new RequestMessage(functionName, outType);
+
+    // create request message and send
+    reqMsg.inParams = new InParam[1];
+    reqMsg.inParams[0] = new InParam("data", "byte[]", data);
+
+    // create a binary message
+    byte[] reqBytes = NetUtils.serialize(reqMsg);
+    client.send(functionName, reqBytes);
+  }
 
   class RmiClient extends Client {
     public RmiClient() {
