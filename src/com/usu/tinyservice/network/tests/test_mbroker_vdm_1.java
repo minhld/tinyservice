@@ -59,6 +59,9 @@ public class test_mbroker_vdm_1 extends Thread {
 					for (int i = 0; i < files.length; i++) {
 						NetUtils.print("\t File: " + files[i]);
 					}
+				} else if (resp.functionName.equals("sendData")) {
+					byte[] respStr = (byte[]) resp.outParam.values[0];
+					NetUtils.print("[Client] Received: " + new String(respStr));
 				}
 			}
 		});
