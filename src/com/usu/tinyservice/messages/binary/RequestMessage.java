@@ -1,6 +1,6 @@
 package com.usu.tinyservice.messages.binary;
 
-public class RequestMessage extends Message {
+public class RequestMessage extends Message implements Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	public enum RequestType {

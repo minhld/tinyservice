@@ -146,7 +146,19 @@ public class MobileServiceDemoWorker {
 	              "\"hops\" : 1" +
 	            "}" +
 	          "]" +
-            "}" +
+            "}," +
+            "{" +
+            "\"functionName\" : \"sendData\"," +
+            "\"inParams\" : [\"byte[]\"]," +
+            "\"outParam\" : \"byte[]\"," +
+            "\"workerInfos\" : [" +
+          	"{" +
+	              "\"workerId\" : \"" + workerId + "\"," +
+	              "\"strength\" : " + strength() + "," +
+	              "\"hops\" : 1" +
+	            "}" +
+	          "]" +
+            "}" +  
           "]" +
         "}";
       return json;

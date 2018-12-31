@@ -111,6 +111,7 @@ public class Bridge extends Thread {
 					List<WorkerInfo> workers = func.workerInfos;
 					for (WorkerInfo wi : workers) {
 						wi.workerId += "/" + mWorker.workerId;
+						wi.hops++;
 					}
 				}
 				

@@ -116,7 +116,7 @@ public class WorkerScheduler {
 	public double getDistributionRate(String workerId) {
 		WorkerRecord workerRecord = workerRecords.get(workerId);
 		
-		if (this.isNewWorkerJoined) {
+		if (WorkerScheduler.isNewWorkerJoined) {
 			// if the new worker joins, rate will be based on capacity
 			return workerRecord.capacity / this.totalCapacity;
 		} else {
