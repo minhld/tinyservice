@@ -4,7 +4,6 @@ import com.usu.tinyservice.messages.binary.InParam;
 import com.usu.tinyservice.messages.binary.RequestMessage;
 import com.usu.tinyservice.network.parsers.ByteDataParser;
 import com.usu.tinyservice.network.parsers.IDataParser;
-import com.usu.tinyservice.network.parsers.WordDataParser;
 import com.usu.tinyservice.network.utils.Function;
 import com.usu.tinyservice.network.utils.RegInfo;
 import com.usu.tinyservice.network.utils.WorkerInfo;
@@ -204,7 +203,7 @@ public class MBrokerX extends Thread {
 
                     durForwardTime += System.currentTimeMillis() - startForwardTime;
 
-                    NetUtils.printX("[Broker-" + brokerId + "] Forward To Client [" + clientId + "] (" + durForwardTime + "ms)");
+                    NetUtils.printX("[Broker-" + brokerId + "] Forward From Worker [" + workerId + "] To Client [" + clientId + "] (" + durForwardTime + "ms)");
                 }
             }
 
@@ -307,7 +306,7 @@ public class MBrokerX extends Thread {
                             taskIndex = divideRequest(sessionId, reqMsg, taskNumber, backend,
                             		workerInfo.workerId, fwdWorkerId, idChain, taskIndex);
 
-                            NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + fwdWorkerId + "] task #" + taskIndex);
+                            NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + fwdWorkerId + "]");
                         }
                         durForwardTime = System.currentTimeMillis() - startForwardTime;
 
@@ -371,7 +370,7 @@ public class MBrokerX extends Thread {
             taskIndex++;
 
             // create a sub task - called job
-            RequestMessage jobReqMsg = reqMsg.cloneMessage();
+            RequestMessage jobReqMsg = reqMsg.clone();
             jobReqMsg.sessionId = sessionId;
             jobReqMsg.requestType = RequestMessage.RequestType.FORWARDING;
             jobReqMsg.inParams[0].values[0] = dividedPkgData;
@@ -380,6 +379,8 @@ public class MBrokerX extends Thread {
 
             // send to peer
             sendToPeer(peer, fwdWorkerId, idChain, reqMsg.functionName, taskMsgBytes);
+            
+            NetUtils.printX("[Broker-" + brokerId + "] Forward Task #" + i + " To Worker [" + workerIdChain + "]");
         }
 
         return taskIndex;
@@ -413,7 +414,7 @@ public class MBrokerX extends Thread {
     	byte[] dividedPkgData = dataParser.getPartFromObject(packageData, firstOffset, lastOffset);
 
     	// create a sub task - called job
-    	RequestMessage jobReqMsg = reqMsg.cloneMessage();
+    	RequestMessage jobReqMsg = reqMsg.clone();
     	jobReqMsg.inParams[0].values[0] = dividedPkgData;
 
     	return NetUtils.serialize(jobReqMsg);

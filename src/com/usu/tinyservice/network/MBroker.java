@@ -378,7 +378,7 @@ public class MBroker extends Thread {
     	byte[] packageData = getInParamByteValue(reqMsg.inParams[0]);
     	
     	// get the average worker value
-    	double avgWorkerValue = scheduler.getDistributionRate(workerId);
+    	// double avgWorkerValue = scheduler.getDistributionRate(workerId);
     	
     	int firstOffset = 0, lastOffset = 0;
     	
@@ -386,7 +386,7 @@ public class MBroker extends Thread {
     	byte[] dividedPkgData = dataParser.getPartFromObject(packageData, firstOffset, lastOffset);
     	
     	// create a sub task - called job
-    	RequestMessage jobReqMsg = reqMsg.cloneMessage();
+    	RequestMessage jobReqMsg = reqMsg.clone();
     	jobReqMsg.inParams[0].values[0] = dividedPkgData;
     	
     	return NetUtils.serialize(jobReqMsg);
