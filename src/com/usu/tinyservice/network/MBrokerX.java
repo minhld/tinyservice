@@ -380,7 +380,7 @@ public class MBrokerX extends Thread {
             // send to peer
             sendToPeer(peer, fwdWorkerId, idChain, reqMsg.functionName, taskMsgBytes);
             
-            NetUtils.printX("[Broker-" + brokerId + "] Forward Task #" + i + " To Worker [" + workerIdChain + "]");
+            NetUtils.printX("[Broker-" + brokerId + "] Forward Task #" + i + " To Worker [" + fwdWorkerId + "]");
         }
 
         return taskIndex;
