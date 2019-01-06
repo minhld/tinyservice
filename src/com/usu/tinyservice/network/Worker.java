@@ -77,8 +77,9 @@ public abstract class Worker extends Thread {
             // to report worker has finished the initialization
             // workerStarted(this.workerId);
             workerPrefix = (this.workMode == WorkMode.FORWARD ? "Bridge-" : "") + "Worker";
-            NetUtils.print("[" + workerPrefix + "-" + workerId + "] Connected At " +
-            			"'" + this.groupIp + ":" + this.port + "'");
+            NetUtils.printX("[" + workerPrefix + "-" + workerId + "] Connected At " +
+            			    "'" + this.groupIp + ":" + this.port + "'",
+                            this.workMode == WorkMode.FORWARD ? NetUtils.TextColor.YELLOW : NetUtils.TextColor.GREEN);
 
             // inform broker that i am ready
             // worker.send(NetUtils.WORKER_READY);
@@ -130,7 +131,8 @@ public abstract class Worker extends Thread {
                     
                     // when worker completes the task
                     // workerFinished(workerId, taskInfo);
-                    NetUtils.print("[" + workerPrefix + "-" + workerId + "] Completed In " + taskInfo.durration + "m");
+                    NetUtils.printX("[" + workerPrefix + "-" + workerId + "] Completed In " + taskInfo.durration + "m",
+                                    NetUtils.TextColor.GREEN);
 
                 } catch (Exception d) {
                     d.printStackTrace();

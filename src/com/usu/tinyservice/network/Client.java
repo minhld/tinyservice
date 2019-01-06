@@ -60,8 +60,9 @@ public abstract class Client extends Thread {
         // print message
         clientPreffix = (this.workMode == WorkMode.FORWARD ? "Bridge-" : "") + "Client";
         clientId = new String(requester.getIdentity());
-        NetUtils.print("[" + clientPreffix + "-" + clientId + "] Connected To " + 
-        			"'" + this.groupIp + ":" + this.port + "'");
+        NetUtils.printX("[" + clientPreffix + "-" + clientId + "] Connected To " +
+        			"'" + this.groupIp + ":" + this.port + "'",
+					this.workMode == WorkMode.FORWARD ? NetUtils.TextColor.YELLOW : NetUtils.TextColor.WHITE);
     }
 
 	public void close() {

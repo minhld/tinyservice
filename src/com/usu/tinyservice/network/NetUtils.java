@@ -18,9 +18,19 @@ import com.usu.tinyservice.network.utils.Function;
 import com.usu.tinyservice.network.utils.RegInfo;
 
 public class NetUtils {
-	public static enum WorkMode {
+	public enum WorkMode {
 		NORMAL,
 		FORWARD
+	}
+
+	public enum TextColor {
+		RED,
+		GREEN,
+		YELLOW,
+		BLUE,
+		PURPLE,
+		CYAN,
+		WHITE
 	}
 	
     public static final int WORKER_PORT = 6666;
@@ -47,7 +57,9 @@ public class NetUtils {
     /**
      * convert function list to JSON string
      * 
-     * @param functionMap
+     * @param id
+	 * @param functions
+	 *
      * @return
      */
     public static String createForwardMessage(String id, Function[] functions) {
@@ -71,7 +83,7 @@ public class NetUtils {
     /**
      * get the list of <b>Functions</b> provided by a worker. 
      * 
-     * @param workerInfoJson
+     * @param regInfoJson
      * @return
      */
     public static RegInfo getRegInfo(String regInfoJson) {
@@ -349,5 +361,40 @@ public class NetUtils {
     public static void printX(String msg) {
     	System.err.println(msg);
     }
-    
+
+	public static void printX(String msg, TextColor color) {
+    	String selectedColor = "";
+    	String resetColor = "\u001B[0m";
+    	switch (color) {
+			case RED: {
+				selectedColor = "\u001B[31m";
+				break;
+			}
+			case GREEN: {
+				selectedColor = "\u001B[32m";
+				break;
+			}
+			case YELLOW: {
+				selectedColor = "\u001B[33m";
+				break;
+			}
+			case BLUE: {
+				selectedColor = "\u001B[34m";
+				break;
+			}
+			case PURPLE: {
+				selectedColor = "\u001B[35m";
+				break;
+			}
+			case CYAN: {
+				selectedColor = "\u001B[36m";
+				break;
+			}
+			case WHITE: {
+				selectedColor = "\u001B[37m";
+				break;
+			}
+		}
+		System.err.println(selectedColor + msg + resetColor);
+	}
 }

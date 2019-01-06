@@ -101,7 +101,7 @@ public class MBrokerX extends Thread {
 
         NetUtils.printX("[Broker-" + this.brokerId + "] Started At " +
         			"'" + this.brokerIp + "' Client Port " + this.clientPort + " " +
-        			"Worker Port " + this.workerPort);
+        			"Worker Port " + this.workerPort, NetUtils.TextColor.CYAN);
 
         // Queue of available workers
         functionMap = new HashMap<>();
@@ -146,13 +146,14 @@ public class MBrokerX extends Thread {
                 	addToFunctionMap(regInfo.functions);
 
                 	// NetUtils.printX("[Broker-" + brokerId + "] Adding New Worker [" + workerId + "]");
-                	NetUtils.printX("[Broker-" + brokerId + "] Added From Worker [" + workerId + "] " + services());
+                	NetUtils.printX("[Broker-" + brokerId + "] Added From Worker [" + workerId + "] " + services(),
+                                    NetUtils.TextColor.CYAN);
 
                 	// skip the last frame
                     backend.recv();
                 } else if (workerInfo.equals(NetUtils.INFO_WORKER_FAILED)) {
                     String msg = "Worker [" + workerId + "] Has Problem.";
-                	NetUtils.printX("[Broker-" + brokerId + "] " + msg);
+                	NetUtils.printX("[Broker-" + brokerId + "] " + msg, NetUtils.TextColor.CYAN);
 
                     // skip the last frame
                     backend.recv();
@@ -203,7 +204,9 @@ public class MBrokerX extends Thread {
 
                     durForwardTime += System.currentTimeMillis() - startForwardTime;
 
-                    NetUtils.printX("[Broker-" + brokerId + "] Forward From Worker [" + workerId + "] To Client [" + clientId + "] (" + durForwardTime + "ms)");
+                    NetUtils.printX("[Broker-" + brokerId + "] Forward From Worker [" + workerId +
+                                    "] To Client [" + clientId + "] (" + durForwardTime + "ms)",
+                                    NetUtils.TextColor.CYAN);
                 }
             }
 
@@ -278,8 +281,9 @@ public class MBrokerX extends Thread {
                 	frontend.send(serviceListBytes);
                 	// sendMsg(clientId, serviceListBytes);
 
-                	NetUtils.printX("[Broker-" + brokerId + "] Passed Service Info To Bridge Client [" + clientId + "]");
-                	NetUtils.printX("[Broker-" + brokerId + "] " + serviceList);
+                	NetUtils.printX("[Broker-" + brokerId + "] Passed Service Info To Bridge Client [" + clientId + "]",
+                                    NetUtils.TextColor.CYAN);
+                	NetUtils.printX("[Broker-" + brokerId + "] " + serviceList, NetUtils.TextColor.CYAN);
                 } else {
                 	// WORKERS AVAILABLE
 
@@ -298,7 +302,11 @@ public class MBrokerX extends Thread {
 
                         int taskNumber = 10;
                         int taskIndex = 0;
-                        for (WorkerInfo workerInfo : workers) {
+                        // for (WorkerInfo workerInfo : workers) {
+                        for (int i = 0; i < workers.length; i++) {
+                            WorkerInfo workerInfo = workers[i];
+                            if (i == 0) continue;
+
                             String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
                             String fwdWorkerId = workerIds[0];
 
@@ -306,7 +314,8 @@ public class MBrokerX extends Thread {
                             taskIndex = divideRequest(sessionId, reqMsg, taskNumber, backend,
                             		workerInfo.workerId, fwdWorkerId, idChain, taskIndex);
 
-                            NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + fwdWorkerId + "]");
+                            NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + fwdWorkerId + "]",
+                                            NetUtils.TextColor.CYAN);
                         }
                         durForwardTime = System.currentTimeMillis() - startForwardTime;
 
@@ -316,7 +325,8 @@ public class MBrokerX extends Thread {
                         sendToPeer(backend, workerId, idChain, funcName, request);
 
                         durForwardTime = System.currentTimeMillis() - startForwardTime;
-                        NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]");
+                        NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]",
+                                        NetUtils.TextColor.CYAN);
                     }
 
                 }
@@ -380,7 +390,8 @@ public class MBrokerX extends Thread {
             // send to peer
             sendToPeer(peer, fwdWorkerId, idChain, reqMsg.functionName, taskMsgBytes);
             
-            NetUtils.printX("[Broker-" + brokerId + "] Forward Task #" + i + " To Worker [" + fwdWorkerId + "]");
+            NetUtils.printX("[Broker-" + brokerId + "] Forward Task #" + i + " To Worker [" + fwdWorkerId + "]",
+                            NetUtils.TextColor.CYAN);
         }
 
         return taskIndex;
