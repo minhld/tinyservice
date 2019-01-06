@@ -321,12 +321,18 @@ public class MBrokerX extends Thread {
 
                     } else if (reqMsg.requestType == RequestMessage.RequestType.FORWARDING) {
                         // just send a single request to worker
-                        String workerId = infoId;
-                        sendToPeer(backend, workerId, idChain, funcName, request);
+                        for (WorkerInfo workerInfo : workers) {
+                            String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
+                            String fwdWorkerId = workerIds[0];
+                            if (fwdWorkerId.equals(reqMsg.endWorkerId)) {
+                                sendToPeer(backend, fwdWorkerId, idChain, funcName, request);
+                                NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + fwdWorkerId + "]",
+                                        NetUtils.TextColor.CYAN);
+                            }
+                        }
 
                         durForwardTime = System.currentTimeMillis() - startForwardTime;
-                        NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + workerId + "]",
-                                        NetUtils.TextColor.CYAN);
+
                     }
 
                 }
@@ -362,8 +368,8 @@ public class MBrokerX extends Thread {
     }
 
     int divideRequest(String sessionId, RequestMessage reqMsg, int taskNumber,
-                      ZMQ.Socket peer, String workerIdChain, String fwdWorkerId, 
-                      String idChain, int taskIndex) {
+                      ZMQ.Socket peer, String workerIdChain, String fwdWorkerId,
+                      String clientIdChain, int taskIndex) {
         // we believe a function to split always have 2 parameters
         // the first is for data and the second is for data parser
         // byte[] packageData = (byte[]) reqMsg.inParams[0].values[0];
@@ -384,11 +390,12 @@ public class MBrokerX extends Thread {
             jobReqMsg.sessionId = sessionId;
             jobReqMsg.requestType = RequestMessage.RequestType.FORWARDING;
             jobReqMsg.inParams[0].values[0] = dividedPkgData;
-
+            String[] ids = NetUtils.getLastClientId(workerIdChain);
+            jobReqMsg.endWorkerId = ids[0];
             byte[] taskMsgBytes = NetUtils.serialize(jobReqMsg);
 
             // send to peer
-            sendToPeer(peer, fwdWorkerId, idChain, reqMsg.functionName, taskMsgBytes);
+            sendToPeer(peer, fwdWorkerId, clientIdChain, reqMsg.functionName, taskMsgBytes);
             
             NetUtils.printX("[Broker-" + brokerId + "] Forward Task #" + i + " To Worker [" + fwdWorkerId + "]",
                             NetUtils.TextColor.CYAN);

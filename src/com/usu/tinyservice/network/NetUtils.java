@@ -126,17 +126,34 @@ public class NetUtils {
      * 
      */
     public static String[] getLastClientId(String chain) {
-    	int lastIdx = chain.lastIndexOf("/");
     	if (chain == null || chain.isEmpty()) {
     		return new String[] { NetUtils.EMPTY, NetUtils.EMPTY }; 
-    	} else if (!chain.isEmpty() && lastIdx < 0) {
-    		return new String[] { chain, NetUtils.EMPTY }; 
     	} else {
-	    	String newChain = chain.substring(0, lastIdx);
-	    	String lastClientId = chain.substring(lastIdx + 1);
-	    	return new String[] { lastClientId, newChain };
-    	}
+			int lastIdx = chain.lastIndexOf("/");
+			if (!chain.isEmpty() && lastIdx < 0) {
+				return new String[] { chain, NetUtils.EMPTY };
+			} else {
+				String newChain = chain.substring(0, lastIdx);
+				String lastClientId = chain.substring(lastIdx + 1);
+				return new String[] { lastClientId, newChain };
+			}
+		}
     }
+
+	public static String[] getFirstWorkerId(String chain) {
+		if (chain == null || chain.isEmpty()) {
+			return new String[] { NetUtils.EMPTY, NetUtils.EMPTY };
+		} else {
+			int firstIdx = chain.indexOf("/");
+			if (!chain.isEmpty() && firstIdx < 0) {
+				return new String[] { chain, NetUtils.EMPTY };
+			} else {
+				String firstWorkerId = chain.substring(0, firstIdx);
+				String newChain = chain.substring(firstIdx + 1);
+				return new String[] { firstWorkerId, newChain };
+			}
+		}
+	}
     
 	public static <T> String[] getString(T inputArray) {
     	String[] rets = new String[1];

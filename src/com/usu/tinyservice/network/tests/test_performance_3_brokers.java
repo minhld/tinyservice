@@ -38,7 +38,7 @@ public class test_performance_3_brokers extends Thread {
 		// listen to client 5556 and worker 5555
 		// start a remote worker
 		new Broker(remoteBrokerIp, 5556, 5555);
-		new MobileServiceDemoWorker(remoteBrokerIp, 5555);
+		// new MobileServiceDemoWorker(remoteBrokerIp, 5555);
 		
 		NetUtils.sleep(500);
 
@@ -48,7 +48,7 @@ public class test_performance_3_brokers extends Thread {
 		// start a local broker
 		// listen to client 6668 and worker 6666
 		new Broker();
-		new MobileServiceDemoWorker(remoteBrokerIp, 6666);
+		// new MobileServiceDemoWorker(remoteBrokerIp, 6666);
 		
 		NetUtils.sleep(500);
 		

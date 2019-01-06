@@ -168,7 +168,8 @@ public abstract class Client extends Thread {
 		// inform the receive() function which defined by developer
 		// to handle the result at the client
 		byte[] resp = requester.recv(0);
-		NetUtils.print("[" + clientPreffix + "-" + clientId + "] Received: ");
+		NetUtils.printX("[" + clientPreffix + "-" + clientId + "] Received: ",
+						this.workMode == WorkMode.FORWARD ? NetUtils.TextColor.YELLOW : NetUtils.TextColor.WHITE);
 		receive(idChain, retFuncName, resp);
 	}
 	

@@ -1,5 +1,7 @@
 package com.usu.tinyservice.messages.binary;
 
+import com.usu.tinyservice.network.NetUtils;
+
 public class RequestMessage extends Message {
 	private static final long serialVersionUID = 1L;
 
@@ -11,6 +13,8 @@ public class RequestMessage extends Message {
 	public RequestType requestType = RequestType.ORIGINAL;
 
 	public InParam[] inParams = new InParam[0];
+
+	public String endWorkerId = NetUtils.EMPTY;
 
 	public RequestMessage() { 
 		super();
