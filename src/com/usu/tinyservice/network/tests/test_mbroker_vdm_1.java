@@ -33,13 +33,14 @@ public class test_mbroker_vdm_1 extends Thread {
 
 		new Bridge(remoteBrokerIp, 2222, remoteBrokerIp, 3334);
 
+
 		// start a local broker
 		// listen to client 6668 and worker 6666
 		new MBrokerX();
         new MobileServiceDemoWorker(remoteBrokerIp, 6666);
 
 		NetUtils.sleep(1000);
-		
+
 		new Bridge(remoteBrokerIp, 6666, remoteBrokerIp, 2223);
 		
 		NetUtils.sleep(1000);

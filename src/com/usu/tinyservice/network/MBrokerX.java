@@ -322,10 +322,12 @@ public class MBrokerX extends Thread {
                     } else if (reqMsg.requestType == RequestMessage.RequestType.FORWARDING) {
                         // just send a single request to worker
                         for (WorkerInfo workerInfo : workers) {
-                            String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
-                            String fwdWorkerId = workerIds[0];
-                            if (fwdWorkerId.equals(reqMsg.endWorkerId)) {
-                                sendToPeer(backend, fwdWorkerId, idChain, funcName, request);
+                            if (workerInfo.workerId.equals(reqMsg.endWorkerId)) {
+                                String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
+                                String fwdWorkerId = workerIds[0];
+                                reqMsg.endWorkerId = workerIds[1];
+                                byte[] forwardRequest = NetUtils.serialize(reqMsg);
+                                sendToPeer(backend, fwdWorkerId, idChain, funcName, forwardRequest);
                                 NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + fwdWorkerId + "]",
                                         NetUtils.TextColor.CYAN);
                             }
