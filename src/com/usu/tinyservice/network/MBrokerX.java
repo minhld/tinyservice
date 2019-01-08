@@ -332,7 +332,6 @@ public class MBrokerX extends Thread {
                         }
 
                         durForwardTime = System.currentTimeMillis() - startForwardTime;
-
                     }
 
                 }
@@ -391,7 +390,7 @@ public class MBrokerX extends Thread {
             jobReqMsg.requestType = RequestMessage.RequestType.FORWARDING;
             jobReqMsg.inParams[0].values[0] = dividedPkgData;
             String[] ids = NetUtils.getLastClientId(workerIdChain);
-            jobReqMsg.endWorkerId = ids[0];
+            jobReqMsg.endWorkerId = ids[1];
             byte[] taskMsgBytes = NetUtils.serialize(jobReqMsg);
 
             // send to peer
