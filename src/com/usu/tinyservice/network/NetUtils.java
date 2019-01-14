@@ -49,7 +49,9 @@ public class NetUtils {
     public static final String INFO_REQUEST_SERVICES = "REQUEST_SERVICES";
     public static final String INFO_WORKER_FAILED = "WORKER_FAILED";
     public static final String INFO_WORKERS_READY = "WORKERS_READY";
-    
+
+    public static final int TASK_TOTAL_NUMBER = 3;
+
     private static Gson gson = new Gson();
 	
     private static Random rand = new Random(System.currentTimeMillis());

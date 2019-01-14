@@ -51,6 +51,8 @@ public class MBrokerX extends Thread {
     // long startTime = 0;
     // static long startRLRequestTime = 0;
 
+    int taskIndex = 0;
+
     public MBrokerX() {
         this.start();
     }
@@ -161,13 +163,9 @@ public class MBrokerX extends Thread {
                     // forward the error back to the Client
 
                     // return the result from worker
-                    frontend.sendMore(clientId);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    frontend.sendMore(idChain);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    frontend.sendMore(NetUtils.BROKER_INFO);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    frontend.send(NetUtils.createMessage(NetUtils.INFO_WORKER_FAILED));
+                    sendToPeer(frontend, clientId, idChain, NetUtils.BROKER_INFO,
+                            NetUtils.createMessage(NetUtils.INFO_WORKER_FAILED));
+
                 } else {
                 	// WORKER SUCCESSFULLY DONE
                     // WORKER has completed the task, returned the results
@@ -194,14 +192,9 @@ public class MBrokerX extends Thread {
                     scheduler.endSession();
 
                     // return the result from worker
-                    frontend.sendMore(clientId);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    frontend.sendMore(idChain);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    frontend.sendMore(funcName);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    frontend.send(reply);
+                    sendToPeer(frontend, clientId, idChain, funcName, reply);
 
+                    // calculate time for forwarding messages
                     durForwardTime += System.currentTimeMillis() - startForwardTime;
 
                     NetUtils.printX("[Broker-" + brokerId + "] Forward From Worker [" + workerId +
@@ -257,14 +250,9 @@ public class MBrokerX extends Thread {
 
                     // send back a denied message to the requesting client
                     byte[] deniedMsgBytes = NetUtils.createMessage(NetUtils.INFO_WORKER_NOT_READY);
-                    frontend.sendMore(clientId);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    frontend.sendMore(idChain);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    frontend.sendMore(NetUtils.INFO_WORKER_NOT_READY);
-                    frontend.sendMore(NetUtils.DELIMITER);
-                    frontend.send(deniedMsgBytes);
-                    // sendMsg(clientId, deniedMsgBytes);
+
+                    // send back to the client who sent the request
+                    sendToPeer(frontend, clientId, idChain, NetUtils.INFO_WORKER_NOT_READY, deniedMsgBytes);
 
                     NetUtils.printX("[Broker-" + brokerId + "] Denied Client [" + clientId + "] - Function Not Found.");
                 } else if (infoId.equals(NetUtils.INFO_REQUEST_SERVICES)) {
@@ -272,14 +260,9 @@ public class MBrokerX extends Thread {
 
                 	String serviceList = services();
                 	byte[] serviceListBytes = NetUtils.createMessage(serviceList);
-                	frontend.sendMore(clientId);
-                	frontend.sendMore(NetUtils.DELIMITER);
-                	frontend.sendMore(idChain);
-                	frontend.sendMore(NetUtils.DELIMITER);
-                	frontend.sendMore(NetUtils.INFO_REQUEST_SERVICES);
-                	frontend.sendMore(NetUtils.DELIMITER);
-                	frontend.send(serviceListBytes);
-                	// sendMsg(clientId, serviceListBytes);
+
+                	// send to the next Bridge
+                    sendToPeer(frontend, clientId, idChain, NetUtils.INFO_REQUEST_SERVICES, serviceListBytes);
 
                 	NetUtils.printX("[Broker-" + brokerId + "] Passed Service Info To Bridge Client [" + clientId + "]",
                                     NetUtils.TextColor.CYAN);
@@ -300,8 +283,8 @@ public class MBrokerX extends Thread {
                         // start a new session
                         String sessionId = scheduler.startSession();
 
-                        int taskNumber = 3;
-                        int taskIndex = 0;
+                        taskIndex = 0;
+
                         // for (WorkerInfo workerInfo : workers) {
                         for (int i = 0; i < workers.length; i++) {
                             WorkerInfo workerInfo = workers[i];
@@ -311,8 +294,8 @@ public class MBrokerX extends Thread {
                             String fwdWorkerId = workerIds[0];
 
                             // get divided job (sub-task) message
-                            taskIndex = divideRequest(sessionId, reqMsg, taskNumber, backend,
-                            		workerInfo.workerId, fwdWorkerId, idChain, taskIndex);
+                            divideRequest(sessionId, reqMsg, NetUtils.TASK_TOTAL_NUMBER,
+                                    backend, workerInfo.workerId, fwdWorkerId, idChain);
 
                             NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + fwdWorkerId + "]",
                                             NetUtils.TextColor.CYAN);
@@ -357,9 +340,18 @@ public class MBrokerX extends Thread {
     	return NetUtils.createForwardMessage(brokerId, funcList);
     }
 
-    void sendToPeer(ZMQ.Socket peer, String workerId, String idChain,
+    /**
+     * send a message to a peer (Client or Worker)
+     *
+     * @param peer socket to send
+     * @param peerId ID of socket
+     * @param idChain chain of IDs of the peers
+     * @param funcName function name that the sending is serving for
+     * @param request request message in binary format
+     */
+    private void sendToPeer(ZMQ.Socket peer, String peerId, String idChain,
                         String funcName, byte[] request) {
-        peer.sendMore(workerId);
+        peer.sendMore(peerId);
         peer.sendMore(NetUtils.DELIMITER);
         peer.sendMore(idChain);
         peer.sendMore(NetUtils.DELIMITER);
@@ -368,9 +360,9 @@ public class MBrokerX extends Thread {
         peer.send(request);
     }
 
-    int divideRequest(String sessionId, RequestMessage reqMsg, int taskNumber,
-                      ZMQ.Socket peer, String workerIdChain, String fwdWorkerId,
-                      String clientIdChain, int taskIndex) {
+    private void divideRequest(String sessionId, RequestMessage reqMsg, int taskNumber,
+                            ZMQ.Socket peer, String workerIdChain, String fwdWorkerId,
+                            String clientIdChain) {
         // we believe a function to split always have 2 parameters
         // the first is for data and the second is for data parser
         // byte[] packageData = (byte[]) reqMsg.inParams[0].values[0];
@@ -384,7 +376,6 @@ public class MBrokerX extends Thread {
         for (int i = 0; i < jobActualNumber; i++) {
             // use data parser to divide the task
             byte[] dividedPkgData = dataParser.getPartFromObject(packageData, taskIndex, taskNumber);
-            taskIndex++;
 
             // create a sub task - called job
             RequestMessage jobReqMsg = reqMsg.clone();
@@ -398,11 +389,10 @@ public class MBrokerX extends Thread {
             // send to peer
             sendToPeer(peer, fwdWorkerId, clientIdChain, reqMsg.functionName, taskMsgBytes);
             
-            NetUtils.printX("[Broker-" + brokerId + "] Forward Task #" + i + " To Worker [" + fwdWorkerId + "]",
+            NetUtils.printX("[Broker-" + brokerId + "] Forward Task #" + taskIndex + " To Worker [" + fwdWorkerId + "]",
                             NetUtils.TextColor.CYAN);
+            taskIndex++;
         }
-
-        return taskIndex;
     }
 
     /**
