@@ -300,12 +300,12 @@ public class MBrokerX extends Thread {
                         // start a new session
                         String sessionId = scheduler.startSession();
 
-                        int taskNumber = 10;
+                        int taskNumber = 3;
                         int taskIndex = 0;
                         // for (WorkerInfo workerInfo : workers) {
                         for (int i = 0; i < workers.length; i++) {
                             WorkerInfo workerInfo = workers[i];
-                            if (i == 0) continue;
+                            if (i == 1) continue;
 
                             String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
                             String fwdWorkerId = workerIds[0];

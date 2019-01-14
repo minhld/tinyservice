@@ -72,6 +72,7 @@ public class Bridge extends Thread {
 				} else {
 					// other responses - worker will send it back to 
 					// the previous broker
+					NetUtils.printX("-> FORWARD ->", NetUtils.TextColor.YELLOW);
 					mWorker.send(idChain, funcName, data);
 				}
 				
