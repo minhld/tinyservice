@@ -52,6 +52,11 @@ public class MBrokerX extends Thread {
     // static long startRLRequestTime = 0;
 
     int taskIndex = 0;
+    int taskNumber = NetUtils.TASK_TOTAL_NUMBER;
+    int actualTaskNumber = 0;
+    int receiveTaskIndex = 0;
+    byte[] placeHolder;
+
 
     public MBrokerX() {
         this.start();
@@ -187,19 +192,27 @@ public class MBrokerX extends Thread {
                     // get LAST FRAME - main result from worker
                     reply = backend.recv();
 
+                    // merge the reply
+                    dataParser.copyPartToHolder(placeHolder, reply, receiveTaskIndex, taskNumber);
 
-                    // report that session is over
-                    scheduler.endSession();
-
-                    // return the result from worker
-                    sendToPeer(frontend, clientId, idChain, funcName, reply);
-
-                    // calculate time for forwarding messages
-                    durForwardTime += System.currentTimeMillis() - startForwardTime;
+                    receiveTaskIndex++;
 
                     NetUtils.printX("[Broker-" + brokerId + "] Forward From Worker [" + workerId +
-                                    "] To Client [" + clientId + "] (" + durForwardTime + "ms)",
-                                    NetUtils.TextColor.CYAN);
+                                    "] To Client [" + clientId + "] (" + durForwardTime + "ms)", NetUtils.TextColor.CYAN);
+
+                    if (receiveTaskIndex == actualTaskNumber) {
+                        // report that session is over
+                        scheduler.endSession();
+
+                        // return the result from worker
+                        sendToPeer(frontend, clientId, idChain, funcName, reply);
+
+                        // calculate time for forwarding messages
+                        durForwardTime += System.currentTimeMillis() - startForwardTime;
+
+                        // reset receive task index
+                        receiveTaskIndex = 0;
+                    }
                 }
             }
 
@@ -284,18 +297,18 @@ public class MBrokerX extends Thread {
                         String sessionId = scheduler.startSession();
 
                         taskIndex = 0;
+                        actualTaskNumber = 0;
 
                         // for (WorkerInfo workerInfo : workers) {
                         for (int i = 0; i < workers.length; i++) {
                             WorkerInfo workerInfo = workers[i];
-                            if (i == 1) continue;
+                            if (i == 0) continue;
 
                             String[] workerIds = NetUtils.getLastClientId(workerInfo.workerId);
                             String fwdWorkerId = workerIds[0];
 
                             // get divided job (sub-task) message
-                            divideRequest(sessionId, reqMsg, NetUtils.TASK_TOTAL_NUMBER,
-                                    backend, workerInfo.workerId, fwdWorkerId, idChain);
+                            divideRequest(sessionId, reqMsg, backend, workerInfo.workerId, fwdWorkerId, idChain);
 
                             NetUtils.printX("[Broker-" + brokerId + "] Sent To Worker [" + fwdWorkerId + "]",
                                             NetUtils.TextColor.CYAN);
@@ -360,9 +373,8 @@ public class MBrokerX extends Thread {
         peer.send(request);
     }
 
-    private void divideRequest(String sessionId, RequestMessage reqMsg, int taskNumber,
-                            ZMQ.Socket peer, String workerIdChain, String fwdWorkerId,
-                            String clientIdChain) {
+    private void divideRequest(String sessionId, RequestMessage reqMsg, ZMQ.Socket peer,
+                       String workerIdChain, String fwdWorkerId, String clientIdChain) {
         // we believe a function to split always have 2 parameters
         // the first is for data and the second is for data parser
         // byte[] packageData = (byte[]) reqMsg.inParams[0].values[0];
@@ -371,6 +383,7 @@ public class MBrokerX extends Thread {
         // get the average worker value
         double avgWorkerValue = scheduler.getDistributionRate(workerIdChain);
         int jobActualNumber = (int) Math.floor(taskNumber * avgWorkerValue);
+        actualTaskNumber += jobActualNumber;
 
         // send all the sub tasks to the worker
         for (int i = 0; i < jobActualNumber; i++) {
@@ -384,6 +397,9 @@ public class MBrokerX extends Thread {
             jobReqMsg.inParams[0].values[0] = dividedPkgData;
             String[] ids = NetUtils.getLastClientId(workerIdChain);
             jobReqMsg.endWorkerId = ids[1];
+            jobReqMsg.taskIndex = taskIndex;
+            jobReqMsg.taskNumber = taskNumber;
+
             byte[] taskMsgBytes = NetUtils.serialize(jobReqMsg);
 
             // send to peer

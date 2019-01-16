@@ -10,7 +10,10 @@ public class Message implements Serializable {
 	public String messageId;
 	public String functionName;
 	public OutParam outParam;
-	
+	public int taskIndex;
+	public int taskNumber;
+
+
 	public Message() { 
 		this.messageId = UUID.randomUUID().toString();
 	}

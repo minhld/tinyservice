@@ -52,7 +52,7 @@ public class ByteDataParser implements IDataParser {
 	}
 
 	@Override
-	public Object copyPartToHolder(Object placeholderObj, byte[] partObj, int firstOffset, int lastOffset) {
+	public Object copyPartToHolder(Object placeholderObj, byte[] partObj, int taskIndex, int taskNumber) {
 		// TODO Auto-generated method stub
 		return null;
 	}
